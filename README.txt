@@ -1,5 +1,7 @@
-WARRIORS HIT LAB V4.4 — PRESET LEAGUES & TOURNAMENTS
+WARRIORS HIT LAB V4.5 — MOBILE RESULTS & FINAL SCORE
 
-19 fictional, minor-league-inspired preset opponents are automatically added on a fresh install and merged into existing saved profiles. Existing saves, stats, tournament bracket and season remain intact. Every NEW season randomly draws up to 7 opposing teams into an 8-team league. Every NEW tournament randomly chooses 3, 7 or 15 opponents from the preset+custom pool. Preset teams cannot be removed, custom teams still can. Existing active seasons and tournaments do not change.
+Includes 19 preset teams, randomized tournaments and seasons, more-hit probabilities, mobile hitting controls, larger swing outcomes, and a full final score screen after each game.
 
-Install: Export Save in Settings first; upload all five extracted files to the existing warriors-hit-lab GitHub repository root (never Diamond IQ). After Pages deploy, refresh the iPhone app. If stale, close/reopen without clearing website data.
+UPGRADE: Upload the five files to the EXISTING warriors-hit-lab repository root. Preserve Diamond IQ separately. No player reset needed; save key unchanged. Export a backup first.
+
+After a game ends, the full final score and personal game batting stats are displayed; tap CONTINUE TO GAME MENU.
