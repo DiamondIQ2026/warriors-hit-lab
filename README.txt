@@ -1,7 +1,7 @@
-WARRIORS HIT LAB V4.5 — MOBILE RESULTS & FINAL SCORE
+Warriors Hit Lab V5.0 — Player Feedback Build
 
-Includes 19 preset teams, randomized tournaments and seasons, more-hit probabilities, mobile hitting controls, larger swing outcomes, and a full final score screen after each game.
+Nine editable batters and stats, 3x3 net with center bonus, increased hit probabilities, late comeback boost, and handedness influences. Every real tee swing still controls the entire team; overall career stats remain.
 
-UPGRADE: Upload the five files to the EXISTING warriors-hit-lab repository root. Preserve Diamond IQ separately. No player reset needed; save key unchanged. Export a backup first.
+Before updating, export a backup from Settings. Upload the five files to your existing warriors-hit-lab GitHub repository ONLY. Do not alter Diamond IQ.
 
-After a game ends, the full final score and personal game batting stats are displayed; tap CONTINUE TO GAME MENU.
+Test on iPhone: batter rotation, all nine target squares, changing roster names/attributes, game result, saved stats, a season and an eight-team tournament.
