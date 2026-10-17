@@ -1,12 +1,9 @@
-WARRIORS HIT LAB V4 — CONSOLIDATED BUILD
+WARRIORS HIT LAB V4.3 - TOURNAMENT & MOBILE
 
-One player controls every at-bat with a real tee swing. Record six net zones and contact strength. Includes 3/6/9 inning games, quick play, seasons, league standings, playoffs, custom opponents, cumulative statistics, net-zone analytics, per-game results, achievements, save/restore, and undo of the previous swing while the game is still active.
+NEW: 4/8/16-team single-elimination tournaments. Opponents are chosen from your existing league list. CPU opponents simulate their games, while the real player swings for every team at-bat. All tournament batting adds to overall career statistics. Tournament bracket, results and history are saved. More hits: hard upper 52%, hard lower 45%; medium upper 35%, medium lower 30%. Soft unchanged.
 
-UPGRADE: Existing V3 progress from the same browser is loaded automatically when first opened under the same site origin. Always export a backup before replacing a published version.
+Install/update: Back up your career using Settings > Export Save. Upload index.html, sw.js, icon.svg, manifest.webmanifest, README.txt to your EXISTING warriors-hit-lab GitHub repository root, NOT Diamond IQ. Wait for Pages deployment. If an old interface appears, close and reopen the installed app or refresh once.
 
-PUBLISH: Create a NEW GitHub repository named warriors-hit-lab. Upload index.html, sw.js, manifest.webmanifest, icon.svg to the repository root. Configure Pages for main/(root). DO NOT EDIT THE DIAMOND IQ REPOSITORY.
+Tournament mode: Open Tournament tab. Pick bracket size and innings. Ensure your League has enough opponents (3, 7 or 15). Start tournament, choose Play Next Tournament Game. Each player swing is logged by 6-zone target and strength. After completing a game the bracket advances or concludes. Starting a new tournament replaces only the existing bracket, not season or lifetime career.
 
-LIMITATIONS: No cloud sync. No automated ball detection. This simulator uses probabilistic outcomes and simplified baseball rules. Undo cannot be used after an inning ends or a game finishes. Test before extended use.
-
-V4.1 BALANCE UPDATE
-Hard upper impact: 43% hit probability (was 72%). Hard lower: 37% (was 64%). Medium upper: 28% (was 49%). Medium lower: 24% (was 41%). Soft upper: 12%; soft lower: 10%. Probabilities are designed game settings, not measured baseball data. The visible scoreboard now uses TOP 2ND, a batting-team label, and three visual out indicators. The opponent's BOTTOM half is simulated immediately, with the result in the play-by-play. Existing V4 browser saves use the same storage key, so updating files should not reset progress. Export a save backup before deployment.
+NOTE: Game uses browser local storage per device; exports/imports are manual. Do not upload career backup JSON to your public repository. Simulated probabilities are entertainment settings, not measured flight or hit outcomes.
