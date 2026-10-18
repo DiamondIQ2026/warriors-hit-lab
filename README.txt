@@ -1,5 +1,7 @@
-WARRIORS HIT LAB V5.8 - START BUTTON LAYOUT
+WARRIORS HIT LAB V6 — ULTIMATE EDITION
 
-Moved START GAME directly below the game mode standings / tournament overview and above the innings and opponent controls. All V5.7 gameplay, records and saved-career format are preserved.
+Includes everything from V5.9 plus Arcade/Balanced mode, optional sound effects and spoken calls, mute control, daily tee challenges, real-contact analytics, postgame awards, autosave status and local snapshot recovery.
 
-Back up your career first (Settings > Export Save), then upload the five files in this folder to your existing warriors-hit-lab GitHub repository root. Do not modify Diamond IQ.
+IMPORTANT: Export the current save JSON before upgrading. Upload the five files directly to the existing warriors-hit-lab repository main root. Do not upload the save JSON publicly. Do not touch Diamond IQ.
+
+Audio requires browser/device permission and interaction. Stats are based on manually recorded tee swings, not camera measurement. Daily challenges reset by local date. Existing saves maintain prior stats; tee-practice history starts when V6 is installed.
