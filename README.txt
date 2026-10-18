@@ -1,5 +1,5 @@
-WARRIORS HIT LAB V5.6 — LEGENDS & HALL OF FAME
+WARRIORS HIT LAB V5.7 — GAME MODE OVERVIEW
 
-Adds career, season, legend, and Hall of Fame achievements. Single-season record thresholds are in-game fictional milestones, not official MLB records. A saved season ledger counts only season games completed after this update. Older lifetime records remain preserved but historical per-season numbers cannot be reconstructed reliably. The highest recorded season HR, hit and RBI totals persist across seasons. Game mode, tournament, roster, profile, UI, and save key retained from V5.5.
+Play screen: Season shows live standings below Game Mode; Tournament shows the current bracket, results and next matchup. Quick Play shows a short reminder.
 
-Upload all five files to existing warriors-hit-lab repository only. NEVER upload personal save JSON to the public repository. Export backup before update. Do not edit Diamond IQ.
+All V5.6 Legends, walk-off, roster, mobile and career data features are retained. Back up career in Settings before updating. Upload these files only to warriors-hit-lab; do not edit Diamond IQ.
