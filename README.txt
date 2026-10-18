@@ -1,8 +1,5 @@
-Warriors Hit Lab V6.2 — Team Directory Refresh
+WARRIORS HIT LAB V6.3 — Individual Season Statistics
 
-All preset teams have full location and mascot names.
-Older six generic names are replaced in the opponent selection pool for FUTURE seasons and tournaments, without renaming any opponents already in saved game records, live seasons, or existing brackets.
-Team page now groups opponents into a collapsible list to reduce clutter.
-All earlier V6.1 features included.
+Adds Team > Player Batting Statistics: current season, career and selectable past seasons. Separate per-batter statistics for at-bats, hits, batting average, doubles, triples, HR and RBI. Leaderboards are shown below. Season totals are recorded per swing, including ongoing games; undo reverses them. Quick Play and Tournament batting affects career, not season. Previous game saves load without losing existing career statistics, however past per-player season data cannot be reconstructed from old save formats.
 
-Backup your saved career via Settings before uploading to GitHub. Upload individual files to the warriors-hit-lab repository only. Never upload your personal save JSON to public GitHub.
+BACK UP first: Settings > Export Save. Upload these five files to DiamondIQ2026/warriors-hit-lab only, not Diamond IQ.
