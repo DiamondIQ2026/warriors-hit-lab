@@ -1,5 +1,5 @@
-WARRIORS HIT LAB V5.2 — MOBILE TEAM MENU
+WARRIORS HIT LAB V5.3 - SEASON NAVIGATION
 
-Changes: League menu label is now Team. On screens up to 700px wide, the five horizontal navigation tabs are replaced by a hamburger-style dropdown with Play, Career, Team, Tournament, and Settings. The desktop tab layout stays unchanged. Opponent and season management remains inside Team. No career or save-key changes.
+NEW: Season is a separate navigation item on desktop and mobile. Team contains batting order and opponent management. Season shows setup when no active season, and otherwise season standings, next opponent, and PLAY NEXT SEASON GAME. Replace current season using START A DIFFERENT SEASON (with confirmation); lifetime stats preserved.
 
-UPDATE: Export your latest career save from Settings before replacing files. Upload all five files at the root of your EXISTING DiamondIQ2026/warriors-hit-lab repository. Do not modify Diamond IQ. Reload the web app after GitHub Pages publishes.
+To install: back up your career from Settings and upload all five files to the existing warriors-hit-lab GitHub repository. Do not edit Diamond IQ.
