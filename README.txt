@@ -1,5 +1,5 @@
-WARRIORS HIT LAB V5.7 — GAME MODE OVERVIEW
+WARRIORS HIT LAB V5.8 - START BUTTON LAYOUT
 
-Play screen: Season shows live standings below Game Mode; Tournament shows the current bracket, results and next matchup. Quick Play shows a short reminder.
+Moved START GAME directly below the game mode standings / tournament overview and above the innings and opponent controls. All V5.7 gameplay, records and saved-career format are preserved.
 
-All V5.6 Legends, walk-off, roster, mobile and career data features are retained. Back up career in Settings before updating. Upload these files only to warriors-hit-lab; do not edit Diamond IQ.
+Back up your career first (Settings > Export Save), then upload the five files in this folder to your existing warriors-hit-lab GitHub repository root. Do not modify Diamond IQ.
