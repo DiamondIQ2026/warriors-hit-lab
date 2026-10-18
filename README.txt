@@ -1,9 +1,8 @@
-WARRIORS HIT LAB V6 — ULTIMATE EDITION
+Warriors Hit Lab V6.2 — Team Directory Refresh
 
-Includes everything from V5.9 plus Arcade/Balanced mode, optional sound effects and spoken calls, mute control, daily tee challenges, real-contact analytics, postgame awards, autosave status and local snapshot recovery.
+All preset teams have full location and mascot names.
+Older six generic names are replaced in the opponent selection pool for FUTURE seasons and tournaments, without renaming any opponents already in saved game records, live seasons, or existing brackets.
+Team page now groups opponents into a collapsible list to reduce clutter.
+All earlier V6.1 features included.
 
-IMPORTANT: Export the current save JSON before upgrading. Upload the five files directly to the existing warriors-hit-lab repository main root. Do not upload the save JSON publicly. Do not touch Diamond IQ.
-
-Audio requires browser/device permission and interaction. Stats are based on manually recorded tee swings, not camera measurement. Daily challenges reset by local date. Existing saves maintain prior stats; tee-practice history starts when V6 is installed.
-
-V6.1: Shows three live daily challenges on the Play page above standings/tournament overview.
+Backup your saved career via Settings before uploading to GitHub. Upload individual files to the warriors-hit-lab repository only. Never upload your personal save JSON to public GitHub.
