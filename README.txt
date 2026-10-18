@@ -1,5 +1,5 @@
-WARRIORS HIT LAB V5.3 - SEASON NAVIGATION
+WARRIORS HIT LAB V5.6 — LEGENDS & HALL OF FAME
 
-NEW: Season is a separate navigation item on desktop and mobile. Team contains batting order and opponent management. Season shows setup when no active season, and otherwise season standings, next opponent, and PLAY NEXT SEASON GAME. Replace current season using START A DIFFERENT SEASON (with confirmation); lifetime stats preserved.
+Adds career, season, legend, and Hall of Fame achievements. Single-season record thresholds are in-game fictional milestones, not official MLB records. A saved season ledger counts only season games completed after this update. Older lifetime records remain preserved but historical per-season numbers cannot be reconstructed reliably. The highest recorded season HR, hit and RBI totals persist across seasons. Game mode, tournament, roster, profile, UI, and save key retained from V5.5.
 
-To install: back up your career from Settings and upload all five files to the existing warriors-hit-lab GitHub repository. Do not edit Diamond IQ.
+Upload all five files to existing warriors-hit-lab repository only. NEVER upload personal save JSON to the public repository. Export backup before update. Do not edit Diamond IQ.
