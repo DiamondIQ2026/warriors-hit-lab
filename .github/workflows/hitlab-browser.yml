@@ -29,4 +29,4 @@ jobs:
           cat /tmp/hitlab-server.log
           exit 1
       - name: Run isolated browser tests
-        run: node --test tests/browser-smoke.test.cjs tests/gameplay-smoke.test.cjs
+        run: node --test tests/browser-smoke.test.cjs tests/gameplay-smoke.test.cjs tests/game-completion.test.cjs
