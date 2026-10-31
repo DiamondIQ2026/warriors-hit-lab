@@ -23,7 +23,7 @@ async function isolatedPage(browser, saved) {
   },{key:KEY,value:saved});
   const page=await context.newPage();
   const errors=[];
-  page.on('pageerror',error=>errors.push(error.message));
+  page.on('pageerror',error=>errors.push(error.stack || error.message));
   await page.goto(BASE,{waitUntil:'domcontentloaded'});
   return {context,page,errors};
 }
