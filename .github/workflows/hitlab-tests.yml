@@ -1,0 +1,85 @@
+
+name: Hit Lab - Code Checks
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate Hit Lab Files
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check required files
+        run: |
+          test -s index.html
+          test -s sw.js
+          test -s manifest.webmanifest
+          test -s icon.svg
+          echo "Required files found."
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check sw.js
+          node <<'NODE'
+          const fs = require('node:fs');
+          const vm = require('node:vm');
+
+          const html = fs.readFileSync('index.html', 'utf8');
+          const scripts = [...html.matchAll(
+            /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi
+          )];
+
+          if (scripts.length === 0) {
+            throw new Error('No script tags found in index.html');
+          }
+
+          let checked = 0;
+
+          for (const match of scripts) {
+            const attrs = match[1];
+            const code = match[2];
+
+            if (/\bsrc\s*=/.test(attrs) || !code.trim()) {
+              continue;
+            }
+
+            const type =
+              attrs.match(/\btype\s*=\s*["']([^"']+)["']/i)?.[1];
+
+            if (type && !['module', 'text/javascript',
+                          'application/javascript'].includes(type)) {
+              continue;
+            }
+
+            if (type === 'module') {
+              new vm.SourceTextModule(code);
+            } else {
+              new vm.Script(code);
+            }
+
+            checked++;
+          }
+
+          if (checked === 0) {
+            throw new Error('No inline JavaScript checked');
+          }
+
+          console.log(`Checked ${checked} inline script(s).`);
+          NODE
+        env:
+          NODE_OPTIONS: --experimental-vm-modules
