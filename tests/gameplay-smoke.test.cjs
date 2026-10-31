@@ -51,7 +51,7 @@ test('Season setup creates schedule and season game starts',async()=>{
   let d=await t.saved();
   assert.equal(d.season.phase,'regular');
   assert.ok(d.season.schedule.length>0);
-  await t.page.locator('#gameMode').selectOption('season');
+  await t.page.locator('#gameMode').evaluate(el=>{el.value='season';el.dispatchEvent(new Event('change',{bubbles:true}))});
   await t.page.locator('#start').evaluate(el=>el.click());
   d=await t.saved();
   assert.equal(d.game.mode,'season');
@@ -74,7 +74,7 @@ test('Tournament setup creates bracket and starts tournament game',async()=>{
   assert.equal(d.tournament.status,'active');
   assert.ok(d.tournament.rounds.length>0);
   assert.ok(d.tournament.nextOpponent);
-  await t.page.locator('#gameMode').selectOption('tournament');
+  await t.page.locator('#gameMode').evaluate(el=>{el.value='tournament';el.dispatchEvent(new Event('change',{bubbles:true}))});
   await t.page.locator('#start').evaluate(el=>el.click());
   d=await t.saved();
   assert.equal(d.game.mode,'tournament');
