@@ -34,6 +34,15 @@
    function tick(now){const t=Math.max(0,Math.min(1,(now-start)/flight.durationMs));display(t);if(t<1)frame=requestAnimationFrame(tick);else finish();}
    frame=requestAnimationFrame(tick);
  }
+ // Populate the stand-alone preview from an optional swing link. Never read game saves.
+ if(typeof location!=='undefined' && location.search){
+   const params=new URLSearchParams(location.search);
+   for(const [key,allowed] of [['zone',zones],['contact',['hard','medium','soft']],['outcome',Object.keys(outcomes)],['hand',['L','R']]]){
+     const value=params.get(key);
+     if(value && allowed.includes(value))$(key).value=value;
+   }
+   $('result').textContent='Swing outcome loaded — press PLAY to see the simulation.';
+ }
  $('play').addEventListener('click',play);
  $('replay').addEventListener('click',play);
  $('skip').addEventListener('click',()=>{if(!flight)flight=build();finish();});
