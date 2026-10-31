@@ -16,4 +16,5 @@ jobs:
       - name: Validate flight model and tests
         run: |
           node --check v7/flight-model.cjs
-          node --test tests/v7-flight.test.cjs
+          node --check v7/flight-browser.js
+          node --test tests/v7-flight.test.cjs tests/v7-preview.test.cjs
