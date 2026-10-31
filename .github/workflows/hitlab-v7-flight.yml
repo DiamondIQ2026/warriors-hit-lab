@@ -1,0 +1,19 @@
+name: Hit Lab - V7 Flight Prototype
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  flight-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate flight model and tests
+        run: |
+          node --check v7/flight-model.cjs
+          node --test tests/v7-flight.test.cjs
