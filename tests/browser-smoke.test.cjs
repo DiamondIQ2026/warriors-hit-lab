@@ -12,7 +12,7 @@ const sample = {
   stats:{ab:21,h:9,hr:3}, teams:['Test Opponent'], completed:[],log:[],
   wins:3,losses:1,games:4,xp:120,
   season:{id:'season-fixture'}, tournament:{id:'tournament-fixture'},
-  game:{inning:2,outs:1,score:4,other:2,lineupPos:3},
+  game:{inning:2,innings:3,outs:1,score:4,other:2,lineupPos:3,opponent:'Test Opponent',mode:'quick',bases:[false,false,false],ab:4,homeGame:false},
   seasonHistory:[{id:'old-season'}],tournamentHistory:[{id:'old-tournament'}]
 };
 
