@@ -68,7 +68,7 @@ test('Tournament setup creates bracket and starts tournament game',async()=>{
  const browser=await chromium.launch();
  try{
   const t=await setup(browser);
-  await t.page.locator('#tournamentSize').selectOption('4');
+  await t.page.locator('#tournamentSize').evaluate(el=>{el.value='4';el.dispatchEvent(new Event('change',{bubbles:true}))});
   await t.page.locator('#newTournament').evaluate(el=>el.click());
   let d=await t.saved();
   assert.equal(d.tournament.status,'active');
