@@ -11,7 +11,7 @@ const sample = {
   version:4, player:{name:'Synthetic Tester',hand:'R'}, team:'Tampa Warriors',
   stats:{ab:21,h:9,hr:3}, teams:['Test Opponent'], completed:[],log:[],
   wins:3,losses:1,games:4,xp:120,
-  season:{id:'season-fixture',number:1,phase:'regular',played:1,length:4,innings:3,schedule:['Test Opponent','Test Opponent'],standings:{'Tampa Warriors':{w:1,l:0},'Test Opponent':{w:0,l:1}}}, tournament:{id:'tournament-fixture',status:'active',nextOpponent:'Test Opponent',rounds:[],innings:3},
+  season:{id:'season-fixture',number:1,phase:'regular',played:1,length:4,innings:3,schedule:['Test Opponent','Test Opponent'],standings:{'Tampa Warriors':{w:1,l:0},'Test Opponent':{w:0,l:1}}}, tournament:{id:'tournament-fixture',status:'active',nextOpponent:'Test Opponent',rounds:[{name:'Round 1',matches:[{a:'Tampa Warriors',b:'Test Opponent',winner:null}]}],innings:3},
   game:{inning:2,innings:3,outs:1,score:4,other:2,lineupPos:3,opponent:'Test Opponent',mode:'quick',bases:[false,false,false],ab:4,homeGame:false,batting:{ab:4,h:2,hr:0,rbi:1,doubles:0,triples:0},inningRuns:1},
   seasonHistory:[{id:'old-season'}],tournamentHistory:[{id:'old-tournament'}]
 };
