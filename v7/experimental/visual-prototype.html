@@ -3,7 +3,70 @@
 <title>Hit Lab V7 — Visual Prototype</title>
 <style>
 :root{--red:#ed263b;--blue:#328fff;--navy:#07162e;--panel:#102849;--ink:#eaf4ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#18477a,#050b19 68%);color:var(--ink);font:600 15px system-ui,Arial;min-height:100dvh}button,input,select{font:inherit}button{cursor:pointer;color:inherit;border:1px solid #4484b4;border-radius:10px;background:linear-gradient(#214b77,#09162e);padding:12px}button:focus-visible{outline:3px solid #fff}.app{max-width:490px;margin:auto;min-height:100dvh;display:flex;flex-direction:column;border-inline:1px solid #285a83}.head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:#08152be8;border-bottom:2px solid var(--red)}.brand{font-weight:1000;font-style:italic;font-size:22px;letter-spacing:1px}.brand b{color:var(--red)}.brand small{font-size:11px;display:block;text-align:center;letter-spacing:4px}.page{padding:17px;flex:1}.panel{border:1px solid #3d87ba;border-radius:12px;background:linear-gradient(135deg,#153960eb,#07152de8);box-shadow:inset 0 0 20px #24548133,0 6px 18px #0005;padding:15px;margin-bottom:13px}h1{font-size:24px;text-transform:uppercase;font-style:italic;margin:8px 0 16px}h2{font-size:17px;margin:0 0 10px;text-transform:uppercase}p{color:#bdd0e3;line-height:1.5}small,.muted{color:#a9c1d7}.hero{min-height:175px;display:flex;flex-direction:column;justify-content:center;text-align:center;background:radial-gradient(circle at 50% 80%,#35618b,#081327 70%);border:1px solid #4088ba;border-radius:14px;margin-bottom:16px}.hero .mark{font-size:44px;font-weight:1000;letter-spacing:-6px;color:#fff;text-shadow:3px 4px var(--red)}.primary{background:linear-gradient(#ff4257,#a00a23);border:1px solid #ff8b95;box-shadow:0 0 13px #e22a4388;font-weight:900;text-transform:uppercase}.wide{width:100%}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.tile{min-height:80px;font-weight:850;text-transform:uppercase}.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:3px;padding:8px 5px max(8px,env(safe-area-inset-bottom));background:#071329;border-top:1px solid #3c6f9e}.nav button{padding:10px 1px;font-size:11px}.nav .on{background:linear-gradient(#dc2a43,#7e1023)}.menu{position:fixed;inset:0;background:#000a;z-index:10}.drawer{max-width:320px;background:#07182f;height:100%;padding:20px;display:flex;flex-direction:column;gap:9px}.hidden{display:none!important}.row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row>*{min-width:0}.stat{font-size:25px;font-weight:950}.field{position:relative;aspect-ratio:1.2;background:radial-gradient(ellipse at 50% 70%,#276b46 0 38%,#143d30 68%,#071a29);border:3px solid #4b8aa9;border-radius:50% 50% 12px 12px;overflow:hidden}.diamond{position:absolute;left:50%;top:54%;width:37%;aspect-ratio:1;transform:translate(-50%,-50%) rotate(45deg);border:3px solid #b99067;background:#986b4540}.fielder{position:absolute;width:15px;height:15px;transform:rotate(45deg);background:linear-gradient(135deg,#dce8f4,#426e9d);border:2px solid #8abdf5;box-shadow:0 0 9px #a4d2ff}.zones{position:absolute;left:50%;top:52%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,1fr);width:43%;aspect-ratio:1;background:#07172bcf;border:2px solid #dceaff}.zones button{border-radius:0;padding:0;font-size:18px;background:#16365aa8}.zones button.chosen{background:#c61934}.score{display:grid;grid-template-columns:1fr 92px 1fr;text-align:center;align-items:center;border:2px solid #abc9dc;border-radius:8px;overflow:hidden;margin-bottom:12px}.score>div{padding:10px 2px}.score .left{background:#175184}.score .right{background:#b51d38}.score strong{display:block;font-size:31px}.score .middle{background:#eaf0f4;color:#091525;font-size:12px}.bases{font-size:22px;color:#d6a42c}.pill{border:1px solid #5589b3;border-radius:7px;padding:9px;text-align:center}.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.selected{outline:2px solid #f44}.list{display:grid;gap:7px}.item{display:flex;justify-content:space-between;gap:8px;padding:11px;border:1px solid #315b82;border-radius:8px;background:#0a1b33}select,input{background:#0b213e;color:#fff;border:1px solid #4b8ebf;border-radius:7px;padding:10px;width:100%}.note{font-size:12px;color:#a9bdd2}.feedback{text-align:center;min-height:28px;color:#ffd46c;font-weight:900}.field{isolation:isolate}.field:before{content:'';position:absolute;inset:0;background:repeating-conic-gradient(from 20deg at 50% 90%,#ffffff08 0deg 12deg,transparent 12deg 24deg);pointer-events:none}.field .zones{z-index:3}.field.animating .zones{visibility:hidden}.ball{position:absolute;z-index:5;left:50%;top:80%;width:13px;height:13px;border-radius:50%;background:#fff;box-shadow:0 0 12px 5px #fff8;animation:flight .95s cubic-bezier(.16,.75,.25,1) forwards;pointer-events:none}@keyframes flight{from{transform:translate(-50%,0) scale(.6)}to{transform:translate(calc(-50% + var(--dx)),var(--dy)) scale(.35);opacity:.2}}.nav{position:sticky;bottom:0;z-index:7}.nav.gamehide{display:none}.field .diamond{background:linear-gradient(45deg,#b3845355,#c89a6955)}.score .middle{font-weight:900}.live{color:#fff7d1;font-size:12px;text-align:center;margin-bottom:10px}
-@media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}</style>
+@media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}
+/* V7 metallic scoreboard: CSS-only, compact enough to keep primary CTAs high. */
+.score{
+  grid-template-columns:minmax(0,1fr) minmax(78px,92px) minmax(0,1fr);
+  gap:2px;
+  padding:3px;
+  background:linear-gradient(180deg,#f2f8fd 0%,#8a9cab 22%,#263a4d 50%,#afc2d0 85%,#e7f0f6 100%);
+  border:2px solid #c8d8e4;
+  border-radius:12px;
+  box-shadow:inset 0 2px 0 #fff9,inset 0 -2px 0 #283d50,0 6px 15px #0008;
+}
+.score>div{
+  min-width:0;
+  min-height:84px;
+  padding:7px 3px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow-wrap:anywhere;
+  font-size:clamp(10px,2.8vw,13px);
+  line-height:1.2;
+  letter-spacing:.025em;
+}
+.score .left{
+  background:linear-gradient(150deg,#32618c,#122f50 55%,#07192f);
+  border:1px solid #6d9abb;
+  border-radius:8px 2px 2px 8px;
+  text-shadow:0 1px 2px #0009;
+}
+.score .right{
+  background:linear-gradient(150deg,#a82b42,#651429 55%,#280814);
+  border:1px solid #d16b7c;
+  border-radius:2px 8px 8px 2px;
+  text-shadow:0 1px 2px #0009;
+}
+.score strong{
+  margin-top:3px;
+  color:#fff;
+  font-size:clamp(29px,8vw,36px);
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 3px #000a;
+}
+.score .middle{
+  background:linear-gradient(155deg,#f9fcff,#cbd8e2 54%,#9eafbd);
+  border:1px solid #edf5fa;
+  color:#0a2038;
+  font-size:11px;
+  font-weight:900;
+  text-shadow:none;
+}
+.score .bases{
+  color:#a35e00;
+  font-size:18px;
+  white-space:nowrap;
+  letter-spacing:-2px;
+}
+@media(max-width:360px),(max-height:740px){
+  .score>div{min-height:70px;padding:5px 2px}
+  .score strong{font-size:28px}
+  .score .bases{font-size:16px}
+}
+</style>
 <div class="app"><header class="head"><button id="menuButton" aria-label="Open menu">☰</button><div class="brand">TW <b>HIT LAB</b><small>V7 PROTOTYPE</small></div><button id="backButton" aria-label="Go home">⌂</button></header><main class="page" id="page"></main><nav class="nav" id="nav"></nav></div>
 <div class="menu hidden" id="menu"><div class="drawer"><div class="row"><h2>Hit Lab Menu</h2><button id="closeMenu">✕</button></div><div id="menuItems" class="list"></div></div></div>
 <script>
