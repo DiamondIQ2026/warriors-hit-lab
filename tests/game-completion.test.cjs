@@ -92,3 +92,60 @@ test('Tournament game finalization updates bracket and elimination',async()=>{
  await t.context.close();
  }finally{await b.close()}
 });
+
+test('Season completes all innings naturally and updates standings',async()=>{
+ const b=await chromium.launch();
+ try{
+ const t=await session(b);
+ await t.page.locator('#newSeason').evaluate(e=>e.click());
+ await t.set('gameMode','season');
+ await t.page.evaluate(()=>{Math.random=()=>0.999999});
+ await t.page.locator('#start').evaluate(e=>e.click());
+ let swings=0;
+ while((await t.state()).game && swings<65){
+   await t.page.locator('[data-zone="LL"]').first().evaluate(e=>e.click());
+   await t.page.locator('[data-power="soft"]').first().evaluate(e=>e.click());
+   swings++;
+ }
+ const d=await t.state();
+ assert.equal(d.game,null);
+ assert.equal(d.games,1);
+ assert.equal(d.season.played,1);
+ assert.equal(d.completed[0].mode,'season');
+ assert.equal(d.stats.swings,swings);
+ assert.equal(d.seasonStats['1'].games,1);
+ await t.page.reload();
+ assert.equal((await t.state()).season.played,1);
+ assert.deepEqual(t.errors,[]);
+ await t.context.close();
+ }finally{await b.close()}
+});
+test('Tournament completes all innings naturally and records elimination',async()=>{
+ const b=await chromium.launch();
+ try{
+ const t=await session(b);
+ await t.set('tournamentSize','4');
+ await t.page.locator('#newTournament').evaluate(e=>e.click());
+ await t.set('gameMode','tournament');
+ await t.page.evaluate(()=>{Math.random=()=>0.999999});
+ await t.page.locator('#start').evaluate(e=>e.click());
+ let swings=0;
+ while((await t.state()).game && swings<65){
+   await t.page.locator('[data-zone="LL"]').first().evaluate(e=>e.click());
+   await t.page.locator('[data-power="soft"]').first().evaluate(e=>e.click());
+   swings++;
+ }
+ const d=await t.state();
+ assert.equal(d.game,null);
+ assert.equal(d.games,1);
+ assert.equal(d.completed[0].mode,'tournament');
+ assert.equal(d.tournament.status,'complete');
+ assert.equal(d.tournament.result,'Eliminated');
+ assert.equal(d.tournamentHistory.length,1);
+ assert.equal(d.stats.swings,swings);
+ await t.page.reload();
+ assert.equal((await t.state()).tournamentHistory.length,1);
+ assert.deepEqual(t.errors,[]);
+ await t.context.close();
+ }finally{await b.close()}
+});
