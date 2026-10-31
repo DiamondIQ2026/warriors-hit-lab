@@ -35,3 +35,13 @@ ChatGPT leads integration, tests and roadmap; Grok can implement visual/interfac
 - Design responsive match setup, profile/lineup editor, scoreboard, and explicit 'PASS PHONE TO' screen.
 - Test on iPhone-scale viewport and run GitHub CI.
 - Leave implementation notes and open questions in the same PR and Development HQ.
+
+## Additional progress on 2026-10-31 — playable standalone UI
+- `v7/multiplayer.html`: standalone mobile-friendly match setup for editable Dad and Maddon profiles, independent nine-name lineups, inning selection, scoreboard, batting order, explicit pass-phone interstitial, impact zones and simulated outcomes.
+- `v7/pass-and-play-ui.js`: wired to the **same tested engine** (no forked scoring logic), records every physical swing, advances game, displays active hitter and team, serializes to isolated localStorage key `warriors-hit-lab-v7-multiplayer-prototype` and downloads JSON backup.
+- `tests/v7-multiplayer-browser.test.cjs`: real Chromium test verifies three-out handoff, continuation after reload, independent team swing counts and no writes to V6.3 legacy career key.
+- CI at commit `d8a670ca5c0366b3071ca0e60244969142dc8747`: both GitHub Actions checks passed.
+- This is **not** integrated into `index.html`; prototype outcome selection is manual for QA and will eventually use a simulator adapter. No production release.
+
+## Grok integration note
+When returning, review PR #6 and this updated handoff first; do **not** rebuild the scoring engine or work in the same files concurrently. Prefer a separate draft PR for stronger mobile UI, explicit handedness visualization, editable per-batter attributes, a profile picker, and test coverage. UX review should clarify passing the phone; keyboard-usable button controls for the pass prompt remain to be improved. Never write multiplayer prototype saves into the solo V6.3 localStorage key.
