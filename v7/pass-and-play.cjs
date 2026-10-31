@@ -48,4 +48,6 @@ function recordSwing(match,{zone,power,outcome}){
  return m;
 }
 function currentTurn(m){return {team:offense(m).team,playerId:offense(m).id,inning:m.inning,half:m.half,outs:m.outs,status:m.status}}
-module.exports={createProfile,newMatch,recordSwing,currentTurn,scoreRuns};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns};
+if(typeof module!=='undefined'&&module.exports)module.exports=api;
+if(typeof window!=='undefined')window.HitLabMultiplayer=api;
