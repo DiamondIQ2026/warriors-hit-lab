@@ -1,0 +1,19 @@
+name: Hit Lab - V7 Pass and Play
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  multiplayer:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate multiplayer game engine and tests
+        run: |
+          node --check v7/pass-and-play.cjs
+          node --test tests/v7-pass-and-play.test.cjs
