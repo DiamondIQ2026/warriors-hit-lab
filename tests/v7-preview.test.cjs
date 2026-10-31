@@ -61,3 +61,15 @@ test('existing swing code links only simulated flight inputs without save schema
  assert.match(page,/previewLink\.target='_blank'/);
  assert.match(page,/const KEY='warriors-hit-lab-v4'/);
 });
+
+test('main game embeds and safely closes the optional field preview',()=>{
+ const source=fs.readFileSync('index.html','utf8');
+ assert.match(source,/id="v7FlightPanel" class="hidden"/);
+ assert.match(source,/id="v7FlightFrame"/);
+ assert.match(source,/sandbox="allow-scripts"/);
+ assert.match(source,/id="v7FlightClose"/);
+ assert.match(source,/previewLink\.dataset\.v7Flight='1'/);
+ assert.match(source,/frame\.src=link\.href/);
+ assert.match(source,/frame\)|\$\('v7FlightFrame'\)\.removeAttribute\('src'\)/);
+ assert.match(source,/e\.preventDefault\(\)/);
+});
