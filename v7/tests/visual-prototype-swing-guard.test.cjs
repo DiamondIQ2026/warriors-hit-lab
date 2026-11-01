@@ -140,3 +140,9 @@ test('Family Rivalry displays the active batter above controls and on handoff', 
   assert.match(html, /batter-kicker/);
   assert.match(html, /PASS THE PHONE · YOU ARE UP/);
 });
+
+test('Family Rivalry final screen includes park and both players total runs', () => {
+  assert.match(html, /TOTAL RUNS<br><b>/);
+  assert.match(html, /rivalry\?state\.away\+state\.home:state\.home/);
+  assert.match(html, /selectedPark\(\)\.name/);
+});
