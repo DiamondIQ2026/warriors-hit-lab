@@ -185,3 +185,24 @@ test('unified nine-zone selector supports keyboard arrows and announces selectio
   await context.close();
  }finally{await browser.close()}
 });
+
+test('metallic scoreboard displays both team scores with compact mobile geometry',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:375,height:812}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  const score=page.locator('.score');
+  assert.equal(await score.evaluate(e=>getComputedStyle(e).display),'grid');
+  assert.match(await page.locator('#awayScore').innerText(),/Tampa Warriors 0/);
+  assert.match(await page.locator('#homeScore').innerText(),/Tampa Titans 0/);
+  assert.equal(await page.locator('.scoreMid').innerText(),'VS');
+  const bounds=await score.boundingBox();
+  assert.ok(bounds&&bounds.height<115,'Scoreboard should remain compact');
+  const handoff=await page.locator('#turn').boundingBox();
+  assert.ok(handoff&&handoff.y<480,'Primary handoff CTA must stay high');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});
