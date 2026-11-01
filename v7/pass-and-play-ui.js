@@ -10,6 +10,22 @@
   $('homeLineup').value=Array.from({length:9},(_,i)=>'Titan '+(i+1)).join('\n');
   $('awayLineup').value=Array.from({length:9},(_,i)=>'Warrior '+(i+1)).join('\n');
  }
+
+ function adoptAlphaProfile(side){
+  const status=$('alphaSetupStatus');
+  if(match){status.textContent='Existing match is active. Profile not applied.';return;}
+  const shared=window.HitLabAlphaProfile;
+  if(!shared){status.textContent='Shared profile unavailable. Setup unchanged.';return;}
+  const saved=shared.read(localStorage);
+  if(saved.status!=='ok'){status.textContent='No valid saved alpha profile available. Setup unchanged.';return;}
+  const prefix=side==='away'?'away':'home';
+  $(prefix+'Name').value=saved.profile.name;
+  $(prefix+'Team').value=saved.profile.team;
+  $(prefix+'Hand').value=saved.profile.hand==='Left'?'L':'R';
+  status.textContent='Applied to '+side+' setup only. Lineup untouched; start a new match to use it.';
+ }
+ $('useAlphaHome').addEventListener('click',()=>adoptAlphaProfile('home'));
+ $('useAlphaAway').addEventListener('click',()=>adoptAlphaProfile('away'));
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
  function render(){
