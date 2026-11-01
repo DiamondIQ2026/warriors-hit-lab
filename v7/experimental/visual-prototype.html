@@ -120,7 +120,7 @@ function completeInning(){
  }
  return opponentRuns
 }
-function advanceBases(n){if(!Number.isInteger(n)||n<1||n>4)throw new RangeError('Hit bases must be 1–4');let runs=0;const next=[false,false,false];for(let i=2;i>=0;i--)if(state.bases[i]){if(i+n>=3)runs++;else next[i+n]=true}if(n===4)runs++;else next[n-1]=true;state.bases=next;return runs}
+function advanceBases(n){if(!Number.isInteger(n)||n<1||n>4)throw new RangeError('Hit bases must be 1–4');const result=window.HitLabBaseRules.advance(state.bases,n);state.bases=result.bases;return result.runs}
 function hitProbability(contact,zone,difficulty){const base={SOFT:.40,MEDIUM:.58,HARD:.76}[contact]??.40;const zoneBonus=zone===5?.07:[2,4,6,8].includes(zone)?.025:0;const difficultyPenalty={Rookie:0,Veteran:.04,'All-Star':.09}[difficulty]??.04;return Math.max(.15,Math.min(.88,base+zoneBonus-difficultyPenalty))}
 function hitDistance(contact,roll){const power=contact==='HARD';if(power)return roll<.075?4:roll<.12?3:roll<.38?2:1;if(contact==='MEDIUM')return roll<.025?4:roll<.06?3:roll<.25?2:1;return roll<.005?4:roll<.02?3:roll<.12?2:1}
 function fenceDistance(zone,park=selectedPark()){const spray=((zone-1)%3)-1;return spray<0?park.left:spray>0?park.right:park.center}
