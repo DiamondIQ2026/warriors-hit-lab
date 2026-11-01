@@ -133,3 +133,10 @@ test('stadium wall-contact result uses a distinct landing marker', () => {
   assert.match(html, /wall-contact/);
   assert.match(html, /stadium-trop/);
 });
+
+test('Family Rivalry displays the active batter above controls and on handoff', () => {
+  assert.match(html, /function activeBatterBanner\(\)/);
+  assert.match(html, /return score\(\)\+activeBatterBanner\(\)/);
+  assert.match(html, /batter-kicker/);
+  assert.match(html, /PASS THE PHONE · YOU ARE UP/);
+});
