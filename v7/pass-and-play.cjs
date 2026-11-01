@@ -35,7 +35,7 @@ function recordSwing(match,{zone,power,outcome}){
  m.realSwings[player.id]++;m.battingOrder[player.id]=(index+1)%9;
  m.atBats.push({teamId:player.id,batter,index,inning:m.inning,half:m.half,zone,power,outcome,runs,kind:'real-swing'});
  if(outcome==='out')m.outs++;else{m.bases=result.bases;m.score[player.id]+=runs}
- if(m.half==='bottom'&&m.inning>=m.innings&&m.score[m.home.id]>m.score[m.away.id]){
+ if((typeof window!=='undefined'&&window.HitLabFinishRules?window.HitLabFinishRules.decision({inning:m.inning,scheduled:m.innings,half:m.half,home:m.score[m.home.id],away:m.score[m.away.id]}).kind==='final':(m.half==='bottom'&&m.inning>=m.innings&&m.score[m.home.id]>m.score[m.away.id))){
   m.status='final';m.winner=m.home.id;return m;
  }
  if(m.outs===3){
