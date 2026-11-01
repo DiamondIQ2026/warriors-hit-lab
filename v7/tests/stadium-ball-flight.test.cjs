@@ -120,3 +120,21 @@ test('wall-contact ball flight shows a distinct marker and accessible simulated 
  assert.match(app.field(),/data-zone="9"/);
  assert.ok(app.writes.every(([key])=>key==='hitlab-v7-visual-prototype-only'));
 });
+
+test('low-zone home run is announced as a fly ball, not a ground ball',()=>{
+ const app=boot([0,.01]);
+ app.state.screen='Drill';app.state.zone=9;app.state.contact='HARD';
+ app.swing();
+ assert.equal(app.state.trainingFeedback,'HOME RUN!');
+ const call=app.created.find(n=>n.className==='play-call');
+ assert.match(call.textContent,/^FLY BALL · HOME RUN!/);
+});
+test('low-zone outs remain ground balls while low-zone wall hits are fly balls',()=>{
+ const out=boot([.99]);
+ out.state.screen='Drill';out.state.zone=9;out.swing();
+ assert.match(out.created.find(n=>n.className==='play-call').textContent,/^GROUND BALL · BALL IN PLAY — OUT/);
+ const wall=boot([0,.01]);
+ wall.state.screen='Drill';wall.state.zone=8;wall.state.contact='MEDIUM';wall.swing();
+ assert.equal(wall.state.trainingFeedback,'OFF THE WALL — DOUBLE!');
+ assert.match(wall.created.find(n=>n.className==='play-call').textContent,/^FLY BALL · OFF THE WALL/);
+});
