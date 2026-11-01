@@ -95,7 +95,7 @@ function finishGame(reason){state.gameStarted=false;state.gameFinished=true;stat
 function completeInning(){
  if(state.mode==='Family Rivalry'&&state.rivalryTurn==='away'){
   const reset=window.HitLabBaseRules.afterThirdOut();state.outs=reset.outs;state.bases=reset.bases;
-  if(state.inning>=state.innings&&state.home>state.away){finishGame('Home player leads after the top of the final inning.');return 0}
+  if(window.HitLabFinishRules.decision({inning:state.inning,scheduled:state.innings,half:'top',home:state.home,away:state.away,thirdOut:true}).kind==='final'){finishGame('Home player leads after the top of the final inning.');return 0}
   state.rivalryTurn='home';state.feedback='SWITCH PLAYERS · HOME TEAM BATS';state.handoff=true;
   state.log.unshift('TOP '+state.inning+' COMPLETE · SWITCH PLAYERS');return 0
  }
@@ -104,7 +104,7 @@ function completeInning(){
  state.handoff=state.mode==='Family Rivalry';
  const reset=window.HitLabBaseRules.afterThirdOut();state.outs=reset.outs;state.bases=reset.bases;state.inning++;
  if(completed>=state.innings){
-  if(state.home!==state.away){finishGame('Completed '+completed+' inning'+(completed===1?'':'s')+(state.extraInnings?' including '+state.extraInnings+' extra':'')+'.');return 0}
+  if(window.HitLabFinishRules.decision({inning:completed,scheduled:state.innings,half:'bottom',home:state.home,away:state.away,thirdOut:true}).kind==='final'){finishGame('Completed '+completed+' inning'+(completed===1?'':'s')+(state.extraInnings?' including '+state.extraInnings+' extra':'')+'.');return 0}
   state.extraInnings++;state.log.unshift('EXTRA INNING '+state.inning+' STARTS')
  }
  if(state.mode==='Family Rivalry'){
