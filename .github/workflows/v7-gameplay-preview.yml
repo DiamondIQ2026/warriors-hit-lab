@@ -1,0 +1,46 @@
+name: V7 Gameplay Preview Checks
+on:
+  pull_request:
+    paths:
+      - 'v7/**'
+      - 'tests/**'
+      - '.github/workflows/v7-gameplay-preview.yml'
+  push:
+    branches:
+      - 'chatgpt/v7-figma-gameplay-clarity-20261101'
+permissions:
+  contents: read
+jobs:
+  gameplay-static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gameplay static regression checks
+        run: node --test tests/v7-figma-gameplay-clarity.test.cjs
+      - name: Install browser testing dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Launch local preview server
+        run: python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hitlab-preview.log 2>&1 &
+      - name: Full V7 multiplayer and Gameplay regression suite
+        run: node --test tests/*.test.cjs
+      - name: Capture 375px and 390px mobile Gameplay screenshots
+        run: node tests/v7-gameplay-visual-capture.cjs
+      - name: Upload mobile screenshots for Figma visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-gameplay-mobile-captures
+          path: artifacts/v7-gameplay/*.png
+          retention-days: 14
+          if-no-files-found: warn
+      - name: Check JavaScript syntax
+        run: |
+          node --check v7/pass-and-play-ui.js
+          node --check v7/pass-and-play.cjs
