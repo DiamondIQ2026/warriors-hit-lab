@@ -1,13 +1,14 @@
 name: Hit Lab - V7 Save Safety
 on:
   pull_request:
-    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101', 'chatgpt/v7-reader-failclosed-20261101', 'chatgpt/v7-cross-tab-race-reproducer-20261101']
+    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101', 'chatgpt/v7-reader-failclosed-20261101', 'chatgpt/v7-cross-tab-race-reproducer-20261101', 'chatgpt/v7-web-lock-gate-prototype-20261101']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
   save-safety:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,3 +22,11 @@ jobs:
           node --check v7/save-lock.cjs
           node --check tests/v7-save-lock.test.cjs
           node --test tests/v7-save-envelope.test.cjs tests/v7-save-write.test.cjs tests/v7-cross-tab-race.test.cjs tests/v7-save-lock.test.cjs
+      - name: Install isolated Chromium browser QA dependencies
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Exercise real two-tab native Web Locks and V7 save isolation
+        run: |
+          node --check tests/v7-save-lock-browser.test.cjs
+          node --test tests/v7-save-lock-browser.test.cjs
