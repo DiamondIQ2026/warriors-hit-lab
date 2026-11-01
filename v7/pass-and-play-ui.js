@@ -50,12 +50,26 @@
    const old=api.currentTurn(match);
    match=api.recordSwing(match,{zone,power:$('power').value,outcome:$('outcome').value});
    $('event').textContent='Recorded '+zone+' / '+$('power').value+' • simulated '+$('outcome').value+'.';
+   $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
+   $('viewFlight').classList.remove('hidden');
    if(old.playerId!==api.currentTurn(match).playerId||old.half!==match.half)acknowledge=false;
    zone=null;for(const el of zoneRoot.children)el.classList.remove('active');
    persist();render();
   }catch(e){$('event').textContent=e.message;}
  };
- $('backup').onclick=()=>{
+ $('viewFlight').onclick=()=>{
+  const url=$('viewFlight').dataset.url;
+  if(!url)return;
+  $('flightFrame').src=url;
+  $('flightDialog').showModal();
+ };
+ function closeFlight(){
+  $('flightDialog').close();
+  $('flightFrame').removeAttribute('src');
+ }
+ $('closeFlight').onclick=closeFlight;
+ $('flightDialog').addEventListener('close',()=>{$('flightFrame').removeAttribute('src')});
+  $('backup').onclick=()=>{
   const blob=new Blob([JSON.stringify(match,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='hit-lab-v7-multiplayer-prototype.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  };
