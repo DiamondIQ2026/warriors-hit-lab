@@ -160,3 +160,28 @@ test('unified multiplayer and simulated flight preview leave career and game sta
   await context.close();
  }finally{await browser.close()}
 });
+
+test('unified nine-zone selector supports keyboard arrows and announces selection',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  const first=page.locator('#zones button').first();
+  await first.focus();
+  await page.keyboard.press('ArrowRight');
+  const second=page.locator('#zones button').nth(1);
+  assert.equal(await second.evaluate(e=>document.activeElement===e),true);
+  await page.keyboard.press('Enter');
+  assert.equal(await second.getAttribute('aria-pressed'),'true');
+  assert.equal(await first.getAttribute('aria-pressed'),'false');
+  await page.locator('#record').click();
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),'warriors-hit-lab-v7-multiplayer-prototype');
+  assert.equal(saved.atBats[0].zone,'UC');
+  assert.equal(await second.getAttribute('aria-pressed'),'false');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});
