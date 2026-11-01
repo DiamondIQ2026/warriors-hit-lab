@@ -24,6 +24,10 @@ const cases=[
  {name:'runner on first double',before:[true,false,false],hit:2,runs:0,after:[false,true,true]},
  {name:'runner on second single',before:[false,true,false],hit:1,runs:0,after:[true,false,true]},
  {name:'runner on third single',before:[false,false,true],hit:1,runs:1,after:[true,false,false]},
+ {name:'runner on first single',before:[true,false,false],hit:1,runs:0,after:[true,true,false]},
+ {name:'runner on third double',before:[false,false,true],hit:2,runs:1,after:[false,true,false]},
+ {name:'bases loaded single',before:[true,true,true],hit:1,runs:1,after:[true,true,true]},
+ {name:'empty bases homer',before:[false,false,false],hit:4,runs:1,after:[false,false,false]},
  {name:'loaded double',before:[true,true,true],hit:2,runs:2,after:[false,true,true]},
  {name:'loaded triple',before:[true,true,true],hit:3,runs:3,after:[false,false,true]},
  {name:'loaded homer',before:[true,true,true],hit:4,runs:4,after:[false,false,false]}
