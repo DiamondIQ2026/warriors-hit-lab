@@ -51,3 +51,38 @@ test('separate multiplayer save never creates or overwrites legacy career key',a
  await context.close();
  }finally{await browser.close()}
 });
+
+test('375px mobile handoff is keyboard-operable and visible near scoreboard',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({viewport:{width:375,height:812},serviceWorkers:'block'});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  const turn=page.locator('#turn');
+  assert.equal(await turn.evaluate(e=>e.tagName),'BUTTON');
+  const box=await turn.boundingBox();
+  assert.ok(box && box.y<480,'Phone handoff should be above the fold');
+  await turn.focus();
+  await page.keyboard.press('Enter');
+  assert.equal(await page.locator('#swingPanel').isVisible(),true);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth),true,'No horizontal overflow');
+  await context.close();
+ }finally{await browser.close()}
+});
+test('rapid double submission counts exactly one real tee swing',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block'});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  await page.locator('#zones button').first().click();
+  await page.locator('#record').evaluate(e=>{e.click();e.click();});
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(saved.realSwings.maddon,1);
+  assert.equal(saved.atBats.length,1);
+  await context.close();
+ }finally{await browser.close()}
+});
