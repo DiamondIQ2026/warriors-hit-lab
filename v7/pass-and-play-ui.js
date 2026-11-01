@@ -28,7 +28,7 @@
   if(lastTurn!==token){acknowledge=false;lastTurn=token;}
   $('swingPanel').classList.toggle('hidden',match.status==='final'||!acknowledge);
   $('turn').textContent=match.status==='final'?('GAME OVER • WINNER: '+(match.winner===match.home.id?match.home.team:match.away.team)):(acknowledge?('BATTING: '+p.team):('PASS PHONE TO '+p.name.toUpperCase()+' • '+p.team+' — TAP TO CONTINUE'));
-  $('turn').style.cursor=match.status==='final'?'default':'pointer';
+  $('turn').disabled=match.status==='final';
   $('record').disabled=!zone||!acknowledge||match.status==='final';
  }
  $('turn').addEventListener('click',()=>{if(match&&match.status==='active'){acknowledge=true;render();}});
