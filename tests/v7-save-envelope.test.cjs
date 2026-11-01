@@ -49,3 +49,28 @@ test('future save with no valid alternative stays read only',()=>{
  assert.equal(selectSlots(memory({'whl7:slot:a':JSON.stringify(x)})).status,'FUTURE');
 });
 test('empty storage is empty, not an automatically written save',()=>assert.equal(selectSlots(memory()).status,'EMPTY'));
+
+test('future slot blocks older valid slot instead of risking downgrade overwrite',()=>{
+ const next=JSON.parse(encode({career:'newer'},{seq:9}));next.schemaVersion=6;
+ const out=selectSlots(memory({'whl7:slot:a':encode({career:'old'},{seq:8}),'whl7:slot:b':JSON.stringify(next)}));
+ assert.equal(out.status,'FUTURE');assert.equal(out.payload,undefined);
+});
+test('identical sequence with different payloads is a conflict',()=>{
+ const out=selectSlots(memory({'whl7:slot:a':encode({career:'a'},{seq:3}),
+  'whl7:slot:b':encode({career:'b'},{seq:3})}));
+ assert.equal(out.status,'CONFLICT');assert.equal(out.payload,undefined);
+});
+test('storage exceptions are unavailable rather than empty',()=>{
+ assert.equal(selectSlots(null).status,'UNAVAILABLE');
+ assert.equal(selectSlots({getItem(){throw Error('blocked')}}).status,'UNAVAILABLE');
+});
+test('application validator can reject intact but unopenable saves',()=>{
+ const out=selectSlots(memory({'whl7:slot:a':encode({},{seq:9}),
+  'whl7:slot:b':encode({player:'Dad'},{seq:8})}),p=>typeof p.player==='string');
+ assert.equal(out.status,'FALLBACK');assert.equal(out.slot,'b');
+});
+test('unsupported schemas and malformed payloads are distinct from corruption',()=>{
+ const old=JSON.parse(encode({player:'Dad'},{seq:1}));old.schemaVersion=4;
+ assert.equal(selectSlots(memory({'whl7:slot:a':JSON.stringify(old)})).status,'UNSUPPORTED');
+ assert.equal(selectSlots(memory({'whl7:slot:a':JSON.stringify({format:'warriors-hit-lab',schemaVersion:5})})).status,'INVALID');
+});
