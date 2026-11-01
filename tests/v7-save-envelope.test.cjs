@@ -102,7 +102,7 @@ test('fault injection: invalid timestamp fails closed',()=>{
 
 test('fault injection: adapter read exception is surfaced, never silently replaced by empty save',()=>{
  const storage={getItem(){throw Error('storage blocked');},setItem(){throw Error('write forbidden');}};
- assert.throws(()=>selectSlots(storage),/storage blocked/);
+ assert.equal(selectSlots(storage).status,'STORAGE_UNAVAILABLE');
 });
 
 test('fault injection: two future-schema slots require read-only upgrade path',()=>{
@@ -114,4 +114,40 @@ test('fault injection: two future-schema slots require read-only upgrade path',(
  assert.equal(out.status,'FUTURE');
  assert.equal(out.payload,undefined);
  assert.equal(JSON.stringify(entries),original);
+});
+
+test('future-schema slot blocks older valid slot and exposes no downgrade payload',()=>{
+ const future=JSON.parse(encode({v:'future'},{seq:12}));future.schemaVersion=6;
+ for(const id of ['a','b']){
+  const entries={'whl7:slot:a':encode({v:'old'},{seq:4}),'whl7:slot:b':encode({v:'old'},{seq:4})};
+  entries['whl7:slot:'+id]=JSON.stringify(future);
+  const out=selectSlots(memory(entries));
+  assert.equal(out.status,'FUTURE');assert.equal(out.payload,undefined);
+ }
+});
+test('divergent equal-sequence slots are conflicts independent of slot order',()=>{
+ for(const [a,b] of [[{v:'A'},{v:'B'}],[{v:'B'},{v:'A'}]]){
+  const out=selectSlots(memory({'whl7:slot:a':encode(a,{seq:8}),
+   'whl7:slot:b':encode(b,{seq:8})}));
+  assert.equal(out.status,'CONFLICT');assert.equal(out.payload,undefined);
+ }
+});
+test('null adapter and throwing storage fail closed without creating an empty save',()=>{
+ assert.equal(selectSlots(null).status,'STORAGE_UNAVAILABLE');
+ assert.equal(selectSlots({getItem(){throw new Error('blocked');}}).status,'STORAGE_UNAVAILABLE');
+});
+test('injected semantic validation rejects invalid newest payload and requires recovery',()=>{
+ const entries={'whl7:slot:a':encode({career:{hits:2}},{seq:1}),
+  'whl7:slot:b':encode({unexpected:true},{seq:2})};
+ const out=selectSlots(memory(entries),p=>Boolean(p.career));
+ assert.equal(out.status,'FALLBACK');assert.equal(out.slot,'a');
+ assert.equal(out.failures[0].result.reason,'Payload validation failed');
+ const none=selectSlots(memory(entries),()=>{throw Error('invalid');});
+ assert.equal(none.status,'RECOVERY');assert.equal(none.payload,undefined);
+});
+test('read-only inspection never invokes mutating storage operations',()=>{
+ const entries={'whl7:slot:a':encode({career:true},{seq:1})};
+ let writes=0;const storage={getItem:k=>entries[k]??null,
+  setItem(){writes++;},removeItem(){writes++;},clear(){writes++;}};
+ assert.equal(selectSlots(storage).status,'OK');assert.equal(writes,0);
 });
