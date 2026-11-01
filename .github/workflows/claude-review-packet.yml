@@ -24,7 +24,17 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Check trusted packet builder is installed
+        id: builder
+        run: |
+          if test -f scripts/build_claude_review_packet.py; then
+            echo 'available=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'available=false' >> "$GITHUB_OUTPUT"
+            echo 'Trusted packet builder is not on main yet; install this workflow first.'
+          fi
       - name: Generate read-only review packet
+        if: steps.builder.outputs.available == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
@@ -32,6 +42,7 @@ jobs:
         run: |
           python scripts/build_claude_review_packet.py --repo "$REPOSITORY" --pr "$PR_NUMBER" --out claude-review-packet.md
       - name: Upload review source as downloadable artifact
+        if: steps.builder.outputs.available == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: claude-review-pr-${{ github.event.pull_request.number || inputs.pr_number }}
