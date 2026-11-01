@@ -25,6 +25,13 @@
 .field .zones button.chosen{background:linear-gradient(155deg,#ff5265,#a00d28);box-shadow:inset 0 0 0 2px #ffe4e8}
 .field .zones button:focus-visible{outline:3px solid #fff;outline-offset:-4px;z-index:1}
 @media(max-width:380px){.field .zones button{min-height:33px;font-size:14px}}
+/* Hit-result feedback and ball-flight polish */
+.field{perspective:600px}
+.field .ball{width:15px;height:15px;background:radial-gradient(circle at 30% 28%,#fff 0 34%,#dce5eb 65%,#a9bac6);border:1px solid #fff;box-shadow:0 0 0 2px #fff4,0 0 16px 5px #fff7;animation:flight .95s cubic-bezier(.15,.72,.22,1) forwards}
+@keyframes flight{0%{transform:translate(-50%,0) scale(.75);opacity:1}55%{opacity:1}100%{transform:translate(calc(-50% + var(--dx)),var(--dy)) scale(.3);opacity:0}}
+.field.animating{box-shadow:inset 0 0 0 3px #d7f3ff55,inset 0 0 30px #0008,0 0 20px #3ca0d044}
+.feedback{border-radius:8px;padding:6px 4px;transition:background .2s ease}
+@media(prefers-reduced-motion:reduce){.field .ball{animation-duration:.01ms}.feedback{transition:none}}
 @media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}</style>
 <div class="app"><header class="head"><button id="menuButton" aria-label="Open menu">☰</button><div class="brand">TW <b>HIT LAB</b><small>V7 PROTOTYPE</small></div><button id="backButton" aria-label="Go home">⌂</button></header><main class="page" id="page"></main><nav class="nav" id="nav"></nav></div>
 <div class="menu hidden" id="menu"><div class="drawer"><div class="row"><h2>Hit Lab Menu</h2><button id="closeMenu">✕</button></div><div id="menuItems" class="list"></div></div></div>
