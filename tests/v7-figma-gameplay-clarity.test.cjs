@@ -18,7 +18,7 @@ test('Primary action remains above nine-zone grid',()=>{
  const record=html.indexOf('id="record"'),zones=html.indexOf('id="zones"');
  assert.ok(record>0 && zones>record);
  assert.match(html,/#record:disabled/);
- assert.match(html,/\.zones button\{min-height:70px\}/);
+ assert.match(html,/\.zones button\{min-height:70px(?:;|\})/);
 });
 
 test('Nine numeric buttons preserve stable impact codes and accessible labels',()=>{
