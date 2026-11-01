@@ -127,3 +127,9 @@ test('Stadium Mode includes Tropicana Field and preserves shared-phone handoff',
   app.click('readyBatter');
   assert.equal(app.state().handoff, false);
 });
+
+test('stadium wall-contact result uses a distinct landing marker', () => {
+  assert.match(html, /result\.startsWith\('OFF THE WALL'\)\?25/);
+  assert.match(html, /wall-contact/);
+  assert.match(html, /stadium-trop/);
+});
