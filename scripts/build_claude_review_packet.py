@@ -7,6 +7,8 @@ MAX_FILE_BYTES=75000
 MAX_TOTAL_BYTES=600000
 ALLOWED={".js",".cjs",".mjs",".html",".css",".json",".md",".yml",".yaml",".txt",".ts",".tsx",".jsx"}
 EXCLUDE_PARTS={".env","secrets","credentials","private","node_modules","vendor","dist"}
+SENSITIVE_NAMES={"id_rsa","id_ed25519",".npmrc",".pypirc",".netrc"}
+SENSITIVE_MARKERS=("-----BEGIN PRIVATE KEY-----","-----BEGIN RSA PRIVATE KEY-----","-----BEGIN OPENSSH PRIVATE KEY-----")
 def api(url, token):
     req=urllib.request.Request(url,headers={"Authorization":f"Bearer {token}","Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"})
     with urllib.request.urlopen(req,timeout=25) as response:return json.load(response)
@@ -33,7 +35,9 @@ def main():
     for f in files:
         name=f["filename"]
         path=pathlib.PurePosixPath(name)
-        if f["status"]=="removed" or len(selected)>=MAX_FILES or path.suffix.lower() not in ALLOWED or any(part.lower() in EXCLUDE_PARTS for part in path.parts):
+        if (f["status"]=="removed" or len(selected)>=MAX_FILES or path.suffix.lower() not in ALLOWED or
+            any(part.lower() in EXCLUDE_PARTS or part.lower().startswith(".env") for part in path.parts) or
+            path.name.lower() in SENSITIVE_NAMES):
             omitted.append(name);continue
         if int(f.get("changes",0))>3000:
             omitted.append(name);continue
@@ -45,6 +49,8 @@ def main():
             if len(raw)>MAX_FILE_BYTES or total+len(raw)>MAX_TOTAL_BYTES:
                 omitted.append(name);continue
             text=raw.decode("utf-8")
+            if any(marker in text for marker in SENSITIVE_MARKERS):
+                omitted.append(name);continue
             selected.append((name,text))
             total+=len(raw)
         except (ValueError, UnicodeError, KeyError, urllib.error.HTTPError):
@@ -69,6 +75,8 @@ def main():
     for name,content in selected:
         fence="````" if "```" in content else "```"
         output += ["",f"## Source: `{name}`",f"{fence}{pathlib.PurePosixPath(name).suffix.lstrip('.') or 'text'}",content,fence]
+    if not selected:
+        raise SystemExit("No eligible source files found; packet withheld")
     pathlib.Path(args.out).write_text("\n".join(output)+"\n",encoding="utf-8")
     print(f"Produced {args.out} ({len(selected)} files, {total} source bytes, {len(omitted)} omitted)")
 
