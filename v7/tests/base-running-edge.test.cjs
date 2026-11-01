@@ -35,6 +35,6 @@ for(const c of cases)test(c.name,()=>{
 });
 test('invalid hit distances rejected without modifying bases',()=>{
  const app=setup([true,false,true]);
- for(const n of [0,5,-1,1.5,NaN])assert.throws(()=>app.advance(n),RangeError);
+ for(const n of [0,5,-1,1.5,NaN])assert.throws(()=>app.advance(n),{name:'RangeError'});
  assert.deepEqual(Array.from(app.state().bases),[true,false,true]);
 });
