@@ -164,3 +164,52 @@ test('stadium-aware flight converts a short center-field home run into a double'
  assert.equal(left.bases,4);
  assert.equal(left.cleared,true);
 });
+
+test('family rivalry alternates away and home without CPU runs',()=>{
+ const app=setup();
+ Object.assign(app.state,{mode:'Family Rivalry',innings:3,inning:1,away:2,home:1,outs:3,rivalryTurn:'away',handoff:false,bases:[true,false,true]});
+ app.complete();
+ assert.equal(app.state.rivalryTurn,'home');
+ assert.equal(app.state.handoff,true);
+ assert.equal(app.state.inning,1);
+ assert.equal(app.state.away,2);
+ assert.equal(app.state.home,1);
+ assert.equal(app.state.outs,0);
+ assert.equal(app.state.bases.some(Boolean),false);
+ app.state.handoff=false;
+ app.state.outs=3;
+ app.complete();
+ assert.equal(app.state.rivalryTurn,'away');
+ assert.equal(app.state.inning,2);
+ assert.equal(app.state.handoff,true);
+ assert.equal(app.state.away,2);
+ assert.equal(app.state.home,1);
+});
+test('family rivalry tied regulation enters extras and continues turn-taking',()=>{
+ const app=setup();
+ Object.assign(app.state,{mode:'Family Rivalry',innings:3,inning:3,away:5,home:5,rivalryTurn:'home',outs:3,handoff:false});
+ app.complete();
+ assert.equal(app.state.gameFinished,false);
+ assert.equal(app.state.inning,4);
+ assert.equal(app.state.extraInnings,1);
+ assert.equal(app.state.rivalryTurn,'away');
+ assert.equal(app.state.handoff,true);
+});
+test('family rivalry skips bottom of final inning when home already leads',()=>{
+ const app=setup();
+ Object.assign(app.state,{mode:'Family Rivalry',innings:3,inning:3,away:2,home:4,rivalryTurn:'away',outs:3,handoff:false});
+ app.complete();
+ assert.equal(app.state.gameFinished,true);
+ assert.equal(app.state.handoff,false);
+ assert.equal(app.state.inning,3);
+ assert.equal(app.state.home,4);
+});
+test('family rivalry ends after completed final bottom half with a winner',()=>{
+ const app=setup();
+ Object.assign(app.state,{mode:'Family Rivalry',innings:3,inning:3,away:5,home:3,rivalryTurn:'home',outs:3,handoff:false});
+ app.complete();
+ assert.equal(app.state.gameFinished,true);
+ assert.equal(app.state.away,5);
+ assert.equal(app.state.home,3);
+ assert.equal(app.state.handoff,false);
+});
