@@ -18,6 +18,10 @@ function offense(m){return m.half==='top'?m.away:m.home}
 function scoreRuns(bases,outcome){
  const n={single:1,double:2,triple:3,homer:4}[outcome];
  if(!n)return {bases:[...bases],runs:0};
+ const shared=typeof window!=='undefined'&&window.HitLabBaseRules;
+ return shared?shared.advance(bases,n):advanceFallback(bases,n);
+}
+function advanceFallback(bases,n){
  const next=[false,false,false];let runs=n===4?1:0;
  for(let i=2;i>=0;i--)if(bases[i]){if(i+n>=3)runs++;else next[i+n]=true}
  if(n<4)next[n-1]=true;
