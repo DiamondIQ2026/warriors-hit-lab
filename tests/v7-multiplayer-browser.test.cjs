@@ -206,3 +206,30 @@ test('metallic scoreboard displays both team scores with compact mobile geometry
   await context.close();
  }finally{await browser.close()}
 });
+
+test('touch zone controls are adequately sized and recording action stays reachable at 375px',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:375,height:812}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  const zones=page.locator('#zones button');
+  assert.equal(await zones.count(),9);
+  for(let i=0;i<9;i++){
+   const b=await zones.nth(i).boundingBox();
+   assert.ok(b&&b.height>=70&&b.width>=70,'Zone touch target too small: '+i);
+  }
+  await zones.nth(4).click();
+  assert.equal(await zones.nth(4).getAttribute('aria-pressed'),'true');
+  await page.locator('#record').scrollIntoViewIfNeeded();
+  const record=await page.locator('#record').boundingBox();
+  assert.ok(record&&record.height>=48);
+  await page.locator('#record').click();
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(saved.atBats[0].zone,'MC');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});
