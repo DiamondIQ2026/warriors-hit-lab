@@ -12,30 +12,30 @@ const functionBody = (name, nextName) => {
   return source.slice(start, end);
 };
 
-test('home Play Ball primary action precedes tall hero and secondary mode tiles', () => {
+test('home Play Ball primary action precedes hero and secondary tiles', () => {
   const home = functionBody('home', 'play');
-  assert.ok(home.indexOf('data-go=\\"Play\\"') !== -1, 'home must offer Play');
-  assert.ok(home.indexOf('data-go=\\"Play\\"') < home.indexOf('class=\\"hero\\"'), 'primary CTA must precede hero');
-  assert.ok(home.indexOf('class=\\"hero\\"') < home.indexOf('class=\\"grid\\"'), 'secondary tiles follow hero');
+  assert.ok(home.includes('data-go="Play"'), 'home must offer Play');
+  assert.ok(home.indexOf('data-go="Play"') < home.indexOf('class="hero"'), 'primary CTA must precede hero');
+  assert.ok(home.indexOf('class="hero"') < home.indexOf('class="grid"'), 'secondary tiles follow hero');
 });
 
 test('game setup Play Ball primary action precedes matchup and configuration', () => {
   const play = functionBody('play', 'game');
-  assert.match(play, /class=\"primary wide\" data-go=\"Game\"/);
-  assert.ok(play.indexOf('data-go=\\"Game\\"') < play.indexOf('<h2>Matchup</h2>'));
-  assert.ok(play.indexOf('data-go=\\"Game\\"') < play.indexOf('id=\\"mode\\"'));
+  assert.ok(play.includes('class="primary wide" data-go="Game"'));
+  assert.ok(play.indexOf('data-go="Game"') < play.indexOf('<h2>Matchup</h2>'));
+  assert.ok(play.indexOf('data-go="Game"') < play.indexOf('id="mode"'));
 });
 
-test('game and drill keep primary swing recording prominent', () => {
+test('game and drill keep primary swing recording ahead of field', () => {
   const game = functionBody('game', 'training');
   const drill = functionBody('drill', 'report');
-  assert.match(game, /id=\"swing\"/);
-  assert.match(drill, /id=\"swing\"/);
-  assert.ok(game.indexOf('id=\\"swing\\"') < game.indexOf('+field()'), 'game swing CTA must precede field');
-  assert.ok(drill.indexOf('id=\\"swing\\"') < drill.indexOf('+field()'), 'drill CTA must precede field');
+  assert.ok(game.includes('id="swing"'));
+  assert.ok(drill.includes('id="swing"'));
+  assert.ok(game.indexOf('id="swing"') < game.indexOf('+field()'));
+  assert.ok(drill.indexOf('id="swing"') < drill.indexOf('+field()'));
 });
 
-test('visual prototype retains a dedicated V7-only storage namespace', () => {
-  assert.match(source, /const storeKey='hitlab-v7-visual-prototype-only'/);
+test('visual prototype retains dedicated V7-only storage namespace', () => {
+  assert.ok(source.includes("const storeKey='hitlab-v7-visual-prototype-only'"));
   assert.doesNotMatch(source, /localStorage\.(?:setItem|removeItem|clear)\(\s*['"](?:hitlab-v6|diamond)/i);
 });
