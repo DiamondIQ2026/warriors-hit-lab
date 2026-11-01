@@ -9,14 +9,14 @@ const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Prototype script exists');
 const anchor="el('menuButton').onclick=";
 assert.ok(match[1].includes(anchor),'Test hook anchor exists');
-const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;window.__parkHit=parkAdjustedHit;window.__fence=fenceDistance;window.__swing=swing;"+anchor);
+const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;window.__parkHit=parkAdjustedHit;window.__fence=fenceDistance;window.__swing=swing;window.__nearestFielder=nearestFielderIndex;"+anchor);
 function setup(random=()=>0.99){
  const elements={};const listeners={};
  const el=id=>elements[id]??(elements[id]={innerHTML:'',textContent:'',disabled:false,classList:{add(){},remove(){},toggle(){}},style:{setProperty(){}},appendChild(){}});
  const document={getElementById:el,addEventListener:(name,cb)=>listeners[name]=cb,createElement:()=>({style:{setProperty(){}}})};
  const window={scrollTo(){}};
  vm.runInNewContext(script,{document,window,localStorage:{getItem:()=>null,setItem(){}},setTimeout(){},Math:Object.assign(Object.create(Math),{random})});
- return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance,parkHit:window.__parkHit,fence:window.__fence,swing:window.__swing};
+ return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance,parkHit:window.__parkHit,fence:window.__fence,swing:window.__swing,nearestFielder:window.__nearestFielder};
 }
 test('CPU cannot score more than five runs in one half inning',()=>{
  const app=setup(()=>0);
@@ -212,4 +212,19 @@ test('family rivalry ends after completed final bottom half with a winner',()=>{
  assert.equal(app.state.away,5);
  assert.equal(app.state.home,3);
  assert.equal(app.state.handoff,false);
+});
+
+test('defensive reaction targets the nearest fielder for left, center, and right',()=>{
+ const app=setup();
+ assert.equal(app.nearestFielder(18,25),0);
+ assert.equal(app.nearestFielder(49,14),1);
+ assert.equal(app.nearestFielder(80,25),2);
+ assert.equal(app.nearestFielder(75,60),6);
+});
+test('defensive reaction always returns a valid fielder for playable landing positions',()=>{
+ const app=setup();
+ for(const x of [12,25,50,75,88])for(const y of [9,19,29,42,65]){
+  const index=app.nearestFielder(x,y);
+  assert.ok(Number.isInteger(index)&&index>=0&&index<8);
+ }
 });
