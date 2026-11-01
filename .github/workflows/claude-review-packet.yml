@@ -1,0 +1,37 @@
+name: Hit Lab - Claude Review Packet
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: Pull request number to package
+        required: true
+        type: number
+permissions:
+  contents: read
+  pull-requests: read
+jobs:
+  package-review:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate read-only review packet
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number || inputs.pr_number }}
+        run: |
+          python scripts/build_claude_review_packet.py --repo "$REPOSITORY" --pr "$PR_NUMBER" --out claude-review-packet.md
+      - name: Upload review source as downloadable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: claude-review-pr-${{ github.event.pull_request.number || inputs.pr_number }}
+          path: claude-review-packet.md
+          retention-days: 30
+          if-no-files-found: error
