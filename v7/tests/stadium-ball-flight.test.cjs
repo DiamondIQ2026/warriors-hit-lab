@@ -19,7 +19,7 @@ function boot(rolls=[.99]){
  const elements={},created=[],timers=[],writes=[],listeners={};
  const fielders=Array.from({length:8},()=>({
   props:{},classes:[],
-  style:{setProperty(key,value){this.props[key]=value}},
+  style:{props:{},setProperty(key,value){this.props[key]=value}},
   classList:{add(name){this.owner.classes.push(name)}}
  }));
  for(const f of fielders)f.classList.owner=f;
