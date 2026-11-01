@@ -30,6 +30,16 @@ jobs:
         run: python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hitlab-preview.log 2>&1 &
       - name: Full V7 multiplayer and Gameplay regression suite
         run: node --test tests/*.test.cjs
+      - name: Capture 375px and 390px mobile Gameplay screenshots
+        run: node tests/v7-gameplay-visual-capture.cjs
+      - name: Upload mobile screenshots for Figma visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v7-gameplay-mobile-captures
+          path: artifacts/v7-gameplay/*.png
+          retention-days: 14
+          if-no-files-found: warn
       - name: Check JavaScript syntax
         run: |
           node --check v7/pass-and-play-ui.js
