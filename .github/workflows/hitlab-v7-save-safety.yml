@@ -1,7 +1,7 @@
 name: Hit Lab - V7 Save Safety
 on:
   pull_request:
-    branches: [main]
+    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101']
   workflow_dispatch:
 permissions:
   contents: read
