@@ -9,14 +9,14 @@ const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Prototype script exists');
 const anchor="el('menuButton').onclick=";
 assert.ok(match[1].includes(anchor),'Test hook anchor exists');
-const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;"+anchor);
+const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;"+anchor);
 function setup(random=()=>0.99){
  const elements={};const listeners={};
  const el=id=>elements[id]??(elements[id]={innerHTML:'',textContent:'',disabled:false,classList:{add(){},remove(){},toggle(){}},style:{setProperty(){}},appendChild(){}});
  const document={getElementById:el,addEventListener:(name,cb)=>listeners[name]=cb,createElement:()=>({style:{setProperty(){}}})};
  const window={scrollTo(){}};
  vm.runInNewContext(script,{document,window,localStorage:{getItem:()=>null,setItem(){}},setTimeout(){},Math:Object.assign(Object.create(Math),{random})});
- return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin};
+ return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance};
 }
 test('CPU cannot score more than five runs in one half inning',()=>{
  const app=setup(()=>0);
@@ -80,4 +80,41 @@ test('starting a new game resets score, bases, outs and extras',()=>{
  assert.equal(app.state.extraInnings,0);
  assert.deepEqual(Array.from(app.state.bases),[false,false,false]);
  assert.equal(app.state.gameFinished,false);
+});
+
+test('hard contact improves hit probability over soft contact',()=>{
+ const app=setup();
+ assert.ok(app.prob('HARD',5,'Veteran')>app.prob('SOFT',5,'Veteran'));
+});
+test('middle-middle zone improves probability over corner',()=>{
+ const app=setup();
+ assert.ok(app.prob('MEDIUM',5,'Veteran')>app.prob('MEDIUM',1,'Veteran'));
+});
+test('difficulty reduces chance of a hit',()=>{
+ const app=setup();
+ assert.ok(app.prob('MEDIUM',5,'Rookie')>app.prob('MEDIUM',5,'All-Star'));
+});
+test('hit probability remains between zero and one',()=>{
+ const app=setup();
+ for(const c of ['SOFT','MEDIUM','HARD'])for(const z of [1,5,9])for(const d of ['Rookie','Veteran','All-Star']){
+  const p=app.prob(c,z,d);
+  assert.ok(p>0&&p<1);
+ }
+});
+test('hit distance maps to single through home run',()=>{
+ const app=setup();
+ for(const c of ['SOFT','MEDIUM','HARD']){
+  for(const roll of [0,.02,.1,.5,.99]){
+   const bases=app.distance(c,roll);
+   assert.ok(Number.isInteger(bases)&&bases>=1&&bases<=4);
+  }
+ }
+});
+test('hard contact can produce a home run',()=>{
+ const app=setup();
+ assert.equal(app.distance('HARD',0),4);
+});
+test('soft contact can produce a single',()=>{
+ const app=setup();
+ assert.equal(app.distance('SOFT',.99),1);
 });
