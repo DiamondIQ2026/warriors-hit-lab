@@ -1,7 +1,7 @@
 name: Hit Lab - V7 Save Safety
 on:
   pull_request:
-    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101']
+    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101']
   workflow_dispatch:
 permissions:
   contents: read
