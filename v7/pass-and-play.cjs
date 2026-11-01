@@ -56,7 +56,6 @@ function recordSwing(match,{zone,power,outcome}){
     m.status='final';m.winner=m.score[m.home.id]>m.score[m.away.id]?m.home.id:m.away.id;
    }else{m.inning++;m.half='top'}
   }
-  }
  }
  return m;
 }
