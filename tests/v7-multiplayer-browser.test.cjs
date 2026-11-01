@@ -235,3 +235,34 @@ test('375px primary CTAs stay above fold while setup and batting remain function
   await context.close();
  }finally{await browser.close()}
 });
+
+test('passing the phone hides previous batter animation without changing recorded stats',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block'});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  for(let i=0;i<3;i++){
+   await page.locator('#zones button').first().click();
+   await page.locator('#outcome').selectOption('out');
+   await page.locator('#record').click();
+  }
+  assert.match(await page.locator('#turn').innerText(),/DAD/);
+  assert.equal(await page.locator('#viewFlight').isVisible(),false);
+  assert.equal(await page.locator('#viewFlight').getAttribute('data-url'),null);
+  assert.equal(await page.locator('#flightFrame').getAttribute('src'),null);
+  const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
+  await page.locator('#turn').click();
+  assert.equal(await page.locator('#viewFlight').isVisible(),false);
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before);
+  await page.locator('#zones button').nth(4).click();
+  await page.locator('#record').click();
+  assert.equal(await page.locator('#viewFlight').isVisible(),true);
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(saved.realSwings.maddon,3);
+  assert.equal(saved.realSwings.dad,1);
+  await context.close();
+ }finally{await browser.close()}
+});

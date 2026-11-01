@@ -25,7 +25,7 @@
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
   const now=api.currentTurn(match);
   const token=now.playerId+'-'+now.inning+'-'+now.half;
-  if(lastTurn!==token){acknowledge=false;lastTurn=token;}
+  if(lastTurn!==token){acknowledge=false;lastTurn=token;$('viewFlight').classList.add('hidden');delete $('viewFlight').dataset.url;if($('flightDialog').open)$('flightDialog').close();$('flightFrame').removeAttribute('src');}
   $('swingPanel').classList.toggle('hidden',match.status==='final'||!acknowledge);
   $('turn').textContent=match.status==='final'?('GAME OVER • WINNER: '+(match.winner===match.home.id?match.home.team:match.away.team)):(acknowledge?('BATTING: '+p.team):('PASS PHONE TO '+p.name.toUpperCase()+' • '+p.team+' — TAP TO CONTINUE'));
   $('turn').disabled=match.status==='final';
@@ -36,7 +36,7 @@
   try{
    const home=api.createProfile({id:'dad',name:$('homeName').value,team:$('homeTeam').value,hand:$('homeHand').value,lineup:getNames('homeLineup')});
    const away=api.createProfile({id:'maddon',name:$('awayName').value,team:$('awayTeam').value,hand:$('awayHand').value,lineup:getNames('awayLineup')});
-   match=api.newMatch(home,away,Number($('innings').value));zone=null;lastTurn=null;acknowledge=false;
+   match=api.newMatch(home,away,Number($('innings').value));zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
    $('setupError').textContent='';persist();render();
   }catch(e){$('setupError').textContent=e.message;}
  };
