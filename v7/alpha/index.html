@@ -82,10 +82,6 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
      try{api.select(localStorage,link.dataset.alphaMode)}catch(e){/* Navigation remains usable if storage is blocked. */}
    });
  });
- resume.addEventListener('click',()=>{
-   const saved=api.read(localStorage);
-   if(saved.status!=='ok'||saved.session.mode==='home'){event.preventDefault();return;}
- });
 })();
 </script>
 <div class="notice"><strong>Development preview only.</strong> These are distinct prototypes. Do not assume that scores, teams, or saves transfer between them. Existing V6.3 progress is not migrated or modified.</div>
