@@ -227,3 +227,23 @@ test('ready action is ignored when no handoff is pending or game is finished',()
  app.click('readyBatter');
  assert.equal(state.handoff,true);
 });
+
+test('active swing prevents changing setup and results until animation finishes',()=>{
+ const app=boot();
+ app.click('',{go:'Game'});
+ app.click('swing');
+ assert.equal(app.state().animating,true);
+ const current=app.state().screen;
+ app.click('',{go:'Play'});
+ assert.equal(app.state().screen,current);
+ app.click('',{go:'Results'});
+ assert.equal(app.state().screen,current);
+ app.tick();
+ assert.equal(app.state().animating,false);
+ app.click('',{go:'Play'});
+ assert.equal(app.state().screen,'Play');
+});
+test('reduced motion applies to defensive reactions as well as ball flight',()=>{
+ assert.match(html,/prefers-reduced-motion:reduce/);
+ assert.match(html,/\.field\.animating \.fielder\.reacting\{animation-duration:\.01ms!important/);
+});
