@@ -121,11 +121,11 @@ test('soft contact can produce a single',()=>{
 
 test('family rivalry walk-off ends game when home takes final-inning lead',()=>{
  const app=setup(()=>0);
- Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',inning:3,innings:3,home:2,away:3,contact:'HARD',zone:5,handoff:false,gameFinished:false});
+ Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',inning:3,innings:3,home:3,away:3,contact:'HARD',zone:5,handoff:false,gameFinished:false});
  app.swing();
  assert.equal(app.state.gameFinished,true);
  assert.ok(app.state.finalReason.includes('Walk-off'));
- assert.equal(app.state.home,3);
+ assert.equal(app.state.home,4);
 });
 test('family rivalry cannot walk off before regulation final inning',()=>{
  const app=setup(()=>0);
