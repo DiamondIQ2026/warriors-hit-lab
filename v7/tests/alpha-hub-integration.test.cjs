@@ -17,7 +17,8 @@ test('entry points do not falsely claim combined progress or production readines
   assert.match(hub, /distinct prototypes/i);
   assert.match(hub, /development preview only/i);
   assert.match(hub, /no production deployment/i);
-  assert.doesNotMatch(hub, /localStorage|sessionStorage|indexedDB/);
+  assert.ok(hub.includes('shared-profile.cjs'));
+  assert.doesNotMatch(hub, /localStorage\.(?:removeItem|clear)/);
 });
 
 test('alpha entry actions remain before warnings and are accessible', () => {
