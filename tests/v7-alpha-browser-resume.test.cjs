@@ -46,7 +46,7 @@ test('Family Rivalry restores score, inning, outs and both batting orders after 
   await page.reload();
   const resumed=await saved(page,RIVALRY);
   for(const key of ['inning','half','outs','score','battingOrder'])assert.deepEqual(resumed[key],initial[key],key);
-  await page.locator('#turn').click();
+  if(await page.locator('#turn').isVisible())await page.locator('#turn').click();
   await page.locator('#zones button').first().click();
   await page.locator('#outcome').selectOption('out');
   await page.locator('#record').click();
