@@ -28,6 +28,7 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
 <h1>Unified Alpha Test Hub</h1>
 <p class="lead">Two working development experiences are packaged together for mobile review. This hub does not combine game progress or save data between them.</p>
 <div class="card" id="sessionPanel" aria-live="polite"><strong id="sessionTitle">Choose a game mode</strong><p id="sessionDescription">Your most recently selected alpha experience will appear here.</p><a id="resumeAlpha" class="action" href="./index.html" hidden>Continue selected mode</a></div>
+<section class="card" aria-labelledby="activeTitle"><h2 id="activeTitle">Saved games on this device</h2><p id="activeHelp">Checking independently saved V7 alpha matches. No save will be changed.</p><div id="activeSessions" class="list" aria-live="polite"></div></section>
 <section class="card" aria-labelledby="cpu-title">
 <h2 id="cpu-title">CPU Game & Training Academy</h2>
 <p>Test nine-zone tee swings, inning outcomes, simulated opponent play, and isolated training drills.</p>
@@ -82,6 +83,27 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
      try{api.select(localStorage,link.dataset.alphaMode)}catch(e){/* Navigation remains usable if storage is blocked. */}
    });
  });
+})();
+</script>
+<script src="./active-game-registry.cjs"></script>
+<script>
+(function(){
+ const registry=window.HitLabActiveRegistry;
+ const container=document.getElementById('activeSessions');
+ const labels={cpu:'CPU & Training',rivalry:'Family Rivalry'};
+ const routes={cpu:'../experimental/visual-prototype.html',rivalry:'../multiplayer.html'};
+ for(const entry of registry.scan(localStorage)){
+   const item=document.createElement('p');
+   item.textContent=labels[entry.mode]+': '+(entry.status==='resumable'?'Game may be resumable':entry.status==='finished'?'Last game finished':entry.status==='empty'?'No saved game':entry.status==='unavailable'?'Save inaccessible':entry.status==='invalid'?'Save unrecognized':'No confirmed active game');
+   container.appendChild(item);
+   if(entry.status==='resumable'){
+     const a=document.createElement('a');
+     a.className='action';
+     a.href=routes[entry.mode];
+     a.textContent='Open '+labels[entry.mode]+' saved game';
+     container.appendChild(a);
+   }
+ }
 })();
 </script>
 <div class="notice"><strong>Development preview only.</strong> These are distinct prototypes. Do not assume that scores, teams, or saves transfer between them. Existing V6.3 progress is not migrated or modified.</div>
