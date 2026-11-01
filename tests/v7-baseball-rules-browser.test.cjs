@@ -8,7 +8,7 @@ test('shared base rules drive CPU gameplay without writing Family Rivalry save',
  try{
   const page=await browser.newPage();
   await page.goto(URL+'experimental/visual-prototype.html');
-  assert.deepEqual(await page.evaluate(()=>window.HitLabBaseRules.advance([true,false,true],2)),{bases:[false,true,false],runs:2});
+  assert.deepEqual(await page.evaluate(()=>window.HitLabBaseRules.advance([true,false,true],2)),{bases:[false,true,true],runs:1});
   await page.locator('[data-go="Play"]').first().click();
   await page.locator('[data-go="Game"]').first().click();
   await page.locator('#swing').click();
