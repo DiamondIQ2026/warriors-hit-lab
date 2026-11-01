@@ -1,0 +1,19 @@
+name: Hit Lab - V7 Save Safety
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  save-safety:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check isolated save code
+        run: |
+          node --check v7/save-envelope.cjs
+          node --test tests/v7-save-envelope.test.cjs
