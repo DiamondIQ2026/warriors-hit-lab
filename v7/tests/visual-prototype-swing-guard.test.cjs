@@ -255,3 +255,30 @@ test('fielder coordinates share one source of truth and play calls are accessibl
  assert.match(html,/aria-live','polite/);
  assert.match(html,/prefers-reduced-motion:reduce/);
 });
+
+test('resume action preserves unfinished Family Rivalry state instead of starting over',()=>{
+ const app=boot();
+ const state=app.state();
+ state.mode='Family Rivalry';
+ app.click('',{go:'Game'});
+ app.click('readyBatter');
+ app.click('swing');
+ app.tick();
+ const reps=state.reps,outs=state.outs,inning=state.inning;
+ app.click('',{go:'Home'});
+ app.click('resumeGame');
+ assert.equal(state.screen,'Game');
+ assert.equal(state.reps,reps);
+ assert.equal(state.outs,outs);
+ assert.equal(state.inning,inning);
+});
+test('resume action does not restart finished games',()=>{
+ const app=boot();
+ const state=app.state();
+ state.reps=5;
+ state.gameFinished=true;
+ state.screen='Home';
+ app.click('resumeGame');
+ assert.equal(state.screen,'Home');
+ assert.equal(state.reps,5);
+});
