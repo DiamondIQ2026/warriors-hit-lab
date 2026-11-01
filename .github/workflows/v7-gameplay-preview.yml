@@ -1,0 +1,26 @@
+name: V7 Gameplay Preview Checks
+on:
+  pull_request:
+    paths:
+      - 'v7/**'
+      - 'tests/**'
+      - '.github/workflows/v7-gameplay-preview.yml'
+  push:
+    branches:
+      - 'chatgpt/v7-figma-gameplay-clarity-20261101'
+permissions:
+  contents: read
+jobs:
+  gameplay-static:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Gameplay static regression checks
+        run: node --test tests/v7-figma-gameplay-clarity.test.cjs
+      - name: Check JavaScript syntax
+        run: node --check v7/pass-and-play-ui.js
