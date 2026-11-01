@@ -247,3 +247,11 @@ test('reduced motion applies to defensive reactions as well as ball flight',()=>
  assert.match(html,/prefers-reduced-motion:reduce/);
  assert.match(html,/\.field\.animating \.fielder\.reacting\{animation-duration:\.01ms!important/);
 });
+
+test('fielder coordinates share one source of truth and play calls are accessible',()=>{
+ assert.match(html,/const FIELDER_POSITIONS=/);
+ assert.match(html,/FIELDER_POSITIONS\.map/);
+ assert.match(html,/FIELDER_POSITIONS\.forEach/);
+ assert.match(html,/aria-live','polite/);
+ assert.match(html,/prefers-reduced-motion:reduce/);
+});
