@@ -86,6 +86,7 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
 })();
 </script>
 <script src="./active-game-registry.cjs"></script>
+<script src="./unified-game-state.cjs"></script>
 <script>
 (function(){
  const registry=window.HitLabActiveRegistry;
@@ -100,7 +101,13 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
    if(entry.status==='resumable'){
      const details=document.createElement('p');
      const v=entry.snapshot;
-     details.textContent='Inning '+v.inning+' · '+v.outs+' outs · Away '+v.away+' / Home '+v.home+(v.battingOrder?' · Next lineup spots '+(v.battingOrder.away+1)+' / '+(v.battingOrder.home+1):'');
+     // A shared, stricter game-state contract is required before displaying resume details.
+     let shared=null;
+     try{
+       const key=registry.KEYS[entry.mode];
+       shared=window.HitLabGameState.normalize(entry.mode,JSON.parse(localStorage.getItem(key)));
+     }catch(e){details.textContent='Saved-game state needs review before resume.';}
+     if(shared)details.textContent='Inning '+v.inning+' · '+v.outs+' outs · Away '+v.away+' / Home '+v.home+(v.battingOrder?' · Next lineup spots '+(v.battingOrder.away+1)+' / '+(v.battingOrder.home+1):'');
      container.appendChild(details);
    }
    if(entry.status==='resumable'){
