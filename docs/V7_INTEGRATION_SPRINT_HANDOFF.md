@@ -38,3 +38,10 @@ Review #4 first for save protections. Review #6 before #14 (stacked), and #9 bef
 - Decide whether V7 interactive model should replace or supplement V6.3 solo UI; preserve career save identifiers.
 - Decide whether outcome generation for multiplayer uses a shared simulated-game adapter; current multiplayer prototype allows manual outcome selection for QA.
 - Final staging URL / private playtest approval is still required before any deployment.
+
+## November 1 follow-up — verified integration QA
+- PR #14 multiplayer workflow passed (previous pending status resolved).
+- Added browser tests at commit `02cea211f782b9bee7adaa121d55d78e23ee9547` verifying custom profile names, left/right handedness, team names and all nine lineup names remain saved after reload; an existing `warriors-hit-lab-v4` sentinel is byte-for-byte unchanged.
+- Invalid one-player lineup displays an error and creates no prototype save.
+- GitHub Actions `Hit Lab - V7 Pass and Play` workflow passed on this commit.
+- Still draft. No visual merge with PR #5/#7/#9, no iPhone physical-device validation, no deployment.
