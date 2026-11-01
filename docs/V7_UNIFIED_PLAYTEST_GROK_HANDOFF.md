@@ -26,3 +26,9 @@ The first run at `7b93f89` failed only due to iframe sandbox serviceWorker warni
 
 ## Grok instructions
 Review #15 before editing the shared multiplayer UI. Propose separate patch PR for graphical style or accessibility, and link affected files/tests. Do not edit any of these same branch files concurrently without coordinating.
+
+## November 1 — unified nine-zone input integration
+- Updated `v7/pass-and-play-ui.js` to expose `aria-pressed` and accessible impact-zone labels, and permit arrow-key navigation across the 3×3 net grid; Enter/Space use the native button click behavior.
+- Added real Chromium test in `tests/v7-multiplayer-browser.test.cjs` for 390px viewport, arrow to UC, Enter select, save swing with `zone='UC'`, reset selection, and no horizontal overflow.
+- Commit `83d2c80c845ac1b80cbdee91a80be99d131b9105`; check GitHub workflow before declaring test pass.
+- This integrates swing-entry behaviors into PR #15; it is not a wholesale merge of PR #7's standalone prototype. Retain Grok review of visuals before combining competing UI prototypes. No production change.
