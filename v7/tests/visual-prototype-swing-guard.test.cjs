@@ -202,3 +202,28 @@ test('quick nine-zone picker stays above the primary swing action', () => {
   app.click('', { zone: '9' });
   assert.equal(app.state().zone, 9);
 });
+
+test('rivalry scoreboard indicates top and bottom inning accurately', () => {
+  const app=boot();
+  const state=app.state();
+  state.mode='Family Rivalry';
+  app.click('',{go:'Game'});
+  assert.equal(state.rivalryTurn,'away');
+  app.click('readyBatter');
+  for(let out=0;out<3;out++){app.click('swing');app.tick()}
+  assert.equal(state.rivalryTurn,'home');
+  assert.equal(state.handoff,true);
+  assert.match(html,/state\.rivalryTurn==='away'\?'▲ ':'▼ '/);
+});
+test('ready action is ignored when no handoff is pending or game is finished',()=>{
+ const app=boot();
+ const state=app.state();
+ state.mode='Family Rivalry';
+ app.click('',{go:'Game'});
+ app.click('readyBatter');
+ assert.equal(state.handoff,false);
+ state.gameFinished=true;
+ state.handoff=true;
+ app.click('readyBatter');
+ assert.equal(state.handoff,true);
+});
