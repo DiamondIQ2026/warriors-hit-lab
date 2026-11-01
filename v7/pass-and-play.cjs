@@ -39,7 +39,9 @@ function recordSwing(match,{zone,power,outcome}){
   m.status='final';m.winner=m.home.id;return m;
  }
  if(m.outs===3){
-  m.outs=0;m.bases=[false,false,false];
+  const shared=typeof window!=='undefined'&&window.HitLabBaseRules;
+  const reset=shared?shared.afterThirdOut():{outs:0,bases:[false,false,false]};
+  m.outs=reset.outs;m.bases=reset.bases;
   if(m.half==='top'){
    if(m.inning>=m.innings&&m.score[m.home.id]>m.score[m.away.id]){m.status='final';m.winner=m.home.id;}
    else m.half='bottom';
