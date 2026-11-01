@@ -29,3 +29,10 @@ test('Nine numeric buttons preserve stable impact codes and accessible labels',(
  assert.match(ui,/setAttribute\('aria-pressed',String\(el===b\)\)/);
  assert.match(ui,/const zones=\['UL','UC','UR','ML','MC','MR','LL','LC','LR'\]/);
 });
+
+test('Mobile input and impact grid include touch and accessibility safeguards',()=>{
+ assert.match(html,/input,select,textarea\{width:100%;font-size:16px\}/);
+ assert.match(html,/min-height:44px/);
+ assert.match(html,/\.zones button\{min-height:70px;touch-action:manipulation/);
+ assert.match(html,/id="zones" role="group" aria-label="Nine net-impact zones, batter view"/);
+});
