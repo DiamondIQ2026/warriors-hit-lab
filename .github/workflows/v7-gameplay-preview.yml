@@ -22,6 +22,12 @@ jobs:
           node-version: '22'
       - name: Gameplay static regression checks
         run: node --test tests/v7-figma-gameplay-clarity.test.cjs
+      - name: Install browser testing dependencies
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Launch local preview server
+        run: python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hitlab-preview.log 2>&1 &
       - name: Full V7 multiplayer and Gameplay regression suite
         run: node --test tests/*.test.cjs
       - name: Check JavaScript syntax
