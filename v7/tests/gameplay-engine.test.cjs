@@ -16,7 +16,7 @@ function setup(random=()=>0.99){
  const document={getElementById:el,addEventListener:(name,cb)=>listeners[name]=cb,createElement:()=>({style:{setProperty(){}}})};
  const window={scrollTo(){}};
  vm.runInNewContext(script,{document,window,localStorage:{getItem:()=>null,setItem(){}},setTimeout(){},Math:Object.assign(Object.create(Math),{random})});
- return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance,swing:window.__swing};
+ return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance,parkHit:window.__parkHit,fence:window.__fence,swing:window.__swing};
 }
 test('CPU cannot score more than five runs in one half inning',()=>{
  const app=setup(()=>0);
@@ -145,4 +145,22 @@ test('handoff prevents swing before next family player is ready',()=>{
  Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',handoff:true,reps:4});
  app.swing();
  assert.equal(app.state.reps,4);
+});
+
+test('Tropicana Field uses different left, center, and right fence distances',()=>{
+ const app=setup();
+ assert.equal(app.fence(4),315);
+ assert.equal(app.fence(5),404);
+ assert.equal(app.fence(6),322);
+});
+test('stadium-aware flight converts a short center-field home run into a double',()=>{
+ const app=setup();
+ const center=app.parkHit('MEDIUM',5,4);
+ assert.equal(center.fence,404);
+ assert.equal(center.bases,2);
+ assert.equal(center.cleared,false);
+ const left=app.parkHit('HARD',4,4);
+ assert.equal(left.fence,315);
+ assert.equal(left.bases,4);
+ assert.equal(left.cleared,true);
 });
