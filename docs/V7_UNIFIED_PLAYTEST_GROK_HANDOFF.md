@@ -38,3 +38,9 @@ Review #15 before editing the shared multiplayer UI. Propose separate patch PR f
 - Added a compact middle `VS` panel and retained both teams' live score IDs so game state remains authoritative. The pass-phone primary action stays immediately below scoreboard.
 - Added Chromium 375px test for score values, CSS grid, compact height, no horizontal overflow, and above-fold handoff. Workflow job at `4d9c3a4857c3a1aa8600f54b11baa04ef5213534` completed all steps successfully.
 - This is a draft visual integration. No official Tampa Warriors logo asset was recreated or inserted; preserve exact logo only if its file bytes become available. Next: evaluate screenshot on real iPhone and compare with approved visual mockups.
+
+## November 1 — mobile touch-control polish
+- Changed `v7/multiplayer.html` nine-zone buttons to minimum 76px high with higher contrast, visible pressed/focus states and touch-friendly interaction. Record Swing now uses a sticky, minimum-54px action to remain reachable while scrolling. The three-out phone handoff remains directly under the scoreboard.
+- Added 375px Chromium browser test covering all nine zones' minimum touch dimensions, `aria-pressed` update, middle-middle swing record and horizontal-overflow protection.
+- Commits `cf392b25` (CSS) and `52a362bb` (browser test); verify CI before marking accepted.
+- This is an interface refinement on draft PR #15 only; no official logos, gameplay mechanics, solo save schema or production deployment changed.
