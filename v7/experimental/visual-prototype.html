@@ -15,6 +15,16 @@
 #swing{min-height:58px;font-size:17px;letter-spacing:.04em;box-shadow:0 4px 0 #590817,0 8px 18px #0007}
 #swing:disabled{opacity:.55;cursor:not-allowed}
 @media(max-width:380px){.score{grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr)}.score>div{padding:8px 2px}.score strong{font-size:26px}}
+/* Diamond-view field: readable zones, grass stripes, and a clearly defined infield */
+.field{border:2px solid #7da7bc;border-radius:48% 48% 16px 16px;background:radial-gradient(ellipse at 50% 76%,#347d50 0 26%,#24633e 26% 45%,#174b36 45% 68%,#0a2730 100%);box-shadow:inset 0 0 0 3px #102d3b,inset 0 0 28px #0009,0 9px 20px #0007}
+.field:before{background:repeating-conic-gradient(from -10deg at 50% 83%,#ffffff09 0deg 13deg,#00000006 13deg 26deg);opacity:.8}
+.field .diamond{top:62%;width:32%;border:2px solid #e1c198;background:linear-gradient(45deg,#c59c6d80,#87634388);box-shadow:0 0 0 5px #e5cba41a}
+.field .fielder{width:13px;height:13px;border:2px solid #e7f4ff;border-radius:2px;box-shadow:0 0 0 2px #102c48,0 0 10px #9dc7ff88}
+.field .zones{top:48%;width:min(43%,190px);border:2px solid #e9f2ff;border-radius:7px;overflow:hidden;box-shadow:0 6px 18px #000a,0 0 0 3px #0c244499}
+.field .zones button{border:1px solid #9bc4df77;background:#0d2b4ad9;min-height:38px;font-size:16px;font-weight:900;text-shadow:0 1px 3px #000}
+.field .zones button.chosen{background:linear-gradient(155deg,#ff5265,#a00d28);box-shadow:inset 0 0 0 2px #ffe4e8}
+.field .zones button:focus-visible{outline:3px solid #fff;outline-offset:-4px;z-index:1}
+@media(max-width:380px){.field .zones button{min-height:33px;font-size:14px}}
 @media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}</style>
 <div class="app"><header class="head"><button id="menuButton" aria-label="Open menu">☰</button><div class="brand">TW <b>HIT LAB</b><small>V7 PROTOTYPE</small></div><button id="backButton" aria-label="Go home">⌂</button></header><main class="page" id="page"></main><nav class="nav" id="nav"></nav></div>
 <div class="menu hidden" id="menu"><div class="drawer"><div class="row"><h2>Hit Lab Menu</h2><button id="closeMenu">✕</button></div><div id="menuItems" class="list"></div></div></div>
