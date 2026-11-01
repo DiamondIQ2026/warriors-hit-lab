@@ -27,7 +27,7 @@ test('Nine numeric buttons preserve stable impact codes and accessible labels',(
  assert.match(ui,/Net impact zone /);
  assert.match(ui,/zone=z/);
  assert.match(ui,/setAttribute\('aria-pressed',String\(el===b\)\)/);
- assert.match(ui,/const zones=\['UL','UC','UR','ML','MC','MR','LL','LC','LR'\]/);
+ assert.match(ui,/const zones=window\.HitLabZoneRules\.ZONES/);
 });
 
 test('Mobile input and impact grid include touch and accessibility safeguards',()=>{
