@@ -42,7 +42,13 @@ function recordSwing(match,{zone,power,outcome}){
   const shared=typeof window!=='undefined'&&window.HitLabBaseRules;
   const reset=shared?shared.afterThirdOut():{outs:0,bases:[false,false,false]};
   m.outs=reset.outs;m.bases=reset.bases;
-  if(m.half==='top'){
+  const rules=typeof window!=='undefined'&&window.HitLabFinishRules;
+  const decision=rules?rules.decision({inning:m.inning,scheduled:m.innings,half:m.half,home:m.score[m.home.id],away:m.score[m.away.id],thirdOut:true}):null;
+  if(decision){
+   if(decision.kind==='final'){m.status='final';m.winner=decision.winner==='home'?m.home.id:m.away.id;}
+   else if(decision.kind==='handoff')m.half='bottom';
+   else if(decision.kind==='next-inning'){m.inning=decision.inning;m.half='top';}
+  }else if(m.half==='top'){
    if(m.inning>=m.innings&&m.score[m.home.id]>m.score[m.away.id]){m.status='final';m.winner=m.home.id;}
    else m.half='bottom';
   }else{
