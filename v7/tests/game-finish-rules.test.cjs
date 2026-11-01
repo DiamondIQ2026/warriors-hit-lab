@@ -1,0 +1,12 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const {decision}=require('../alpha/game-finish-rules.cjs');
+const setup=(extra={})=>({inning:3,scheduled:3,half:'bottom',home:2,away:2,...extra});
+test('bottom final inning home lead is a walkoff',()=>{assert.deepEqual(decision(setup({home:3})),{kind:'final',winner:'home',reason:'walkoff'});});
+test('top final inning ends if home already leads after third out',()=>{assert.deepEqual(decision(setup({half:'top',home:4,away:2,thirdOut:true})),{kind:'final',winner:'home',reason:'home-lead'});});
+test('trailing home gets bottom half',()=>{assert.deepEqual(decision(setup({half:'top',home:1,away:3,thirdOut:true})),{kind:'handoff',half:'bottom',inning:3});});
+test('tied completed regulation enters extra innings',()=>{assert.deepEqual(decision(setup({thirdOut:true})),{kind:'next-inning',inning:4,extra:true});});
+test('completed bottom inning gives away win when ahead',()=>{assert.deepEqual(decision(setup({away:5,thirdOut:true})),{kind:'final',winner:'away',reason:'completed'});});
+test('no third out means game continues unless walkoff',()=>{assert.deepEqual(decision(setup()),{kind:'continue'});});
+test('invalid scores and inning fail closed',()=>{assert.throws(()=>decision(setup({home:-1})));assert.throws(()=>decision(setup({half:'left'})));});
