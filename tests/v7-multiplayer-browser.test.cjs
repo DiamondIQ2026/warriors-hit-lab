@@ -131,3 +131,32 @@ test('invalid nine-person lineup blocks match creation without corrupting saved 
   await context.close();
  }finally{await browser.close()}
 });
+
+test('unified multiplayer and simulated flight preview leave career and game state untouched',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  await page.locator('#zones button').first().click();
+  await page.locator('#outcome').selectOption('double');
+  await page.locator('#record').click();
+  const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
+  const show=page.locator('#viewFlight');
+  assert.equal(await show.isVisible(),true);
+  await show.click();
+  assert.equal(await page.locator('#flightDialog').evaluate(e=>e.open),true);
+  const frame=page.frameLocator('#flightFrame');
+  await frame.locator('#play').click();
+  await frame.locator('#skip').click();
+  assert.match(await frame.locator('#result').innerText(),/Double.*complete/);
+  await page.locator('#closeFlight').click();
+  assert.equal(await page.locator('#flightDialog').evaluate(e=>e.open),false);
+  assert.equal(await page.locator('#flightFrame').getAttribute('src'),null);
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v4')),null);
+  await context.close();
+ }finally{await browser.close()}
+});
