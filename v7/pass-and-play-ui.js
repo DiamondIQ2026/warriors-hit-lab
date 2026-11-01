@@ -4,7 +4,7 @@
  const KEY='warriors-hit-lab-v7-multiplayer-prototype';
  const $=id=>document.getElementById(id);
  let match=null,zone=null,acknowledge=false,lastTurn=null;
- const zones=['UL','UC','UR','ML','MC','MR','LL','LC','LR'];
+ const zones=window.HitLabZoneRules.ZONES;
  function getNames(id){return $(id).value.trim().split(/\r?\n/).map(x=>x.trim());}
  function setDefaults(){
   $('homeLineup').value=Array.from({length:9},(_,i)=>'Titan '+(i+1)).join('\n');
@@ -58,7 +58,7 @@
  };
  const zoneRoot=$('zones');
  for(const [zoneIndex,z] of zones.entries()){
-  const b=document.createElement('button');b.textContent=String(zoneIndex+1);b.type='button';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Net impact zone '+(zoneIndex+1)+' of 9 ('+z+')');b.onclick=()=>{zone=z;for(const el of zoneRoot.children){el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',String(el===b));}render();};b.addEventListener('keydown',e=>{const keys={ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3};if(!(e.key in keys))return;e.preventDefault();const next=(zones.indexOf(z)+keys[e.key]+9)%9;zoneRoot.children[next].focus();});zoneRoot.appendChild(b);
+  const b=document.createElement('button');b.textContent=String(zoneIndex+1);b.type='button';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Net impact zone '+(zoneIndex+1)+' of 9 ('+z+')');b.onclick=()=>{zone=window.HitLabZoneRules.label(z);for(const el of zoneRoot.children){el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',String(el===b));}render();};b.addEventListener('keydown',e=>{const keys={ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3};if(!(e.key in keys))return;e.preventDefault();const next=(zones.indexOf(z)+keys[e.key]+9)%9;zoneRoot.children[next].focus();});zoneRoot.appendChild(b);
  }
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
