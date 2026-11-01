@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hit Lab V7 — Animation Sandbox</title>
+<style>
+:root{font-family:system-ui,Arial;background:#081528;color:#f4f7fc;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;padding:18px}.wrap{max-width:890px;margin:auto}
+header{display:flex;justify-content:space-between;gap:10px;align-items:center}h1{font-size:clamp(1.35rem,4vw,2rem);margin:.3em 0}
+small,p{color:#b9c8e0}.tag{padding:.4em .75em;border:1px solid #607694;border-radius:24px;font-size:.75rem}
+main{background:#10243c;border:1px solid #304a68;border-radius:18px;padding:14px;box-shadow:0 18px 50px #0004}
+svg{display:block;width:100%;background:#102f35;border-radius:13px;max-height:520px;aspect-ratio:16/10}
+.controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0}
+label{display:grid;gap:5px;font-size:.84rem;color:#b9c8e0}
+select,button{font:inherit;background:#203c58;color:#fff;border:1px solid #617896;border-radius:9px;padding:10px;min-height:43px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}.primary{background:#d52a40;border-color:#d52a40;font-weight:750}
+button:focus-visible,select:focus-visible{outline:3px solid #ffcf65;outline-offset:2px}
+#result{font-weight:800;font-size:1.2rem;min-height:32px}
+@media(max-width:570px){.controls{grid-template-columns:repeat(2,minmax(0,1fr))}body{padding:9px}}
+@media(prefers-reduced-motion:reduce){svg *{animation:none!important}}
+</style></head><body><div class="wrap">
+<header><div><small>WARRIORS HIT LAB / V7</small><h1>Simulated Ball Flight</h1></div><span class="tag">ISOLATED PREVIEW</span></header>
+<p>Prototype only — fictional trajectory and fielding visuals. No live game, career stats, or saved data are modified.</p>
+<main>
+<svg id="field" viewBox="0 0 800 510" role="img" aria-label="Illustrated baseball diamond with simulated ball path">
+ <defs><radialGradient id="grass"><stop stop-color="#327d4e"/><stop offset="1" stop-color="#17533e"/></radialGradient></defs>
+ <path d="M40 490 L400 32 L760 490 Z" fill="url(#grass)" stroke="#9bc8a6" stroke-width="3"/>
+ <path d="M400 442 L250 315 L400 186 L550 315 Z" fill="#ab7e58" stroke="#dfb991" stroke-width="3"/>
+ <path d="M400 441 L400 36 M400 441 L42 490 M400 441 L758 490" fill="none" stroke="#e8ece1" stroke-width="2" stroke-dasharray="7 6" opacity=".6"/>
+ <g fill="#f4e8d2" stroke="#fff" stroke-width="2"><rect x="391" y="428" width="18" height="18" transform="rotate(45 400 437)"/><rect x="541" y="306" width="18" height="18" transform="rotate(45 550 315)"/><rect x="391" y="177" width="18" height="18" transform="rotate(45 400 186)"/><rect x="241" y="306" width="18" height="18" transform="rotate(45 250 315)"/></g>
+ <g fill="#cbd5e1" stroke="#061e34" stroke-width="3"><circle cx="400" cy="186" r="8"/><circle cx="300" cy="193" r="8"/><circle cx="500" cy="193" r="8"/><circle cx="217" cy="118" r="8"/><circle cx="583" cy="118" r="8"/><circle cx="401" cy="85" r="8"/></g>
+ <polyline id="trail" points="" fill="none" stroke="#ffe9a5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+ <circle id="ball" cx="400" cy="440" r="8" fill="#fff" stroke="#cf3650" stroke-width="2"/>
+ <text x="18" y="27" fill="#ecf4ff" font-size="16">SIMULATED • NOT TRACKED</text>
+</svg>
+<div class="controls">
+<label>Net impact<select id="zone"><option>MC</option><option>UL</option><option>UC</option><option>UR</option><option>ML</option><option>MR</option><option>LL</option><option>LC</option><option>LR</option></select></label>
+<label>Contact<select id="contact"><option>hard</option><option>medium</option><option>soft</option></select></label>
+<label>Outcome<select id="outcome"><option>single</option><option>double</option><option>triple</option><option>homer</option><option>out</option></select></label>
+<label>Bats<select id="hand"><option value="R">Right</option><option value="L">Left</option></select></label>
+</div>
+<div class="actions"><button id="play" class="primary">PLAY SIMULATION</button><button id="skip">SKIP ANIMATION</button><button id="replay">REPLAY</button></div>
+<p id="result" role="status" aria-live="polite">Choose a scenario to preview.</p>
+</main></div>
+<script src="./flight-browser.js"></script>
+</body></html>
