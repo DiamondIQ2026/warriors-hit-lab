@@ -68,11 +68,20 @@ test('drill animation rejects duplicate swing, then permits next rep', () => {
   app.click('', { go: 'Training' });
   app.click('', { drill: 'Zone Precision' });
   app.click('swing');
-  app.click('', { zone: '5' }); // Re-render may recreate an enabled button.
+  const zoneBefore = app.state().zone;
+  const contactBefore = app.state().contact;
+  app.click('', { zone: '5' }); // Active animation must not redraw the field.
+  app.click('', { contact: 'HARD' });
+  assert.equal(app.state().zone, zoneBefore);
+  assert.equal(app.state().contact, contactBefore);
   app.click('swing');
   assert.equal(app.state().reps, 1);
   assert.equal(app.state().trainingLog.length, 1);
   app.tick();
+  app.click('', { zone: '5' });
+  app.click('', { contact: 'HARD' });
+  assert.equal(app.state().zone, 5);
+  assert.equal(app.state().contact, 'HARD');
   app.click('swing');
   assert.equal(app.state().reps, 2);
   assert.equal(app.state().trainingLog.length, 2);
