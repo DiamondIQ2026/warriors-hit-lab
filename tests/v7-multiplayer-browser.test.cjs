@@ -86,3 +86,48 @@ test('rapid double submission counts exactly one real tee swing',async()=>{
   await context.close();
  }finally{await browser.close()}
 });
+
+test('custom multiplayer profiles and lineups survive reload without touching a preexisting solo career',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block'});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  const sentinel='{"preserve":"real career sentinel","version":4}';
+  await page.evaluate(value=>localStorage.setItem('warriors-hit-lab-v4',value),sentinel);
+  await page.locator('#homeName').fill('Coach Dad');
+  await page.locator('#homeTeam').fill('Titans Blue');
+  await page.locator('#homeHand').selectOption('L');
+  await page.locator('#awayName').fill('Junior');
+  await page.locator('#awayTeam').fill('Warriors Red');
+  await page.locator('#awayHand').selectOption('R');
+  await page.locator('#awayLineup').fill(Array.from({length:9},(_,i)=>'Junior Batter '+(i+1)).join('\n'));
+  await page.locator('#start').click();
+  let m=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(m.home.name,'Coach Dad');
+  assert.equal(m.home.hand,'L');
+  assert.equal(m.away.name,'Junior');
+  assert.equal(m.away.lineup[8],'Junior Batter 9');
+  assert.match(await page.locator('#turn').innerText(),/JUNIOR/);
+  await page.reload();
+  m=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(m.away.team,'Warriors Red');
+  assert.equal(m.home.team,'Titans Blue');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v4')),sentinel);
+  await context.close();
+ }finally{await browser.close()}
+});
+test('invalid nine-person lineup blocks match creation without corrupting saved state',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block'});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#homeLineup').fill('Only One');
+  await page.locator('#start').click();
+  assert.match(await page.locator('#setupError').innerText(),/Nine lineup slots required/);
+  assert.equal(await page.locator('#game').isVisible(),false);
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),null);
+  await context.close();
+ }finally{await browser.close()}
+});
