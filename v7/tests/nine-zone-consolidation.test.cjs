@@ -20,5 +20,5 @@ test('CPU and rivalry UI use the same source of nine-zone truth',()=>{
  const rivalry=fs.readFileSync(path.join(root,'pass-and-play-ui.js'),'utf8');
  assert.match(cpu,/HitLabZoneRules\.number\(b\.dataset\.zone\)/);
  assert.match(rivalry,/HitLabZoneRules\.ZONES/);
- assert.match(rivalry,/HitLabZoneRules\.label\(z\)/);
+ assert.match(rivalry,/zone=z/);
 });
