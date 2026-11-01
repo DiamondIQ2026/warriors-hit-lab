@@ -92,10 +92,17 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
  const container=document.getElementById('activeSessions');
  const labels={cpu:'CPU & Training',rivalry:'Family Rivalry'};
  const routes={cpu:'../experimental/visual-prototype.html',rivalry:'../multiplayer.html'};
- for(const entry of registry.scan(localStorage)){
+ for(const candidate of registry.scan(localStorage)){
+   const entry=registry.snapshot(localStorage,candidate.mode);
    const item=document.createElement('p');
    item.textContent=labels[entry.mode]+': '+(entry.status==='resumable'?'Game may be resumable':entry.status==='finished'?'Last game finished':entry.status==='empty'?'No saved game':entry.status==='unavailable'?'Save inaccessible':entry.status==='invalid'?'Save unrecognized':'No confirmed active game');
    container.appendChild(item);
+   if(entry.status==='resumable'){
+     const details=document.createElement('p');
+     const v=entry.snapshot;
+     details.textContent='Inning '+v.inning+' · '+v.outs+' outs · Away '+v.away+' / Home '+v.home+(v.battingOrder?' · Next lineup spots '+(v.battingOrder.away+1)+' / '+(v.battingOrder.home+1):'');
+     container.appendChild(details);
+   }
    if(entry.status==='resumable'){
      const a=document.createElement('a');
      a.className='action';
