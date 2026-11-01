@@ -36,19 +36,37 @@ function decode(raw){
  if(!payload||typeof payload!=='object'||Array.isArray(payload))return {status:'INVALID',reason:'Invalid payload'};
  return {status:'OK',seq:envelope.seq,payload,envelope};
 }
-function selectSlots(storage){
- // Read-only inspection. Never modifies the provided adapter or any storage key.
- const slots=['a','b'].map(id=>{
-  const raw=storage.getItem(PREFIX+'slot:'+id);
-  return {id,present:raw!==null,result:raw===null?null:decode(raw)};
- });
+function selectSlots(storage,validatePayload){
+ // Read-only and fail-closed: never treat inaccessible storage as an empty career.
+ if(!storage||typeof storage.getItem!=='function')
+  return {status:'STORAGE_UNAVAILABLE',reason:'Storage adapter unavailable',failures:[]};
+ let slots;
+ try{
+  slots=['a','b'].map(id=>{
+   const raw=storage.getItem(PREFIX+'slot:'+id);
+   let result=raw===null?null:decode(raw);
+   if(result?.status==='OK'&&typeof validatePayload==='function'){
+    let accepted=false;
+    try{accepted=validatePayload(result.payload)===true;}catch{}
+    if(!accepted)result={status:'INVALID',reason:'Payload validation failed'};
+   }
+   return {id,present:raw!==null,result};
+  });
+ }catch{
+  return {status:'STORAGE_UNAVAILABLE',reason:'Storage read failed',failures:[]};
+ }
+ // A future save takes precedence over an older readable slot: never allow downgrade writes.
+ if(slots.some(s=>s.result?.status==='FUTURE'))
+  return {status:'FUTURE',failures:slots.filter(s=>s.present)};
  const valid=slots.filter(s=>s.result?.status==='OK').sort((a,b)=>b.result.seq-a.result.seq);
+ if(valid.length===2&&valid[0].result.seq===valid[1].result.seq&&
+    valid[0].result.envelope.payloadJson!==valid[1].result.envelope.payloadJson)
+  return {status:'CONFLICT',failures:slots.filter(s=>s.present)};
  if(valid.length){
   const failures=slots.filter(s=>s.present&&s.result.status!=='OK');
   return {status:failures.length?'FALLBACK':'OK',slot:valid[0].id,seq:valid[0].result.seq,
     payload:valid[0].result.payload,failures};
  }
- if(slots.some(s=>s.result?.status==='FUTURE'))return {status:'FUTURE',failures:slots.filter(s=>s.present)};
  if(slots.some(s=>s.present))return {status:'RECOVERY',failures:slots.filter(s=>s.present)};
  return {status:'EMPTY',failures:[]};
 }
