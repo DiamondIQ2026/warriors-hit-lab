@@ -16,7 +16,7 @@ h1 { font-size:clamp(1.85rem,7vw,2.6rem); margin:12px 0 }
 .card h2 { margin:0 0 8px; font-size:1.24rem }
 .card p { color:#c8d8e8; line-height:1.5; margin:0 0 14px }
 a.action { display:block; text-align:center; color:#fff; background:linear-gradient(#f63d54,#a8162d); border:1px solid #ff8798; border-radius:11px; padding:15px 12px; min-height:50px; font-weight:850; text-decoration:none }
-input,select{display:block;width:100%;margin:7px 0 13px;background:#0b2747;color:white;border:1px solid #7199b9;border-radius:8px;padding:10px;font:inherit}button.action{width:100%;cursor:pointer;color:white;background:#ad1930;border:1px solid #ff8798;border-radius:11px;padding:14px;font:inherit;font-weight:800}a.action:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible { outline:3px solid #fff; outline-offset:3px }
+input,select{display:block;width:100%;margin:7px 0 13px;background:#0b2747;color:white;border:1px solid #7199b9;border-radius:8px;padding:10px;font:inherit}button.action{width:100%;cursor:pointer;color:white;background:#ad1930;border:1px solid #ff8798;border-radius:11px;padding:14px;font:inherit;font-weight:800}[hidden]{display:none!important}a.action:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible { outline:3px solid #fff; outline-offset:3px }
 .card.secondary a.action { background:linear-gradient(#2a659f,#11345c); border-color:#81b5ee }
 .notice { border-left:3px solid #e8b35a; padding:11px 14px; color:#e6d9b8; background:#392b20a8; font-size:.89rem; line-height:1.45 }
 footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
@@ -27,15 +27,16 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
 <div class="eyebrow">Warriors Hit Lab • V7 Build A</div>
 <h1>Unified Alpha Test Hub</h1>
 <p class="lead">Two working development experiences are packaged together for mobile review. This hub does not combine game progress or save data between them.</p>
+<div class="card" id="sessionPanel" aria-live="polite"><strong id="sessionTitle">Choose a game mode</strong><p id="sessionDescription">Your most recently selected alpha experience will appear here.</p><a id="resumeAlpha" class="action" href="./index.html" hidden>Continue selected mode</a></div>
 <section class="card" aria-labelledby="cpu-title">
 <h2 id="cpu-title">CPU Game & Training Academy</h2>
 <p>Test nine-zone tee swings, inning outcomes, simulated opponent play, and isolated training drills.</p>
-<a class="action" href="../experimental/visual-prototype.html">Open CPU & Training Alpha</a>
+<a class="action" href="../experimental/visual-prototype.html" data-alpha-mode="cpu">Open CPU & Training Alpha</a>
 </section>
 <section class="card secondary" aria-labelledby="family-title">
 <h2 id="family-title">Family Rivalry / Pass & Play</h2>
 <p>Test the separate local multiplayer experience, inning handoffs, and mobile navigation.</p>
-<a class="action" href="../multiplayer.html">Open Family Rivalry Alpha</a>
+<a class="action" href="../multiplayer.html" data-alpha-mode="rivalry">Open Family Rivalry Alpha</a>
 </section>
 <section class="card" aria-labelledby="profile-title"><h2 id="profile-title">Shared Alpha Player Profile</h2><p>Save a V7-only player identity for both preview screens to display. Existing game lineups and saves are not changed.</p><form id="profileForm"><label>Player name <input id="alphaName" maxlength="24" required autocomplete="off"></label><label>Team <input id="alphaTeam" maxlength="40" required autocomplete="off"></label><label>Batting hand <select id="alphaHand"><option value="Right">Right-handed</option><option value="Left">Left-handed</option></select></label><button class="action" type="submit">Save Alpha Profile</button></form><p id="profileStatus" role="status" aria-live="polite"></p></section>
 <script src="./shared-profile.cjs"></script><script>
@@ -56,6 +57,30 @@ footer { color:#9eb7ce; font-size:.76rem; margin-top:22px }
    const p=api.save(localStorage,{name:document.getElementById('alphaName').value,team:document.getElementById('alphaTeam').value,hand:document.getElementById('alphaHand').value});
    status.textContent='Saved shared alpha profile for '+p.name+'.';
   }catch(e){status.textContent='Not saved: '+e.message;}
+ });
+})();
+</script>
+<script src="./navigation-session.cjs"></script>
+<script>
+(function(){
+ const api=window.HitLabAlphaSession;
+ const title=document.getElementById('sessionTitle');
+ const desc=document.getElementById('sessionDescription');
+ const resume=document.getElementById('resumeAlpha');
+ const last=api.read(localStorage);
+ if(last.status==='ok'&&last.session.mode!=='home'){
+   const mode=last.session.mode;
+   title.textContent=mode==='cpu'?'Last selected: CPU & Training':'Last selected: Family Rivalry';
+   desc.textContent='Continue into the selected alpha experience. Existing gameplay saves remain separate and are not modified.';
+   resume.href=api.destination(mode);
+   resume.hidden=false;
+ }else if(last.status==='unavailable'){
+   desc.textContent='Navigation preference unavailable. Choose a mode below; gameplay saves are unchanged.';
+ }
+ document.querySelectorAll('a[data-alpha-mode]').forEach(link=>{
+   link.addEventListener('click',()=>{
+     try{api.select(localStorage,link.dataset.alphaMode)}catch(e){/* Navigation remains usable if storage is blocked. */}
+   });
  });
 })();
 </script>
