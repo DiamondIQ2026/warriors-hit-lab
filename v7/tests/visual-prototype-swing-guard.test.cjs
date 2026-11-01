@@ -146,3 +146,46 @@ test('Family Rivalry final screen includes park and both players total runs', ()
   assert.match(html, /rivalry\?state\.away\+state\.home:state\.home/);
   assert.match(html, /selectedPark\(\)\.name/);
 });
+
+test('three-inning Tropicana Field rivalry plays through all handoffs to final', () => {
+  const app = boot();
+  const state = app.state();
+  state.mode = 'Family Rivalry';
+  state.innings = 3;
+  state.rivalName = 'Dad';
+  state.homeName = 'Son';
+  app.click('', { go: 'Game' });
+  assert.equal(state.ballpark, 'trop');
+  assert.equal(state.handoff, true);
+  for (let inning = 1; inning <= 3; inning++) {
+    assert.equal(state.inning, inning);
+    assert.equal(state.rivalryTurn, 'away');
+    app.click('readyBatter');
+    assert.equal(state.handoff, false);
+    for (let out = 0; out < 3; out++) {
+      app.click('swing');
+      assert.equal(state.animating, true);
+      app.tick();
+    }
+    assert.equal(state.rivalryTurn, 'home');
+    assert.equal(state.handoff, true);
+    app.click('readyBatter');
+    for (let out = 0; out < 3; out++) {
+      app.click('swing');
+      app.tick();
+    }
+    if (inning < 3) {
+      assert.equal(state.rivalryTurn, 'away');
+      assert.equal(state.handoff, true);
+    }
+  }
+  assert.equal(state.gameFinished, false);
+  assert.equal(state.extraInnings, 1);
+  assert.equal(state.inning, 4);
+  assert.equal(state.rivalryTurn, 'away');
+  assert.equal(state.away, 0);
+  assert.equal(state.home, 0);
+  assert.equal(state.reps, 18);
+  assert.equal(state.rivalryStats.away.reps, 9);
+  assert.equal(state.rivalryStats.home.reps, 9);
+});
