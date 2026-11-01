@@ -22,5 +22,9 @@ jobs:
           node-version: '22'
       - name: Gameplay static regression checks
         run: node --test tests/v7-figma-gameplay-clarity.test.cjs
+      - name: Full V7 multiplayer and Gameplay regression suite
+        run: node --test tests/*.test.cjs
       - name: Check JavaScript syntax
-        run: node --check v7/pass-and-play-ui.js
+        run: |
+          node --check v7/pass-and-play-ui.js
+          node --check v7/pass-and-play.cjs
