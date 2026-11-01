@@ -34,7 +34,7 @@ test('two players alternate after three recorded outs; reload preserves turn and
  data=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
  assert.equal(data.realSwings.dad,1);
  assert.equal(data.atBats.length,4);
- assert.deepEqual(errors,[]);
+ assert.deepEqual(errors.filter(m=>!m.includes("Service worker is disabled because the context is sandboxed and lacks the 'allow-same-origin' flag")),[]);
  await context.close();
  }finally{await browser.close()}
 });
@@ -128,6 +128,108 @@ test('invalid nine-person lineup blocks match creation without corrupting saved 
   assert.match(await page.locator('#setupError').innerText(),/Nine lineup slots required/);
   assert.equal(await page.locator('#game').isVisible(),false);
   assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),null);
+  await context.close();
+ }finally{await browser.close()}
+});
+
+test('unified multiplayer and simulated flight preview leave career and game state untouched',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  await page.locator('#zones button').first().click();
+  await page.locator('#outcome').selectOption('double');
+  await page.locator('#record').click();
+  const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
+  const show=page.locator('#viewFlight');
+  assert.equal(await show.isVisible(),true);
+  await show.click();
+  assert.equal(await page.locator('#flightDialog').evaluate(e=>e.open),true);
+  const frame=page.frameLocator('#flightFrame');
+  await frame.locator('#play').click();
+  await frame.locator('#skip').click();
+  assert.match(await frame.locator('#result').innerText(),/Double.*complete/);
+  await page.locator('#closeFlight').click();
+  assert.equal(await page.locator('#flightDialog').evaluate(e=>e.open),false);
+  assert.equal(await page.locator('#flightFrame').getAttribute('src'),null);
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v4')),null);
+  await context.close();
+ }finally{await browser.close()}
+});
+
+test('unified nine-zone selector supports keyboard arrows and announces selection',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:390,height:844}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  const first=page.locator('#zones button').first();
+  await first.focus();
+  await page.keyboard.press('ArrowRight');
+  const second=page.locator('#zones button').nth(1);
+  assert.equal(await second.evaluate(e=>document.activeElement===e),true);
+  await page.keyboard.press('Enter');
+  assert.equal(await second.getAttribute('aria-pressed'),'true');
+  assert.equal(await first.getAttribute('aria-pressed'),'false');
+  await page.locator('#record').click();
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),'warriors-hit-lab-v7-multiplayer-prototype');
+  assert.equal(saved.atBats[0].zone,'UC');
+  assert.equal(await second.getAttribute('aria-pressed'),'false');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});
+
+test('metallic scoreboard displays both team scores with compact mobile geometry',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:375,height:812}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  const score=page.locator('.score');
+  assert.equal(await score.evaluate(e=>getComputedStyle(e).display),'grid');
+  assert.match(await page.locator('#awayScore').innerText(),/Tampa Warriors 0/);
+  assert.match(await page.locator('#homeScore').innerText(),/Tampa Titans 0/);
+  assert.equal(await page.locator('.scoreMid').innerText(),'VS');
+  const bounds=await score.boundingBox();
+  assert.ok(bounds&&bounds.height<115,'Scoreboard should remain compact');
+  const handoff=await page.locator('#turn').boundingBox();
+  assert.ok(handoff&&handoff.y<480,'Primary handoff CTA must stay high');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});
+
+test('touch zone controls are adequately sized and recording action stays reachable at 375px',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:375,height:812}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  await page.locator('#start').click();
+  await page.locator('#turn').click();
+  const zones=page.locator('#zones button');
+  assert.equal(await zones.count(),9);
+  for(let i=0;i<9;i++){
+   const b=await zones.nth(i).boundingBox();
+   assert.ok(b&&b.height>=70&&b.width>=70,'Zone touch target too small: '+i);
+  }
+  await zones.nth(4).click();
+  assert.equal(await zones.nth(4).getAttribute('aria-pressed'),'true');
+  await page.locator('#record').scrollIntoViewIfNeeded();
+  const record=await page.locator('#record').boundingBox();
+  assert.ok(record&&record.height>=48);
+  await page.locator('#record').click();
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(saved.atBats[0].zone,'MC');
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
   await context.close();
  }finally{await browser.close()}
 });

@@ -42,7 +42,7 @@
  };
  const zoneRoot=$('zones');
  for(const z of zones){
-  const b=document.createElement('button');b.textContent=z;b.type='button';b.onclick=()=>{zone=z;for(const el of zoneRoot.children)el.classList.toggle('active',el===b);render();};zoneRoot.appendChild(b);
+  const b=document.createElement('button');b.textContent=z;b.type='button';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Net impact '+z);b.onclick=()=>{zone=z;for(const el of zoneRoot.children){el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',String(el===b));}render();};b.addEventListener('keydown',e=>{const keys={ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3};if(!(e.key in keys))return;e.preventDefault();const next=(zones.indexOf(z)+keys[e.key]+9)%9;zoneRoot.children[next].focus();});zoneRoot.appendChild(b);
  }
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
@@ -50,12 +50,26 @@
    const old=api.currentTurn(match);
    match=api.recordSwing(match,{zone,power:$('power').value,outcome:$('outcome').value});
    $('event').textContent='Recorded '+zone+' / '+$('power').value+' • simulated '+$('outcome').value+'.';
+   $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
+   $('viewFlight').classList.remove('hidden');
    if(old.playerId!==api.currentTurn(match).playerId||old.half!==match.half)acknowledge=false;
-   zone=null;for(const el of zoneRoot.children)el.classList.remove('active');
+   zone=null;for(const el of zoneRoot.children){el.classList.remove('active');el.setAttribute('aria-pressed','false');}
    persist();render();
   }catch(e){$('event').textContent=e.message;}
  };
- $('backup').onclick=()=>{
+ $('viewFlight').onclick=()=>{
+  const url=$('viewFlight').dataset.url;
+  if(!url)return;
+  $('flightFrame').src=url;
+  $('flightDialog').showModal();
+ };
+ function closeFlight(){
+  $('flightDialog').close();
+  $('flightFrame').removeAttribute('src');
+ }
+ $('closeFlight').onclick=closeFlight;
+ $('flightDialog').addEventListener('close',()=>{$('flightFrame').removeAttribute('src')});
+  $('backup').onclick=()=>{
   const blob=new Blob([JSON.stringify(match,null,2)],{type:'application/json'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='hit-lab-v7-multiplayer-prototype.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
  };
