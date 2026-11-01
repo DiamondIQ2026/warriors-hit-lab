@@ -1,7 +1,7 @@
 name: Hit Lab - V7 Save Safety
 on:
   pull_request:
-    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101']
+    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101', 'chatgpt/v7-reader-failclosed-20261101']
   workflow_dispatch:
 permissions:
   contents: read
@@ -17,4 +17,5 @@ jobs:
         run: |
           node --check v7/save-envelope.cjs
           node --check v7/save-write.cjs
-          node --test tests/v7-save-envelope.test.cjs tests/v7-save-write.test.cjs
+          node --check tests/v7-cross-tab-race.test.cjs
+          node --test tests/v7-save-envelope.test.cjs tests/v7-save-write.test.cjs tests/v7-cross-tab-race.test.cjs
