@@ -189,3 +189,16 @@ test('three-inning Tropicana Field rivalry plays through all handoffs to final',
   assert.equal(state.rivalryStats.away.reps, 9);
   assert.equal(state.rivalryStats.home.reps, 9);
 });
+
+test('quick nine-zone picker stays above the primary swing action', () => {
+  assert.match(html, /function quickZonePicker\(\)/);
+  assert.match(html, /aria-label="Quick batting zone selection"/);
+  const game = html.slice(html.indexOf('function game(){'),html.indexOf('function training(){'));
+  assert.ok(game.indexOf('quickZonePicker()') < game.indexOf('id="swing"'));
+  const app = boot();
+  app.state().mode = 'Family Rivalry';
+  app.click('', { go: 'Game' });
+  app.click('readyBatter');
+  app.click('', { zone: '9' });
+  assert.equal(app.state().zone, 9);
+});
