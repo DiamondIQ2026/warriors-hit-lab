@@ -94,7 +94,7 @@ function simulateOpponentHalf(){const chances={Rookie:.18,Veteran:.27,'All-Star'
 function finishGame(reason){state.gameStarted=false;state.gameFinished=true;state.handoff=false;state.finalReason=reason;state.outs=Math.min(state.outs,3)}
 function completeInning(){
  if(state.mode==='Family Rivalry'&&state.rivalryTurn==='away'){
-  state.outs=0;state.bases=[false,false,false];
+  const reset=window.HitLabBaseRules.afterThirdOut();state.outs=reset.outs;state.bases=reset.bases;
   if(state.inning>=state.innings&&state.home>state.away){finishGame('Home player leads after the top of the final inning.');return 0}
   state.rivalryTurn='home';state.feedback='SWITCH PLAYERS · HOME TEAM BATS';state.handoff=true;
   state.log.unshift('TOP '+state.inning+' COMPLETE · SWITCH PLAYERS');return 0
@@ -102,7 +102,7 @@ function completeInning(){
  const completed=state.inning;
  state.rivalryTurn=state.mode==='Family Rivalry'?'away':'home';
  state.handoff=state.mode==='Family Rivalry';
- state.outs=0;state.bases=[false,false,false];state.inning++;
+ const reset=window.HitLabBaseRules.afterThirdOut();state.outs=reset.outs;state.bases=reset.bases;state.inning++;
  if(completed>=state.innings){
   if(state.home!==state.away){finishGame('Completed '+completed+' inning'+(completed===1?'':'s')+(state.extraInnings?' including '+state.extraInnings+' extra':'')+'.');return 0}
   state.extraInnings++;state.log.unshift('EXTRA INNING '+state.inning+' STARTS')
