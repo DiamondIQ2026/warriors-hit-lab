@@ -75,7 +75,8 @@ test('drill animation rejects duplicate swing, then permits next rep', () => {
   assert.equal(app.state().zone, zoneBefore);
   assert.equal(app.state().contact, contactBefore);
   app.click('swing');
-  assert.equal(app.state().reps, 1);
+  assert.equal(app.state().trainingReps, 1);
+  assert.equal(app.state().reps, 0, 'drill must not alter game reps');
   assert.equal(app.state().trainingLog.length, 1);
   app.tick();
   app.click('', { zone: '5' });
@@ -83,7 +84,8 @@ test('drill animation rejects duplicate swing, then permits next rep', () => {
   assert.equal(app.state().zone, 5);
   assert.equal(app.state().contact, 'HARD');
   app.click('swing');
-  assert.equal(app.state().reps, 2);
+  assert.equal(app.state().trainingReps, 2);
+  assert.equal(app.state().reps, 0, 'drill must not alter game reps');
   assert.equal(app.state().trainingLog.length, 2);
   const refreshed = boot(app.saved());
   assert.equal(refreshed.state().animating, false, 'reload must clear transient lock');
