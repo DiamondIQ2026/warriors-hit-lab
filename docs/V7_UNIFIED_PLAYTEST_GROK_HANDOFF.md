@@ -32,3 +32,9 @@ Review #15 before editing the shared multiplayer UI. Propose separate patch PR f
 - Added real Chromium test in `tests/v7-multiplayer-browser.test.cjs` for 390px viewport, arrow to UC, Enter select, save swing with `zone='UC'`, reset selection, and no horizontal overflow.
 - Commit `83d2c80c845ac1b80cbdee91a80be99d131b9105`; check GitHub workflow before declaring test pass.
 - This integrates swing-entry behaviors into PR #15; it is not a wholesale merge of PR #7's standalone prototype. Retain Grok review of visuals before combining competing UI prototypes. No production change.
+
+## November 1 — metallic scoreboard integration
+- Reviewed draft PR #10 metallic scoreboard CSS and adapted its chrome frame, navy away, red home visual system to the active multiplayer scoreboard in `v7/multiplayer.html` rather than copying overlapping prototype markup.
+- Added a compact middle `VS` panel and retained both teams' live score IDs so game state remains authoritative. The pass-phone primary action stays immediately below scoreboard.
+- Added Chromium 375px test for score values, CSS grid, compact height, no horizontal overflow, and above-fold handoff. Workflow job at `4d9c3a4857c3a1aa8600f54b11baa04ef5213534` completed all steps successfully.
+- This is a draft visual integration. No official Tampa Warriors logo asset was recreated or inserted; preserve exact logo only if its file bytes become available. Next: evaluate screenshot on real iPhone and compare with approved visual mockups.
