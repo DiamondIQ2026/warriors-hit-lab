@@ -9,7 +9,7 @@ const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Prototype script exists');
 const anchor="el('menuButton').onclick=";
 assert.ok(match[1].includes(anchor),'Test hook anchor exists');
-const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;window.__swing=swing;"+anchor);
+const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;window.__parkHit=parkAdjustedHit;window.__fence=fenceDistance;window.__swing=swing;"+anchor);
 function setup(random=()=>0.99){
  const elements={};const listeners={};
  const el=id=>elements[id]??(elements[id]={innerHTML:'',textContent:'',disabled:false,classList:{add(){},remove(){},toggle(){}},style:{setProperty(){}},appendChild(){}});
