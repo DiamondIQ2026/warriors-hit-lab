@@ -114,3 +114,16 @@ test('bases loaded: single scores one, home run scores four', () => {
   assert.equal(app.advanceBases(4), 4);
   assert.deepEqual(Array.from(app.state().bases), [false, false, false]);
 });
+
+test('Stadium Mode includes Tropicana Field and preserves shared-phone handoff', () => {
+  assert.match(html, /Tropicana Field — Dome/);
+  assert.match(html, /stadium-trop/);
+  const app = boot();
+  app.state().mode = 'Family Rivalry';
+  app.click('', { go: 'Game' });
+  assert.equal(app.state().ballpark, 'trop');
+  assert.equal(app.state().handoff, true);
+  assert.equal(app.state().rivalryTurn, 'away');
+  app.click('readyBatter');
+  assert.equal(app.state().handoff, false);
+});
