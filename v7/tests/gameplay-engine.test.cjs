@@ -9,14 +9,14 @@ const match=html.match(/<script>([\s\S]*?)<\/script>/);
 assert.ok(match,'Prototype script exists');
 const anchor="el('menuButton').onclick=";
 assert.ok(match[1].includes(anchor),'Test hook anchor exists');
-const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;"+anchor);
+const script=match[1].replace(anchor,"window.__state=()=>state;window.__complete=completeInning;window.__cpu=simulateOpponentHalf;window.__finish=finishGame;window.__begin=beginGame;window.__prob=hitProbability;window.__distance=hitDistance;window.__swing=swing;"+anchor);
 function setup(random=()=>0.99){
  const elements={};const listeners={};
  const el=id=>elements[id]??(elements[id]={innerHTML:'',textContent:'',disabled:false,classList:{add(){},remove(){},toggle(){}},style:{setProperty(){}},appendChild(){}});
  const document={getElementById:el,addEventListener:(name,cb)=>listeners[name]=cb,createElement:()=>({style:{setProperty(){}}})};
  const window={scrollTo(){}};
  vm.runInNewContext(script,{document,window,localStorage:{getItem:()=>null,setItem(){}},setTimeout(){},Math:Object.assign(Object.create(Math),{random})});
- return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance};
+ return {state:window.__state(),complete:window.__complete,cpu:window.__cpu,finish:window.__finish,begin:window.__begin,prob:window.__prob,distance:window.__distance,swing:window.__swing};
 }
 test('CPU cannot score more than five runs in one half inning',()=>{
  const app=setup(()=>0);
@@ -117,4 +117,32 @@ test('hard contact can produce a home run',()=>{
 test('soft contact can produce a single',()=>{
  const app=setup();
  assert.equal(app.distance('SOFT',.99),1);
+});
+
+test('family rivalry walk-off ends game when home takes final-inning lead',()=>{
+ const app=setup(()=>0);
+ Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',inning:3,innings:3,home:2,away:3,contact:'HARD',zone:5,handoff:false,gameFinished:false});
+ app.swing();
+ assert.equal(app.state.gameFinished,true);
+ assert.ok(app.state.finalReason.includes('Walk-off'));
+ assert.equal(app.state.home,3);
+});
+test('family rivalry cannot walk off before regulation final inning',()=>{
+ const app=setup(()=>0);
+ Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',inning:2,innings:3,home:2,away:3,contact:'HARD',zone:5,handoff:false,gameFinished:false});
+ app.swing();
+ assert.equal(app.state.gameFinished,false);
+ assert.equal(app.state.home,3);
+});
+test('finished game rejects further swings',()=>{
+ const app=setup(()=>0);
+ Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',gameFinished:true,reps:7});
+ app.swing();
+ assert.equal(app.state.reps,7);
+});
+test('handoff prevents swing before next family player is ready',()=>{
+ const app=setup(()=>0);
+ Object.assign(app.state,{screen:'Game',mode:'Family Rivalry',rivalryTurn:'home',handoff:true,reps:4});
+ app.swing();
+ assert.equal(app.state.reps,4);
 });
