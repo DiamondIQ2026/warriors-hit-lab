@@ -206,3 +206,32 @@ test('metallic scoreboard displays both team scores with compact mobile geometry
   await context.close();
  }finally{await browser.close()}
 });
+
+test('375px primary CTAs stay above fold while setup and batting remain functional',async()=>{
+ const browser=await chromium.launch();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:375,height:812}});
+ try{
+  const page=await context.newPage();
+  await page.goto(BASE);
+  const start=page.locator('#start');
+  let box=await start.boundingBox();
+  assert.ok(box&&box.y>=0&&box.y+box.height<=812,'Start Match must be visible without scrolling');
+  await page.evaluate(()=>window.scrollTo(0,350));
+  box=await start.boundingBox();
+  assert.ok(box&&box.y>=0&&box.y<150,'Start Match must remain accessible when editing lineups');
+  await start.click();
+  await page.locator('#turn').click();
+  const record=page.locator('#record');
+  box=await record.boundingBox();
+  assert.ok(box&&box.y>=0&&box.y+box.height<=812,'Record Swing must be visible before scrolling');
+  assert.equal(await record.isDisabled(),true,'Recording still requires zone selection');
+  await page.locator('#zones button').first().click();
+  assert.equal(await record.isEnabled(),true);
+  await record.click();
+  const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+  assert.equal(saved.realSwings.maddon,1);
+  assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v4')),null);
+  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
+  await context.close();
+ }finally{await browser.close()}
+});

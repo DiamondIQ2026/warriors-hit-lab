@@ -1,7 +1,7 @@
 name: Hit Lab - V7 Pass and Play
 on:
   pull_request:
-    branches: [main, chatgpt/v7-pass-and-play-engine, chatgpt/v7-multiplayer-integration-sprint]
+    branches: [main, chatgpt/v7-pass-and-play-engine, chatgpt/v7-multiplayer-integration-sprint, chatgpt/v7-unified-playtest-shell]
   workflow_dispatch:
 permissions:
   contents: read
