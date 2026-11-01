@@ -21,7 +21,7 @@ test('home Play Ball primary action precedes tall hero and secondary mode tiles'
 
 test('game setup Play Ball primary action precedes matchup and configuration', () => {
   const play = functionBody('play', 'game');
-  assert.match(play, /class=\\\"primary wide\\\" data-go=\\\"Game\\\"/);
+  assert.match(play, /class=\"primary wide\" data-go=\"Game\"/);
   assert.ok(play.indexOf('data-go=\\"Game\\"') < play.indexOf('<h2>Matchup</h2>'));
   assert.ok(play.indexOf('data-go=\\"Game\\"') < play.indexOf('id=\\"mode\\"'));
 });
@@ -29,8 +29,8 @@ test('game setup Play Ball primary action precedes matchup and configuration', (
 test('game and drill keep primary swing recording prominent', () => {
   const game = functionBody('game', 'training');
   const drill = functionBody('drill', 'report');
-  assert.match(game, /id=\\\"swing\\\"/);
-  assert.match(drill, /id=\\\"swing\\\"/);
+  assert.match(game, /id=\"swing\"/);
+  assert.match(drill, /id=\"swing\"/);
   assert.ok(game.indexOf('id=\\"swing\\"') < game.indexOf('+field()'), 'game swing CTA must precede field');
   assert.ok(drill.indexOf('id=\\"swing\\"') < drill.indexOf('+field()'), 'drill CTA must precede field');
 });
