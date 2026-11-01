@@ -64,7 +64,13 @@
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
    const old=api.currentTurn(match);
-   match=api.recordSwing(match,{zone,power:$('power').value,outcome:$('outcome').value});
+   const beforeMatch=match;
+   const updatedMatch=api.recordSwing(match,{zone,power:$('power').value,outcome:$('outcome').value});
+   if(beforeMatch.status==='active'&&updatedMatch.status==='active'&&window.HitLabTransition){
+     try{window.__hitLabLastTransition=window.HitLabTransition.observe('rivalry',beforeMatch,updatedMatch);}
+     catch(error){window.__hitLabTransitionWarning=error.message;console.warn('V7 transition observation:',error.message);}
+   }
+   match=updatedMatch;
    $('event').textContent='Recorded '+zone+' / '+$('power').value+' • simulated '+$('outcome').value+'.';
    $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
    $('viewFlight').classList.remove('hidden');
