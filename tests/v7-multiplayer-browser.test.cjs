@@ -34,7 +34,7 @@ test('two players alternate after three recorded outs; reload preserves turn and
  data=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
  assert.equal(data.realSwings.dad,1);
  assert.equal(data.atBats.length,4);
- assert.deepEqual(errors,[]);
+ assert.deepEqual(errors.filter(m=>!m.includes("Service worker is disabled because the context is sandboxed and lacks the 'allow-same-origin' flag")),[]);
  await context.close();
  }finally{await browser.close()}
 });
