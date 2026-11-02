@@ -13,7 +13,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']]){
      await page.locator('#start').tap();
      await page.locator('#turn').tap();
      const panel=page.locator('#liveBoxScore');
-     await panel.locator('summary').tap();
+     await panel.locator(':scope > summary').tap();
      assert.equal(await panel.evaluate(e=>e.open),true);
      const rows=page.locator('#boxScoreRows tr');
      assert.equal(await rows.count(),2);
@@ -29,7 +29,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']]){
      assert.equal(await rows.nth(0).locator('td').nth(11).innerText(),'2');
      const saved=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
      await page.reload();
-     await panel.locator('summary').tap();
+     await panel.locator(':scope > summary').tap();
      assert.equal(await rows.nth(0).locator('td').nth(10).innerText(),'2');
      assert.equal(await rows.nth(0).locator('td').nth(11).innerText(),'2');
      assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')),saved);
