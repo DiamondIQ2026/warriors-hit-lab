@@ -177,6 +177,7 @@ test('empty training log shows no percentages and no invented coaching focus',()
 test('one-rep 100% is visibly marked as a small sample, not a recommendation',()=>{
  const app=boot();
  app.state.trainingLog=[{zone:3,contact:'HARD',hit:true}];
+ app.state.trainingReps=1;app.state.trainingHits=1;
  const summary=app.summary();
  assert.equal(summary.focus,null);
  assert.equal(summary.zones[2].reps,1);
@@ -194,6 +195,7 @@ test('training recommendations require two comparable zones and use simulated hi
   {zone:5,contact:'HARD',hit:true},
   {zone:5,contact:'MEDIUM',hit:true}
  ];
+ app.state.trainingReps=6;app.state.trainingHits=4;
  const summary=app.summary();
  assert.equal(summary.focus,2);
  assert.equal(summary.zones[1].hits,1);
@@ -259,7 +261,7 @@ test('six training drills have distinct, measurable, honest goals without extra 
 });
 test('drill focus panel is after the record-rep CTA and before the field',()=>{
  const app=boot();app.state.drill='Power Challenge';
- app.state.trainingReps=2;
+ app.state.trainingReps=2;app.state.trainingHits=1;
  app.state.trainingLog=[{zone:5,contact:'HARD',hit:true},{zone:2,contact:'SOFT',hit:false}];
  const screen=app.drill();
  assert.ok(screen.indexOf('RECORD REP ▶')<screen.indexOf('DRILL FOCUS'));
@@ -270,6 +272,7 @@ test('drill focus panel is after the record-rep CTA and before the field',()=>{
 });
 test('training report explains goals and preserves its above-fold library CTA',()=>{
  const app=boot();app.state.drill='Quick Hands';app.state.trainingReps=25;
+ app.state.trainingLog=Array.from({length:25},()=>({zone:5,contact:'MEDIUM',hit:false}));
  const page=app.report();
  assert.ok(page.indexOf('BACK TO DRILL LIBRARY')<page.indexOf('DRILL FOCUS'));
  assert.ok(page.indexOf('DRILL FOCUS')<page.indexOf('Zone Performance'));
