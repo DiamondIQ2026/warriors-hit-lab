@@ -26,6 +26,35 @@
  }
  $('useAlphaHome').addEventListener('click',()=>adoptAlphaProfile('home'));
  $('useAlphaAway').addEventListener('click',()=>adoptAlphaProfile('away'));
+ // A damaged V7-only save must never be silently discarded or overwritten.
+ // Recovery controls appear only when a persisted match fails integrity checks.
+ function offerRecovery(raw,reason){
+  const panel=document.createElement('div');
+  panel.id='saveRecovery';panel.setAttribute('role','alert');
+  panel.style.cssText='margin:12px 0;padding:14px;border:2px solid #f4d080;border-radius:10px;background:#3c2530;color:#fff';
+  const heading=document.createElement('strong');heading.textContent='Saved V7 match needs recovery';
+  const detail=document.createElement('p');
+  detail.textContent=reason+'. The original saved bytes are preserved. Export a copy before discarding this V7 match.';
+  const exportButton=document.createElement('button');exportButton.type='button';
+  exportButton.id='saveRecoveryExport';exportButton.textContent='EXPORT ORIGINAL V7 SAVE';
+  exportButton.onclick=()=>{
+   const blob=new Blob([raw],{type:'application/json'});
+   const url=URL.createObjectURL(blob),a=document.createElement('a');
+   a.href=url;a.download='hit-lab-v7-recovery-original.json';a.click();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+  };
+  const discard=document.createElement('button');discard.type='button';
+  discard.id='saveRecoveryDiscard';discard.textContent='DISCARD INVALID V7 MATCH';
+  discard.onclick=()=>{
+   if(!confirm('Discard only the invalid V7 multiplayer match? Export it first if you want a backup. Other saves will not be touched.'))return;
+   try{localStorage.removeItem(KEY);}
+   catch{detail.textContent='Could not clear the invalid V7 save. No data was changed.';return;}
+   panel.remove();$('start').disabled=false;
+   $('setupError').textContent='Invalid V7 match discarded. You can start a new match.';
+  };
+  panel.append(heading,detail,exportButton,discard);
+  $('setup').appendChild(panel);$('start').disabled=true;
+ }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
  function render(){
@@ -133,8 +162,19 @@
  };
  setDefaults();
  try{
-  const raw=localStorage.getItem(KEY),v=raw?JSON.parse(raw):null;
-  if(v&&v.version===1&&v.home?.id==='dad'&&v.away?.id==='maddon'&&['active','final'].includes(v.status)&&Array.isArray(v.atBats)&&Array.isArray(v.bases)){match=v;lastAnimatedAtBatCount=v.atBats.length;}
- }catch{}
+  const raw=localStorage.getItem(KEY);
+  if(raw!==null){
+   let parsed,validation;
+   try{
+    parsed=JSON.parse(raw);
+    validation=api.validateMatch(parsed);
+    // The UI's fixed setup identities are required by its pass-phone controls.
+    if(validation.ok&&(parsed.home.id!=='dad'||parsed.away.id!=='maddon'))
+     validation={ok:false,reason:'Unexpected V7 player identities'};
+   }catch{validation={ok:false,reason:'Unreadable V7 save JSON'};}
+   if(validation.ok){match=parsed;lastAnimatedAtBatCount=parsed.atBats.length;}
+   else offerRecovery(raw,validation.reason);
+  }
+ }catch{$('setupError').textContent='Could not access V7 local storage. Existing saves were not changed.';}
  render();
 })();
