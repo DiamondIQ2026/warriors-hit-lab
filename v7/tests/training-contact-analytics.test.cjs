@@ -11,7 +11,7 @@ assert.ok(start>=0&&end>start,'V7 script present');
 const anchor="el('menuButton').onclick=";
 const original=html.slice(start+8,end);
 assert.ok(original.includes(anchor),'test hook exists');
-const script=original.replace(anchor,"window.__analytics=()=>({state,summary:trainingSummary(),goal:drillGoal(),report:report(),drill:drill()});window.__swing=swing;"+anchor);
+const script=original.replace(anchor,"window.__analytics=()=>({state,summary:trainingSummary(),goal:drillGoal(),next:drillNextStep(),report:report(),drill:drill()});window.__swing=swing;"+anchor);
 function boot(saved=null){
  const elements={},listeners={},timers=[],writes=[];let value=saved;
  const el=id=>elements[id]??(elements[id]={
@@ -101,4 +101,87 @@ test('training breakdown persists through V7-only save reload',()=>{
  assert.equal(reloaded.read().summary.contactHits.SOFT,2);
  assert.ok(reloaded.read().report.includes('Contact Strength Breakdown'));
  assert.equal(reloaded.writes.length,0);
+});
+
+test('zone precision coaches a previously unvisited zone and recognizes five distinct choices',()=>{
+ const app=boot();const state=app.read().state;state.drill='Zone Precision';
+ assert.match(app.read().next.guidance,/unvisited Zone 1/);
+ state.trainingLog=[1,2,3,4].map(zone=>({zone,contact:'MEDIUM',hit:false}));
+ assert.match(app.read().next.guidance,/unvisited Zone 5/);
+ state.trainingLog.push({zone:5,contact:'MEDIUM',hit:false});
+ assert.equal(app.read().next.status,'FOCUS GOAL REACHED');
+ assert.equal(app.writes.length,0);
+});
+test('25-rep cap does not falsely mark an unmet focus goal as achieved',()=>{
+ const app=boot();const state=app.read().state;state.drill='Zone Precision';
+ state.trainingReps=25;state.trainingLog=Array.from({length:25},()=>({zone:5,contact:'SOFT',hit:false}));
+ const next=app.read().next;
+ assert.match(next.status,/FOCUS GOAL NOT REACHED/);
+ assert.match(next.guidance,/Start a new drill/);
+ assert.match(app.read().drill,/25\/25 COMPLETE/);
+ assert.match(app.read().report,/FOCUS GOAL NOT REACHED/);
+ assert.equal(app.writes.length,0);
+});
+test('goal reached at the 25-rep cap is reported as reached',()=>{
+ const app=boot();const state=app.read().state;state.drill='Quick Hands';
+ state.trainingReps=25;
+ assert.equal(app.read().next.status,'FOCUS GOAL REACHED');
+ assert.match(app.read().next.guidance,/Review your completed session report/);
+});
+test('barrel-control coaching counts simulated hits, not total swings',()=>{
+ const app=boot();const state=app.read().state;state.drill='Barrel Control';
+ state.trainingLog=Array.from({length:14},(_,i)=>({zone:5,contact:'MEDIUM',hit:i<13}));
+ assert.match(app.read().next.guidance,/2 more simulated hits/);
+ state.trainingLog.push({zone:5,contact:'HARD',hit:true},{zone:5,contact:'SOFT',hit:true});
+ assert.equal(app.read().next.status,'FOCUS GOAL REACHED');
+});
+test('opposite-field coaching excludes middle-column choices and makes no real-direction claim',()=>{
+ const app=boot();const state=app.read().state;state.drill='Opposite Field';
+ state.trainingLog=Array.from({length:8},()=>({zone:5,contact:'SOFT',hit:true}));
+ assert.match(app.read().next.guidance,/12 more outer-column selections/);
+ state.trainingLog.push(...Array.from({length:11},()=>({zone:1,contact:'SOFT',hit:false})));
+ assert.match(app.read().next.guidance,/1 more outer-column selection needed/);
+ assert.match(app.read().next.guidance,/actual ball direction is not measured/);
+});
+test('power coaching counts HARD input regardless of simulated outcome',()=>{
+ const app=boot();const state=app.read().state;state.drill='Power Challenge';
+ state.trainingLog=Array.from({length:14},()=>({zone:3,contact:'HARD',hit:false}));
+ assert.match(app.read().next.guidance,/1 more HARD selection needed/);
+ state.trainingLog.push({zone:3,contact:'HARD',hit:false});
+ assert.equal(app.read().next.status,'FOCUS GOAL REACHED');
+});
+test('situational coaching chooses a contact choice with fewer than three reps',()=>{
+ const app=boot();const state=app.read().state;state.drill='Situational Hitting';
+ state.trainingLog=[
+  ...Array.from({length:3},()=>({zone:5,contact:'SOFT',hit:true})),
+  ...Array.from({length:2},()=>({zone:5,contact:'MEDIUM',hit:false}))
+ ];
+ assert.match(app.read().next.guidance,/Try MEDIUM contact for 1 more rep/);
+ state.trainingLog.push({zone:5,contact:'MEDIUM',hit:false});
+ assert.match(app.read().next.guidance,/Try HARD contact for 3 more reps/);
+ state.trainingLog.push(...Array.from({length:3},()=>({zone:5,contact:'HARD',hit:false})));
+ assert.equal(app.read().next.status,'FOCUS GOAL REACHED');
+});
+test('quick-hands coaching counts reps only and ignores fabricated speed claims',()=>{
+ const app=boot();const state=app.read().state;state.drill='Quick Hands';
+ state.trainingReps=24;
+ assert.match(app.read().next.guidance,/1 more recorded rep needed/);
+ assert.match(app.read().next.guidance,/Reaction time is not measured/);
+ assert.equal(app.writes.length,0);
+});
+test('coaching is accessible, below the record CTA, and never mutates active game',()=>{
+ const app=boot();const state=app.read().state;
+ Object.assign(state,{drill:'Zone Precision',away:5,home:3,inning:6,outs:2,reps:12,hits:8,bases:[true,false,true]});
+ const before=JSON.stringify({away:state.away,home:state.home,inning:state.inning,outs:state.outs,reps:state.reps,hits:state.hits,bases:state.bases});
+ const markup=app.read().drill;
+ assert.ok(markup.indexOf('id="swing"')<markup.indexOf('FOCUS IN PROGRESS'));
+ assert.match(markup,/role="status" aria-live="polite"/);
+ assert.equal(JSON.stringify({away:state.away,home:state.home,inning:state.inning,outs:state.outs,reps:state.reps,hits:state.hits,bases:state.bases}),before);
+ assert.equal(app.writes.length,0);
+});
+test('malformed training records are ignored by read-only coaching',()=>{
+ const app=boot();const state=app.read().state;state.drill='Power Challenge';
+ state.trainingLog=[null,{},'junk',{zone:5,contact:'HARD',hit:'yes'},{zone:5,contact:'HARD',hit:true}];
+ assert.match(app.read().next.guidance,/14 more HARD selections needed/);
+ assert.equal(app.writes.length,0);
 });
