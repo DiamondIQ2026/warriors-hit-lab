@@ -68,7 +68,7 @@ test('training hub resumes unfinished drill without resetting stats',()=>{
 });
 test('completed drill report is reachable from hub after reload',()=>{
  const app=boot();app.click({drill:'Zone Precision'});
- app.state.trainingReps=25;app.state.trainingHits=10;app.state.trainingLog=[{zone:5,hit:true}];
+ app.state.trainingReps=25;app.state.trainingHits=10;app.state.trainingLog=Array.from({length:25},(_,i)=>({zone:5,contact:'MEDIUM',hit:i<10}));
  app.click({go:'Training'});
  const next=boot(app.saved());
  assert.match(next.training(),/VIEW LAST DRILL REPORT/);

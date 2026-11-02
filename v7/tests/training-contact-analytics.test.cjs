@@ -38,7 +38,7 @@ const valid=[
  {zone:5,contact:'MEDIUM',hit:false},{zone:9,contact:'HARD',hit:true}
 ];
 test('contact-strength panel shows rates only for adequate samples',()=>{
- const app=boot();app.read().state.trainingLog=valid;
+ const app=boot();Object.assign(app.read().state,{trainingLog:valid,trainingReps:8,trainingHits:4});
  const report=app.read().report;
  assert.ok(report.includes('Contact Strength Breakdown'));
  assert.ok(report.includes('SOFT<br><b>67%</b><br><small>2/3 simulated hits'));
@@ -60,20 +60,21 @@ test('malformed entries do not inflate goals or analytics',()=>{
  assert.equal(summary.contacts.HARD,1);assert.equal(goal.current,3);
  assert.equal(app.writes.length,0);
 });
-test('missing and non-array logs produce safe zero-sample reports',()=>{
+test('missing and non-array logs produce a protected report instead of fabricated statistics',()=>{
  const app=boot();const state=app.read().state;
  for(const bad of [null,'bad',{},[null,{}]]){
   state.trainingLog=bad;const {summary,report}=app.read();
   assert.equal(summary.contacts.HARD,0);assert.equal(summary.contactHits.SOFT,0);
   assert.ok(!report.includes('NaN')&&!report.includes('Infinity'));
-  assert.ok(report.includes('SOFT<br><b>—</b>'));
+  assert.ok(report.includes('REPORT PAUSED — SAVED DATA PROTECTED'));
+  assert.ok(!report.includes('Contact Strength Breakdown'));
  }
  assert.equal(app.writes.length,0);
 });
 test('focus recommendation requires two zones with three valid reps each',()=>{
  const app=boot();const state=app.read().state;
  state.trainingLog=valid.slice(0,3);assert.equal(app.read().summary.focus,null);
- state.trainingLog=valid;assert.equal(app.read().summary.focus,5);
+ state.trainingLog=valid;state.trainingReps=8;state.trainingHits=4;assert.equal(app.read().summary.focus,5);
  assert.ok(app.read().report.includes('Review Zone 5'));
 });
 test('analytics are read-only and preserve live game progress',()=>{
