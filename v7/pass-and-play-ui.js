@@ -64,6 +64,7 @@
   $('turn').textContent=match.status==='final'?('GAME OVER • WINNER: '+(match.winner===match.home.id?match.home.team:match.away.team)):(acknowledge?('BATTING: '+p.team):('PASS PHONE TO '+p.name.toUpperCase()+' • '+p.team+' — TAP TO CONTINUE'));
   $('turn').disabled=match.status==='final';
   $('record').disabled=!zone||!acknowledge||match.status==='final';
+  $('recordAfterChoices').disabled=$('record').disabled;
   const impactReview=$('practiceImpactReview');
   impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
   impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · simulated result chosen separately'):'Select a net-impact zone to record your next real tee swing.';
@@ -85,6 +86,7 @@
  for(const b of document.querySelectorAll('.contact-quality-options button'))b.addEventListener('click',()=>{$('power').value=b.dataset.contact;syncContactOptions();if(match)render();});
  $('power').addEventListener('change',()=>{syncContactOptions();if(match)render();});
  syncContactOptions();
+ $('recordAfterChoices').addEventListener('click',()=>{if(!$('record').disabled)$('record').click();});
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
