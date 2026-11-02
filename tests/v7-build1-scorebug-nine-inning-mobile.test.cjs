@@ -61,7 +61,7 @@ for(const [engine,type] of [['Chromium',chromium],['WebKit',webkit]]){
     const page=await context.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto(BASE);
-    await page.evaluate(([a,b])=>{localStorage.setItem(LEGACY,a);localStorage.setItem(SNAPSHOT,b);},[LEGACY_RAW,SNAPSHOT_RAW]);
+    await page.evaluate(([a,b])=>{localStorage.setItem('warriors-hit-lab-v4',a);localStorage.setItem('warriors-hit-lab-v6-snapshot',b);},[LEGACY_RAW,SNAPSHOT_RAW]);
     await page.locator('#start').tap();
     await assertScorebug(page,0,0);
     const turnBox=await page.locator('#turn').boundingBox();
@@ -94,7 +94,7 @@ for(const [engine,type] of [['Chromium',chromium],['WebKit',webkit]]){
     const page=await context.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto(BASE);
-    await page.evaluate(([a,b])=>{localStorage.setItem(LEGACY,a);localStorage.setItem(SNAPSHOT,b);},[LEGACY_RAW,SNAPSHOT_RAW]);
+    await page.evaluate(([a,b])=>{localStorage.setItem('warriors-hit-lab-v4',a);localStorage.setItem('warriors-hit-lab-v6-snapshot',b);},[LEGACY_RAW,SNAPSHOT_RAW]);
     await page.locator('#innings').selectOption('9');
     await page.locator('#start').tap();
     for(let inning=1;inning<=9;inning++){
