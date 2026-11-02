@@ -27,6 +27,30 @@ function advanceFallback(bases,n){
  if(n<4)next[n-1]=true;
  return {bases:next,runs};
 }
+// The real tee swing supplies zone/contact; this seeded *game simulation* supplies
+// an entertainment outcome. No physical ball-tracking or measured hit is claimed.
+// Seed inputs are all already present in the V7 match; no save schema migration.
+function resolveSimulatedOutcome(match,{zone,power}){
+ if(!match||match.status!=='active'||!ZONES.includes(zone)||!POWERS.includes(power))throw Error('Invalid simulated swing');
+ const player=offense(match),index=ZONES.indexOf(zone);
+ const row=Math.floor(index/3),col=index%3;
+ const centrality=1-(Math.abs(row-1)+Math.abs(col-1))/2;
+ const handedSide=(player.hand==='L'&&col===2)||(player.hand==='R'&&col===0);
+ const chance=Math.min(.85,({soft:.37,medium:.51,hard:.61}[power])+.16*centrality+(handedSide?.025:0));
+ const seed=[player.id,player.hand,zone,power,match.inning,match.half,match.outs,
+  match.atBats.length,match.battingOrder[player.id],match.score[player.id],
+  match.score[player.id===match.home.id?match.away.id:match.home.id],...match.bases.map(Number)].join('|');
+ function unit(salt){
+  let h=2166136261;
+  for(const ch of seed+'|'+salt)h=Math.imul(h^ch.charCodeAt(0),16777619)>>>0;
+  return h/4294967296;
+ }
+ if(unit('contact')>=chance)return 'out';
+ const distance=unit('distance');
+ if(power==='soft')return distance<.82?'single':distance<.97?'double':'triple';
+ if(power==='medium')return distance<.61?'single':distance<.84?'double':distance<.94?'triple':'homer';
+ return distance<.43?'single':distance<.72?'double':distance<.80?'triple':'homer';
+}
 function recordSwing(match,{zone,power,outcome}){
  if(match.status!=='active')throw Error('Match is complete');
  if(!ZONES.includes(zone)||!POWERS.includes(power)||!OUTCOMES.includes(outcome))throw Error('Invalid swing');
@@ -141,6 +165,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;

@@ -103,7 +103,7 @@
   $('seeLastSwing').classList.toggle('hidden',!latest);
   const impactReview=$('practiceImpactReview');
   impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
-  impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · simulated result chosen separately'):'Select a net-impact zone to record your next real tee swing.';
+  impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · '+($('outcome').value==='auto'?'game outcome simulated from zone, contact and handedness':'test-only result override')):'Select a net-impact zone to record your next real tee swing.';
  }
  $('turn').addEventListener('click',()=>{if(match&&match.status==='active'){acknowledge=true;render();}});
  $('start').onclick=()=>{
@@ -122,20 +122,24 @@
  for(const b of document.querySelectorAll('.contact-quality-options button'))b.addEventListener('click',()=>{$('power').value=b.dataset.contact;syncContactOptions();if(match)render();});
  $('power').addEventListener('change',()=>{syncContactOptions();if(match)render();});
  syncContactOptions();
+ $('outcome').addEventListener('change',()=>{if(match)render();});
  $('recordAfterChoices').addEventListener('click',()=>{if(!$('record').disabled)$('record').click();});
  $('seeLastSwing').addEventListener('click',()=>{$('event').scrollIntoView({behavior:'instant',block:'center'});});
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
    const old=api.currentTurn(match);
+   const simulated=$('outcome').value==='auto'
+    ?api.resolveSimulatedOutcome(match,{zone,power:$('power').value})
+    :$('outcome').value; // Explicit QA scenario override only.
    const executed=window.HitLabExecution.execute('rivalry',match,current=>
-     api.recordSwing(current,{zone,power:$('power').value,outcome:$('outcome').value}));
+     api.recordSwing(current,{zone,power:$('power').value,outcome:simulated}));
    if(executed.observation)window.__hitLabLastTransition=executed.observation;
    if(executed.warning){window.__hitLabTransitionWarning=executed.warning;console.warn('V7 transition observation:',executed.warning);}
    const updatedMatch=executed.next;
    match=updatedMatch;
-   $('event').textContent='Real tee swing recorded · Net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact. Simulated game result: '+$('outcome').value+'.';
-   $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
+   $('event').textContent='Real tee swing recorded · Net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact. Simulated game result: '+simulated+'.';
+   $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:simulated,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
    $('viewFlight').classList.remove('hidden');
    const handoffRequired=old.playerId!==api.currentTurn(match).playerId||old.half!==match.half;
    if(handoffRequired)acknowledge=false;
