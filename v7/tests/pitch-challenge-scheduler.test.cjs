@@ -37,3 +37,42 @@ test('read-only call never mutates supplied state', () => {
   assert.equal(shouldRefreshPitchChallenge(input), true);
   assert.deepEqual(input, { enabled: true, frequency: FREQUENCIES.HALF_INNING, totalRecordedSwings: 12, halfInningRecordedSwings: 0 });
 });
+
+test('opt-in toggles do not consume or reset the every-three cadence', () => {
+  const recorded = Object.freeze({ totalRecordedSwings: 3, halfInningRecordedSwings: 2 });
+  const evaluate = (enabled) => shouldRefreshPitchChallenge({ ...recorded, enabled, frequency: FREQUENCIES.EVERY_THREE_SWINGS });
+  assert.equal(evaluate(false), false);
+  assert.equal(evaluate(true), true);
+  assert.equal(evaluate(false), false);
+  assert.equal(evaluate(true), true);
+  assert.deepEqual(recorded, { totalRecordedSwings: 3, halfInningRecordedSwings: 2 });
+});
+
+test('undo represented by restored counters restores prompt decision without writing state', () => {
+  const before = Object.freeze({ enabled: true, frequency: FREQUENCIES.EVERY_THREE_SWINGS, totalRecordedSwings: 3, halfInningRecordedSwings: 2 });
+  const afterRecordedSwing = Object.freeze({ ...before, totalRecordedSwings: 4, halfInningRecordedSwings: 3 });
+  assert.equal(shouldRefreshPitchChallenge(before), true);
+  assert.equal(shouldRefreshPitchChallenge(afterRecordedSwing), false);
+  assert.equal(shouldRefreshPitchChallenge(before), true);
+  assert.equal(shouldRefreshPitchChallenge({ ...before, frequency: FREQUENCIES.HALF_INNING, halfInningRecordedSwings: 0 }), true);
+});
+
+test('JSON round-trip of counters/settings preserves deterministic resume cadence', () => {
+  const original = Object.freeze({ enabled: true, frequency: FREQUENCIES.EVERY_THREE_SWINGS, totalRecordedSwings: 6, halfInningRecordedSwings: 0 });
+  const restored = JSON.parse(JSON.stringify(original));
+  assert.deepEqual(restored, original);
+  assert.equal(shouldRefreshPitchChallenge(original), true);
+  assert.equal(shouldRefreshPitchChallenge(restored), true);
+  assert.equal(shouldRefreshPitchChallenge({ ...restored, totalRecordedSwings: 7, halfInningRecordedSwings: 1 }), false);
+  assert.equal(shouldRefreshPitchChallenge({ ...restored, frequency: FREQUENCIES.HALF_INNING }), true);
+});
+
+test('malformed restored counters/settings throw rather than silently enable prompts', () => {
+  const original = { enabled: true, frequency: FREQUENCIES.HALF_INNING, totalRecordedSwings: 8, halfInningRecordedSwings: 0 };
+  for (const restored of [
+    { ...original, totalRecordedSwings: '8' },
+    { ...original, halfInningRecordedSwings: 9 },
+    { ...original, enabled: 'false' },
+    { ...original, frequency: 'invalid' },
+  ]) assert.throws(() => shouldRefreshPitchChallenge(restored));
+});
