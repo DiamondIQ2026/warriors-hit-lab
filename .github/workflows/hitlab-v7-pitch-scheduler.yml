@@ -1,0 +1,25 @@
+name: V7 Pitch Challenge Scheduler Checks
+on:
+  pull_request:
+    paths:
+      - 'v7/experimental/pitch-challenge-scheduler.cjs'
+      - 'v7/tests/pitch-challenge-scheduler.test.cjs'
+      - '.github/workflows/hitlab-v7-pitch-scheduler.yml'
+  workflow_dispatch:
+jobs:
+  scheduler-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check syntax
+        run: |
+          node --check v7/experimental/pitch-challenge-scheduler.cjs
+          node --check v7/tests/pitch-challenge-scheduler.test.cjs
+      - name: Run isolated scheduler tests
+        run: node --test v7/tests/pitch-challenge-scheduler.test.cjs
