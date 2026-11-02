@@ -132,6 +132,21 @@ function boxScore(match){
 // integrity-checked recorded tee swings; never modifies persistent match data.
 // Training metrics count only the player's actual tee selections and contact
 // self-ratings. They never interpret simulated hits as measured batted-ball data.
+// CSV contains logged tee practice only; never export simulated hits as real
+// baseball performance. Quote spreadsheet-sensitive text as literal data.
+function practiceCsv(match){
+ const summary=trainingSummary(match);
+ const escapeCell=value=>{
+  const raw=String(value);
+  const safe=/^[=+@\-\t\r]/.test(raw)?'\''+raw:raw;
+  return '"'+safe.replace(/"/g,'""')+'"';
+ };
+ const rows=[['Player','Team','Hand','Zone','Real tee swings','Hard contact','Medium contact','Soft contact']];
+ for(const player of [summary.away,summary.home])
+  for(const zone of player.zones)
+   rows.push([player.name,player.team,player.hand,zone.number,zone.swings,zone.hard,zone.medium,zone.soft]);
+ return rows.map(row=>row.map(escapeCell).join(',')).join('\r\n')+'\r\n';
+}
 function trainingSummary(match){
  const checked=validateMatch(match);
  if(!checked.ok)throw Error('Invalid match: '+checked.reason);
@@ -241,6 +256,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
