@@ -111,9 +111,9 @@ test('game swing remains independent of prior drill counters',()=>{
  assert.equal(app.state.trainingReps,5);assert.equal(app.state.trainingHits,3);
  assert.equal(app.state.trainingFeedback,'TRAINING');
 });
-test('ending game early clears resume eligibility without touching drill stats',()=>{
+test('explicit End Game clears resume eligibility without touching drill stats',()=>{
  const app=boot();app.begin();app.state.trainingReps=7;
- app.click({go:'Results'});
+ app.click({id:'endGame'});
  assert.equal(app.state.screen,'Results');
  assert.equal(app.state.gameStarted,false);
  assert.equal(app.state.gameFinished,true);
