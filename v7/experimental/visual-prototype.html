@@ -75,11 +75,30 @@
 const pages=['Home','Play','Season','Training','Profile','Tournament','Family Rivalry','Team Locker','Achievements','Lineup','Results'];
 const storeKey='hitlab-v7-visual-prototype-only';
 let state={screen:'Home',team:'Tampa Warriors',mode:'Exhibition',ballpark:'trop',innings:6,difficulty:'Veteran',zone:5,contact:'MEDIUM',outs:0,inning:1,away:0,home:0,reps:0,hits:0,log:[],rival:'Father',bases:[false,false,false],feedback:'',animating:false,trainingLog:[],trainingReps:0,trainingHits:0,trainingFeedback:'',gameStarted:false,gameFinished:false,finalReason:'',extraInnings:0,rivalryTurn:'away',rivalName:'Rival',homeName:'You',handoff:false,rivalryStats:{away:{reps:0,hits:0},home:{reps:0,hits:0}}};
-try{const saved=JSON.parse(localStorage.getItem(storeKey)||'null');if(saved&&typeof saved==='object')state={...state,...saved,screen:'Home'}}catch{}
+// A corrupt or incompatible experimental save is never overwritten on startup.
+let storageWriteLocked=false;
+function validExperimentalSave(saved){
+ if(!saved||typeof saved!=='object'||Array.isArray(saved))return false;
+ if(saved.schemaVersion!==undefined&&saved.schemaVersion!==1)return false;
+ const nums=['innings','inning','outs','away','home','reps','hits','trainingReps','trainingHits'];
+ if(nums.some(k=>saved[k]!==undefined&&(!Number.isSafeInteger(saved[k])||saved[k]<0)))return false;
+ if(saved.outs!==undefined&&saved.outs>2)return false;
+ if(saved.innings!==undefined&&![3,6,9].includes(saved.innings))return false;
+ if(saved.bases!==undefined&&(!Array.isArray(saved.bases)||saved.bases.length!==3||saved.bases.some(x=>typeof x!=='boolean')))return false;
+ if(saved.log!==undefined&&!Array.isArray(saved.log))return false;
+ if(saved.trainingLog!==undefined&&!Array.isArray(saved.trainingLog))return false;
+ if(saved.rivalryStats!==undefined&&(!saved.rivalryStats||typeof saved.rivalryStats!=='object'||Array.isArray(saved.rivalryStats)))return false;
+ return true;
+}
+try{
+ const raw=localStorage.getItem(storeKey);
+ if(raw!==null){const saved=JSON.parse(raw);if(validExperimentalSave(saved))state={...state,...saved,screen:'Home'};else storageWriteLocked=true;}
+}catch{storageWriteLocked=true;}
+
 // Animation is transient; a refresh must never leave swings permanently locked.
 state.animating=false;
 const el=id=>document.getElementById(id),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-function persist(){try{localStorage.setItem(storeKey,JSON.stringify(state))}catch{}}
+function persist(){if(storageWriteLocked)return;try{localStorage.setItem(storeKey,JSON.stringify(state))}catch{storageWriteLocked=true}}
 function go(s){state.screen=s;persist();render();window.scrollTo(0,0)}
 function btn(label,to){return '<button data-go="'+to+'">'+label+'</button>'}
 const BALLPARKS={trop:{name:'Tropicana Field',left:315,center:404,right:322}};
