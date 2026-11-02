@@ -36,7 +36,14 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
     const page=await browser.newPage({viewport:{width,height},isMobile:true,hasTouch:true});
     try{
      await page.goto('http://127.0.0.1:8765/v7/multiplayer.html');
-     const raw=JSON.stringify(completed());
+     let compatible=api.newMatch(
+      api.createProfile({id:'dad',name:'Dad',team:'Tampa Titans',hand:'R'}),
+      api.createProfile({id:'maddon',name:'Son',team:'Tampa Warriors',hand:'L'}),3);
+     compatible=api.recordSwing(compatible,{zone:'MC',power:'hard',outcome:'homer'});
+     for(let i=0;i<40&&compatible.status==='active';i++)
+      compatible=api.recordSwing(compatible,{zone:'MC',power:'medium',outcome:'out'});
+     assert.equal(compatible.status,'final');
+     const raw=JSON.stringify(compatible);
      await page.evaluate(value=>localStorage.setItem('warriors-hit-lab-v7-multiplayer-prototype',value),raw);
      await page.reload();
      assert.equal(await page.locator('#postgameRecap').isVisible(),true);
