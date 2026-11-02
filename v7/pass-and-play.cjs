@@ -120,6 +120,8 @@ function boxScore(match){
   }
   t.runsByInning[play.inning]=(t.runsByInning[play.inning]||0)+play.runs;
  }
+ for(const team of Object.values(teams))for(const batter of team.batters)
+  batter.average=batter.atBats?(batter.hits/batter.atBats).toFixed(3).replace(/^0/,''):'.000';
  return {inning:match.inning,half:match.half,outs:match.outs,
   status:match.status,winner:match.winner,
   away:teams[match.away.id],home:teams[match.home.id]};
