@@ -61,8 +61,10 @@
   $('setup').classList.toggle('hidden',!!match);
   $('game').classList.toggle('hidden',!match);
   if(!match)return;
-  $('awayScore').textContent=match.away.team+' '+match.score[match.away.id];
-  $('homeScore').textContent=match.home.team+' '+match.score[match.home.id];
+  $('awayScore').querySelector('.score-team').textContent=match.away.team;
+  $('awayScore').querySelector('.score-points').textContent=match.score[match.away.id];
+  $('homeScore').querySelector('.score-team').textContent=match.home.team;
+  $('homeScore').querySelector('.score-points').textContent=match.score[match.home.id];
   $('inning').textContent=match.status==='final'?'FINAL':(match.half==='top'?'TOP ':'BOTTOM ')+match.inning+' • '+match.outs+' OUTS';
   $('bases').textContent='Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none');
   const diamond=$('game').querySelector('.score-diamond');
