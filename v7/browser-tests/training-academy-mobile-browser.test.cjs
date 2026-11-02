@@ -2,7 +2,7 @@
 // Isolated V7 Academy browser regression. Synthetic storage only; no V6.3 migration.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { chromium } = require('playwright');
+const { chromium, webkit } = require('playwright');
 
 const URL = 'http://127.0.0.1:8765/v7/experimental/visual-prototype.html';
 const V7_KEY = 'hitlab-v7-visual-prototype-only';
@@ -20,8 +20,10 @@ function trainingFields(s) {
     trainingHits: s.trainingHits, trainingLog: s.trainingLog };
 }
 
-test('Chromium 375/390px Academy undo, zero-rep resume, corrupt review and explicit replacement', async () => {
-  const browser = await chromium.launch();
+// Each engine executes the same isolated recovery, undo and resume contract.
+for (const [engineName, engine] of [['Chromium', chromium], ['WebKit', webkit]]) {
+test(`${engineName} 375/390px Academy undo, zero-rep resume, corrupt review and explicit replacement`, async () => {
+  const browser = await engine.launch();
   try {
     for (const [width, height] of [[375, 812], [390, 844]]) {
       const context = await browser.newContext({
@@ -100,3 +102,4 @@ test('Chromium 375/390px Academy undo, zero-rep resume, corrupt review and expli
     await browser.close();
   }
 });
+}
