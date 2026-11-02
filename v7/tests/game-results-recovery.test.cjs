@@ -172,6 +172,9 @@ test('explicit End Game button produces final results without changing training'
  const app=boot(savedGame({handoff:false})),state=app.read().state;
  app.click({},'resumeGame');
  app.click({},'endGame');
+ assert.equal(state.gameFinished,false,'opening confirmation must not finish the game');
+ assert.match(app.read().game,/END THIS GAME EARLY\?/);
+ app.click({},'confirmEndGame');
  assert.equal(state.gameFinished,true);
  assert.equal(state.gameStarted,false);
  assert.equal(state.screen,'Results');
