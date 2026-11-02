@@ -27,6 +27,11 @@ test('Build 1 integrity: fresh, in-progress, extra-inning and final saves remain
  assert.equal(finished.status,'final');
  assert.equal(finished.winner,'maddon');
  assert.equal(validateMatch(clone(finished)).ok,true);
+ let extras=newMatch(dad,maddon,3);
+ for(let i=0;i<18;i++)extras=swing(extras);
+ assert.equal(extras.inning,4);
+ assert.equal(extras.status,'active');
+ assert.equal(validateMatch(clone(extras)).ok,true);
 });
 
 test('Build 1 integrity: reject corrupted score, swing counts, bases, lineup, outs, and winner',()=>{
