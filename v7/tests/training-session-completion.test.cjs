@@ -53,7 +53,7 @@ test('25th rep completes drill and blocks the 26th rep',()=>{
 });
 test('double taps on the final repetition count only once',()=>{
  const app=boot();app.click({drill:'Quick Hands'});
- app.state.trainingReps=24;app.state.trainingLog=Array.from({length:24},()=>({zone:5,hit:false}));
+ app.state.trainingReps=24;app.state.trainingLog=Array.from({length:24},()=>({zone:5,contact:'MEDIUM',hit:false}));
  app.swing();app.swing();
  assert.equal(app.state.trainingReps,25);
  app.tick();app.swing();
