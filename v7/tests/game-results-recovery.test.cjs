@@ -155,3 +155,50 @@ test('invalid final summary is guarded rather than crashing Results',()=>{
  assert.match(app.read().results,/GAMEPLAY PAUSED/);
  assert.doesNotMatch(app.read().results,/PLAY AGAIN/);
 });
+
+test('menu Results from the live Game screen is navigation, not End Game',()=>{
+ const app=boot(savedGame({handoff:false})),state=app.read().state;
+ app.click({},'resumeGame');
+ assert.match(app.read().game,/id="endGame"/);
+ const before=gameSnapshot(state);
+ app.click({go:'Results'});
+ assert.equal(state.screen,'Results');
+ assert.equal(state.gameFinished,false);
+ assert.equal(gameSnapshot(state),before);
+ assert.match(app.read().results,/GAME STILL IN PROGRESS/);
+ assert.doesNotMatch(app.read().results,/PLAY AGAIN/);
+});
+test('explicit End Game button produces final results without changing training',()=>{
+ const app=boot(savedGame({handoff:false})),state=app.read().state;
+ app.click({},'resumeGame');
+ app.click({},'endGame');
+ assert.equal(state.gameFinished,true);
+ assert.equal(state.gameStarted,false);
+ assert.equal(state.screen,'Results');
+ assert.match(state.finalReason,/Game ended early by player/);
+ assert.match(app.read().results,/Final Score/);
+ assert.match(app.read().results,/PLAY AGAIN/);
+ assert.equal(state.trainingReps,2);
+ assert.equal(state.trainingLog.length,2);
+ assert.equal(app.storage['hitlab-v6.3-production'],'legacy-sentinel');
+});
+test('End Game is inert while an animation is active',()=>{
+ const app=boot(savedGame({handoff:false})),state=app.read().state;
+ app.click({},'resumeGame');
+ state.animating=true;
+ const before=gameSnapshot(state);
+ app.click({},'endGame');
+ assert.equal(state.gameFinished,false);
+ assert.equal(state.screen,'Game');
+ assert.equal(gameSnapshot(state),before);
+});
+test('handoff cannot be bypassed by visiting Results and resuming',()=>{
+ const app=boot(savedGame()),state=app.read().state;
+ app.click({},'resumeGame');
+ assert.match(app.read().game,/PASS THE PHONE/);
+ app.click({go:'Results'});
+ assert.match(app.read().results,/GAME STILL IN PROGRESS/);
+ app.click({},'resumeGame');
+ assert.equal(state.handoff,true);
+ assert.match(app.read().game,/PASS THE PHONE/);
+});
