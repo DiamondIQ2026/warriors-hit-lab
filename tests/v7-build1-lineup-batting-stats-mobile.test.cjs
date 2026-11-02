@@ -13,6 +13,8 @@ test('nine lineup batters retain correct individual hit totals after JSON resume
  assert.equal(box.away.batters.length,9);
  assert.equal(box.home.batters.length,9);
  assert.equal(box.away.batters[0].singles,1);
+ assert.equal(box.away.batters[0].average,'1.000');
+ assert.equal(box.away.batters[3].average,'.000');
  assert.equal(box.away.batters[1].doubles,1);
  assert.equal(box.away.batters[2].homeRuns,1);
  assert.equal(box.away.batters[2].runsProduced,3);
@@ -41,11 +43,13 @@ for(const [browserType,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      const first=page.locator('#lineupStatsRows tr').nth(1);
      assert.equal(await first.locator('td').nth(1).innerText(),'1');
      assert.equal(await first.locator('td').nth(2).innerText(),'1');
+     assert.equal(await first.locator('td').nth(3).innerText(),'1.000');
      const saved=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
      await page.reload();
      await page.locator('#liveBoxScore > summary').tap();
      await page.locator('#lineupStats > summary').tap();
      assert.equal(await page.locator('#lineupStatsRows tr').nth(1).locator('td').nth(2).innerText(),'1');
+     assert.equal(await page.locator('#lineupStatsRows tr').nth(1).locator('td').nth(3).innerText(),'1.000');
      assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')),saved);
      assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);
     }finally{await page.close();}
