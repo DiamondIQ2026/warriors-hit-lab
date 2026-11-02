@@ -71,6 +71,28 @@
    }
   }
   $('trainingZoneRows').replaceChildren(fragment);
+  const maps=document.createDocumentFragment();
+  const maximum=Math.max(1,...summary.home.zones.map(z=>z.swings),...summary.away.zones.map(z=>z.swings));
+  for(const player of [summary.away,summary.home]){
+   const panel=document.createElement('div');panel.className='training-heatmap';
+   const heading=document.createElement('h4');
+   heading.textContent=player.name+' · '+player.swings+' reps';
+   const grid=document.createElement('div');grid.className='training-heatmap-grid';
+   for(const zone of player.zones){
+    const cell=document.createElement('div');cell.className='training-heatmap-cell';
+    const alpha=.12+.68*(zone.swings/maximum);
+    cell.style.backgroundColor='rgba(232,172,72,'+alpha.toFixed(3)+')';
+    cell.setAttribute('aria-label','Zone '+zone.number+': '+zone.swings+' actual tee swings');
+    const number=document.createElement('span');number.textContent='ZONE '+zone.number;
+    const count=document.createElement('strong');count.textContent=String(zone.swings);
+    cell.append(number,count);grid.appendChild(cell);
+   }
+   const legend=document.createElement('p');legend.className='training-heatmap-legend';
+   legend.textContent='Darker = fewer recorded reps · Brighter = more';
+   panel.append(heading,grid,legend);maps.appendChild(panel);
+  }
+  $('trainingHeatmaps').replaceChildren(maps);
+
  }
  function renderRecentPlays(){
   const plays=api.recentPlays(match,8),list=$('recentPlaysList');
