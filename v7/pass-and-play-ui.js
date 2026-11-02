@@ -2,9 +2,12 @@
 (()=>{
  const api=window.HitLabMultiplayer;
  const KEY='warriors-hit-lab-v7-multiplayer-prototype';
+ // Deterministic outcome selection is a local QA fixture, never a hosted game control.
+ const localQaHost=['localhost','127.0.0.1','[::1]'].includes(window.location.hostname);
  const $=id=>document.getElementById(id);
  let match=null,zone=null,acknowledge=false,lastTurn=null,lastAnimatedAtBatCount=0;
  const zones=window.HitLabZoneRules.ZONES;
+ if(!localQaHost){$('outcome').value='auto';$('outcome').closest('.simulated-outcome-control').hidden=true;}
  function getNames(id){return $(id).value.trim().split(/\r?\n/).map(x=>x.trim());}
  function setDefaults(){
   $('homeLineup').value=Array.from({length:9},(_,i)=>'Titan '+(i+1)).join('\n');
@@ -164,9 +167,9 @@
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
    const old=api.currentTurn(match);
-   const simulated=$('outcome').value==='auto'
-    ?api.resolveSimulatedOutcome(match,{zone,power:$('power').value})
-    :$('outcome').value; // Explicit QA scenario override only.
+   const simulated=localQaHost&&$('outcome').value!=='auto'
+    ?$('outcome').value // Explicit local QA scenario override only.
+    :api.resolveSimulatedOutcome(match,{zone,power:$('power').value});
    const executed=window.HitLabExecution.execute('rivalry',match,current=>
      api.recordSwing(current,{zone,power:$('power').value,outcome:simulated}));
    if(executed.observation)window.__hitLabLastTransition=executed.observation;
