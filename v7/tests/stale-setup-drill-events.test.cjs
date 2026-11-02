@@ -173,3 +173,63 @@ test('invalid drill name is rejected even from Training',()=>{
  app.click({drill:'Unknown Drill'});
  unchanged(app,before,writes);
 });
+
+test('completed Family Rivalry scoreboard is immutable while next matchup is drafted',()=>{
+ const app=boot(savedGame({gameStarted:false,gameFinished:true,handoff:false,
+  finalReason:'Completed 3 innings.',inning:4})),s=app.read().state;
+ app.click({go:'Results'});
+ const before=snapshot(s),writes=app.writes.length;
+ app.click({go:'Play'});
+ const afterNavigation=app.writes.length;
+ app.change('mode','Season');app.change('difficulty','All-Star');
+ app.change('rivalName','Other Rival');app.change('homeName','Other Home');
+ app.click({innings:'9'});
+ assert.equal(snapshot(s),before,'finished score and player identity remain unchanged');
+ assert.equal(app.writes.length,afterNavigation,'draft choices are not persisted');
+ app.click({go:'Results'});
+ assert.equal(snapshot(s),before);
+ assert.equal(s.mode,'Family Rivalry');
+ assert.equal(s.rivalName,'Rival');
+ assert.equal(s.homeName,'You');
+ assert.ok(app.writes.length>=writes);
+ assert.equal(app.storage[LEGACY],'legacy-untouched');
+});
+test('completed-game setup choices apply only when Play Again starts a new game',()=>{
+ const app=boot(savedGame({gameStarted:false,gameFinished:true,handoff:false,
+  finalReason:'Completed 3 innings.',inning:4})),s=app.read().state;
+ app.click({go:'Play'});
+ app.change('mode','Tournament');app.change('difficulty','Rookie');
+ app.click({innings:'9'});
+ assert.equal(s.mode,'Family Rivalry');
+ assert.equal(s.innings,3);
+ app.click({go:'Game'});
+ assert.equal(s.mode,'Tournament');
+ assert.equal(s.innings,9);
+ assert.equal(s.difficulty,'Rookie');
+ assert.equal(s.gameStarted,true);
+ assert.equal(s.gameFinished,false);
+ assert.equal(s.inning,1);
+ assert.equal(s.home,0);
+ assert.equal(s.away,0);
+ assert.equal(s.trainingReps,2);
+ assert.equal(s.trainingLog.length,2);
+ assert.equal(app.storage[LEGACY],'legacy-untouched');
+});
+test('abandoned next-game draft cannot rewrite a finished result after reload',()=>{
+ const app=boot(savedGame({gameStarted:false,gameFinished:true,handoff:false,
+  finalReason:'Completed 3 innings.',inning:4})),s=app.read().state;
+ app.click({go:'Play'});
+ app.change('mode','Exhibition');
+ app.change('rivalName','Temporary Name');
+ app.click({innings:'6'});
+ app.click({go:'Home'});
+ assert.equal(s.mode,'Family Rivalry');
+ assert.equal(s.rivalName,'Rival');
+ assert.equal(s.innings,3);
+ const saved=JSON.parse(app.storage[KEY]);
+ assert.equal(saved.mode,'Family Rivalry');
+ assert.equal(saved.rivalName,'Rival');
+ assert.equal(saved.innings,3);
+ assert.equal(saved.gameFinished,true);
+ assert.equal(app.storage[LEGACY],'legacy-untouched');
+});
