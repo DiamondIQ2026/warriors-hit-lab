@@ -16,9 +16,9 @@ test('375px CPU mobile zone grid, touch selection, primary CTA, swing and resume
   await page.goto(ROOT+'experimental/visual-prototype.html');
   await page.locator('[data-go="Play"]').first().click();
   await page.locator('[data-go="Game"]').first().click();
-  assert.equal(await page.locator('[data-zone]').count(),9);
+  assert.equal(await page.locator('.quick-zone [data-zone]').count(),9);
   await above(page,'#swing');
-  await page.locator('[data-zone="5"]').tap();
+  await page.locator('.quick-zone [data-zone="5"]').tap();
   await page.locator('#swing').tap();
   const first=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),CPU);
   assert.equal(first.zone,5);assert.equal(first.reps,1);
