@@ -37,7 +37,7 @@ function boot(rolls=[0,.1],saved=null){
    setItem:(key,value)=>{writes.push([key,value]);storage[key]=value}},
   setTimeout:fn=>timers.push(fn)});
  return {state:window.__state(),swing:window.__swing,credit:window.__credit,
-  results:window.__results,writes,storage,timers,
+  results:window.__results,element:el,writes,storage,timers,
   tick(){const fn=timers.shift();assert.ok(fn,'animation timer exists');fn()}};
 }
 function game(app,patch={}){
@@ -204,4 +204,25 @@ test('completed walkoff result survives JSON reload without changing legacy sent
  assert.match(resumed.results(),/GAME COMPLETE — WIN/);
  assert.equal(resumed.writes.length,0,'reading results does not rewrite save');
  isolated(first);isolated(resumed);
+});
+
+test('visible CPU transition message survives ball-flight animation settlement',()=>{
+ const app=boot([.99,.99,.99,.99]);const s=game(app,{
+  mode:'Season',inning:1,outs:2,home:0,away:0,bases:[false,false,false]
+ });
+ app.swing();
+ assert.match(s.feedback,/TOP 2 COMPLETE/);
+ app.tick();
+ assert.equal(s.animating,false);
+ assert.match(app.element('feedback').textContent,/TOP 2 COMPLETE · OPPONENT \+0/);
+ assert.doesNotMatch(app.element('feedback').textContent,/BALL IN PLAY — OUT/);
+ isolated(app);
+});
+test('ordinary swing still displays its outcome after the animation settles',()=>{
+ const app=boot([0,.6]);const s=game(app,{
+  inning:1,bases:[false,false,false]
+ });
+ app.swing();app.tick();
+ assert.equal(s.feedback,'SINGLE!');
+ assert.equal(app.element('feedback').textContent,'SINGLE!');
 });
