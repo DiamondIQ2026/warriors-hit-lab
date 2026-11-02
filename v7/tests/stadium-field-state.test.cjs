@@ -206,8 +206,8 @@ test('invalid drill entries cannot corrupt zone counts or coaching comparisons',
  const app=boot();
  app.state.trainingLog=[null,{zone:0,hit:true},{zone:10,hit:true},{zone:'3',hit:true},{zone:3,contact:'INVALID',hit:true},{zone:3,contact:'SOFT',hit:false}];
  const summary=app.summary();
- assert.equal(summary.zones[2].reps,2);
- assert.equal(summary.zones[2].hits,1);
+ assert.equal(summary.zones[2].reps,1,'only complete valid records count');
+ assert.equal(summary.zones[2].hits,0,'invalid contact records cannot inflate hits');
  assert.equal(summary.contacts.SOFT,1);
  assert.equal(summary.focus,null);
  app.state.trainingLog='malformed';
