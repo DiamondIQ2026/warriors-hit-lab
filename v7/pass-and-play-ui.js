@@ -42,6 +42,10 @@
    diamond.setAttribute('aria-label', 'Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none'));
   }
   const latest=match.atBats[match.atBats.length-1];
+  if(latest&&!$('event').textContent.trim()){
+   const netIndex=zones.indexOf(latest.zone);
+   $('event').textContent='Real tee swing recorded · '+(netIndex>=0?'Net zone '+(netIndex+1)+' of 9':'Saved net impact')+' · '+latest.power+' contact. Simulated game result: '+latest.outcome+'.';
+  }
   const field=$('game').querySelector('.simulated-field');
   if(field){
    field.dataset.outcome=latest?.outcome||'';
