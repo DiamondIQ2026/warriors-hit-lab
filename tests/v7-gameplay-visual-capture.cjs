@@ -28,6 +28,15 @@ const fs=require('node:fs');
    const outcomeText=await page.locator('#fieldOutcome').textContent();
    const fieldBox=await page.locator('.simulated-field').boundingBox();
    if(outcome!=='double'||!outcomeText.includes('DOUBLE')||!fieldBox||fieldBox.width<=0||fieldBox.height<=0)throw Error(JSON.stringify({width,height,outcome,outcomeText,fieldBox}));
+   // Wait for the simulated result to reach its final position, not a random animation frame.
+   await page.locator('.simulated-field .outcome-ball').evaluate(async el=>{
+    await Promise.all(el.getAnimations().map(animation=>animation.finished.catch(()=>{})));
+   });
+   const markerState=await page.locator('.simulated-field .outcome-ball').evaluate(el=>({
+    animationStates:el.getAnimations().map(animation=>animation.playState),
+    opacity:getComputedStyle(el).opacity
+   }));
+   if(markerState.animationStates.some(state=>state==='running'))throw Error(JSON.stringify({width,height,markerState}));
    await page.screenshot({path:`artifacts/v7-gameplay/gameplay-double-${width}x${height}.png`,fullPage:true});
    console.log(JSON.stringify({width,height,outcome,outcomeText,fieldBox}));
 
