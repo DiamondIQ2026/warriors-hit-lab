@@ -73,7 +73,8 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await handoff(page,'MADDON');
     m=await record(page,'homer');
     assert.deepEqual(m.score,{dad:0,maddon:1});
-    assert.match(await page.locator('#awayScore').textContent(),/Tampa Warriors 1/);
+    assert.equal(await page.locator('#awayScore .score-team').innerText(),'Tampa Warriors');
+    assert.equal(await page.locator('#awayScore .score-points').innerText(),'1');
     await outs(page);
     m=await read(page);
     assert.equal(m.half,'bottom');assert.equal(m.inning,4);
@@ -89,7 +90,8 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     assert.equal(m.atBats.at(-1).runs,4);
     assert.equal(m.atBats.length,26);
     assert.equal(m.realSwings.dad,13);assert.equal(m.realSwings.maddon,13);
-    assert.match(await page.locator('#homeScore').textContent(),/Tampa Titans 4/);
+    assert.equal(await page.locator('#homeScore .score-team').innerText(),'Tampa Titans');
+    assert.equal(await page.locator('#homeScore .score-points').innerText(),'4');
     assert.match(await page.locator('#inning').textContent(),/FINAL/);
     assert.equal(await page.locator('#swingPanel').isVisible(),false);
     assert.equal(await page.locator('#turn').isDisabled(),true);
