@@ -84,7 +84,7 @@ test('missed drill swing never adds a game out or switches innings',()=>{
 test('drill summary reads training counters instead of active-game counters',()=>{
  const app=boot();
  Object.assign(app.state,{reps:50,hits:40,trainingReps:2,trainingHits:1,
-  trainingLog:[{zone:5,hit:true},{zone:5,hit:false}]});
+  trainingLog:[{zone:5,contact:'MEDIUM',hit:true},{zone:5,contact:'MEDIUM',hit:false}]});
  assert.match(app.drill(),/REPS 2\/25/);
  assert.match(app.drill(),/HITS 1/);
  assert.match(app.report(),/2 repetitions · 1 hits/);
