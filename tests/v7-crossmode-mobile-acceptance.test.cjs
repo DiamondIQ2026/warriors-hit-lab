@@ -31,7 +31,7 @@ test('CPU phone scoreboard, nine-zone swing, navigation and save/reload remain i
   assert.ok(await page.locator('.nav button').count()>0);
  }finally{await browser.close();}
 });
-test('Family Rivalry phone handoff and hit, then winning final score resumes without CPU writes',async()=>{
+test('Family Rivalry phone handoff and hit resume without CPU writes',async()=>{
  const browser=await chromium.launch();
  try{
   const context=await browser.newContext(phone),page=await context.newPage();
