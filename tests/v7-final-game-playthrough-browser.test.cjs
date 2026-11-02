@@ -2,17 +2,14 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
+const {matchFixture}=require('./helpers/v7-match-fixtures.cjs');
 const ROOT='http://127.0.0.1:8765/v7/';
 const KEY='warriors-hit-lab-v7-multiplayer-prototype';
 const CPU='hitlab-v7-visual-prototype-only';
-async function setup(page,mutate){
+async function setup(page,scenario){
  await page.goto(ROOT+'multiplayer.html');
- await page.locator('#start').click();
- await page.evaluate(({key,mutate})=>{
-  const v=JSON.parse(localStorage.getItem(key));
-  Object.assign(v,mutate);
-  localStorage.setItem(key,JSON.stringify(v));
- },{key:KEY,mutate});
+ await page.evaluate(({key,match})=>localStorage.setItem(key,JSON.stringify(match)),
+  {key:KEY,match:matchFixture(scenario)});
  await page.reload();
 }
 async function swing(page,outcome){
@@ -26,7 +23,7 @@ test('Family Rivalry visiting third out in final inning ends game with home lead
  const browser=await chromium.launch();
  try{
   const page=await browser.newPage();
-  await setup(page,{inning:3,half:'top',outs:2,score:{dad:4,maddon:2}});
+  await setup(page,'home-leads-top3-two-outs');
   await swing(page,'out');
   const saved=await read(page);
   assert.equal(saved.status,'final');assert.equal(saved.winner,'dad');
@@ -38,7 +35,7 @@ test('Family Rivalry home walkoff in final inning survives reload',async()=>{
  const browser=await chromium.launch();
  try{
   const page=await browser.newPage();
-  await setup(page,{inning:3,half:'bottom',outs:1,score:{dad:2,maddon:2},bases:[false,false,false]});
+  await setup(page,'tied-bottom3-one-out');
   await swing(page,'homer');
   const before=await read(page);
   assert.equal(before.status,'final');assert.equal(before.winner,'dad');
@@ -51,7 +48,7 @@ test('Family Rivalry tied regulation advances to extra inning with cleared bases
  const browser=await chromium.launch();
  try{
   const page=await browser.newPage();
-  await setup(page,{inning:3,half:'bottom',outs:2,score:{dad:2,maddon:2},bases:[true,false,true]});
+  await setup(page,'tied-bottom3-two-outs-runners');
   await swing(page,'out');
   const extra=await read(page);
   assert.equal(extra.status,'active');assert.equal(extra.inning,4);

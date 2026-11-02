@@ -72,6 +72,49 @@ function recordSwing(match,{zone,power,outcome}){
  return m;
 }
 function currentTurn(m){return {team:offense(m).team,playerId:offense(m).id,inning:m.inning,half:m.half,outs:m.outs,status:m.status}}
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns};
+// Validate persisted V7-only matches before rendering or accepting more swings.
+// Never repair, migrate or rewrite an invalid save: recovery is an explicit user action.
+function validateMatch(m){
+ const fail=reason=>({ok:false,reason});
+ if(!m||typeof m!=='object'||Array.isArray(m)||m.version!==1)return fail('Unsupported V7 match format');
+ const profile=p=>p&&typeof p.id==='string'&&p.id.length>0&&typeof p.name==='string'&&p.name.trim()&&
+  typeof p.team==='string'&&p.team.trim()&&['L','R'].includes(p.hand)&&
+  Array.isArray(p.lineup)&&p.lineup.length===9&&p.lineup.every(n=>typeof n==='string'&&n.trim());
+ if(!profile(m.home)||!profile(m.away)||m.home.id===m.away.id||m.home.team.toLowerCase()===m.away.team.toLowerCase())
+  return fail('Invalid player or lineup');
+ if(![3,6,9].includes(m.innings)||!Number.isSafeInteger(m.inning)||m.inning<1||
+  !['top','bottom'].includes(m.half)||!Number.isInteger(m.outs)||m.outs<0||m.outs>2)
+  return fail('Invalid inning or outs');
+ if(!Array.isArray(m.bases)||m.bases.length!==3||m.bases.some(b=>typeof b!=='boolean'))
+  return fail('Invalid baserunners');
+ if(!['active','final'].includes(m.status)||m.status==='active'&&m.winner!==null||
+  m.status==='final'&&![m.home.id,m.away.id].includes(m.winner))
+  return fail('Invalid game status');
+ if(!m.score||!m.realSwings||!m.battingOrder)return fail('Missing scoring records');
+ const ids=[m.home.id,m.away.id],counts=Object.fromEntries(ids.map(id=>[id,0]));
+ const runs=Object.fromEntries(ids.map(id=>[id,0]));
+ for(const id of ids){
+  if(!Number.isSafeInteger(m.score[id])||m.score[id]<0||
+   !Number.isSafeInteger(m.realSwings[id])||m.realSwings[id]<0||
+   !Number.isInteger(m.battingOrder[id])||m.battingOrder[id]<0||m.battingOrder[id]>8)
+   return fail('Invalid score or batting order');
+ }
+ if(!Array.isArray(m.atBats)||m.atBats.length>10000)return fail('Invalid swing history');
+ for(const a of m.atBats){
+  if(!a||!ids.includes(a.teamId)||!Number.isInteger(a.index)||a.index<0||a.index>8||
+   !Number.isInteger(a.inning)||a.inning<1||a.inning>m.inning||
+   !['top','bottom'].includes(a.half)||!ZONES.includes(a.zone)||!POWERS.includes(a.power)||
+   !OUTCOMES.includes(a.outcome)||!Number.isSafeInteger(a.runs)||a.runs<0||
+   a.outcome==='out'&&a.runs!==0)
+   return fail('Invalid recorded swing');
+  counts[a.teamId]++;runs[a.teamId]+=a.runs;
+ }
+ for(const id of ids){
+  if(counts[id]!==m.realSwings[id]||counts[id]%9!==m.battingOrder[id]||runs[id]!==m.score[id])
+   return fail('Swing history and scoreboard disagree');
+ }
+ return {ok:true,reason:null};
+}
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
