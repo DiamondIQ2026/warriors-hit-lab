@@ -69,6 +69,12 @@
    fragment.appendChild(row);
   }
   body.replaceChildren(fragment);
+  // Fast-glance stat strip uses the same validated history-derived box score.
+  $('quickAwayName').textContent=box.away.name;
+  $('quickHomeName').textContent=box.home.name;
+  $('quickAwayLine').textContent=[box.away.runs,box.away.hits,box.away.outs].join(' · ');
+  $('quickHomeLine').textContent=[box.home.runs,box.home.hits,box.home.outs].join(' · ');
+
   const lineup=document.createDocumentFragment();
   for(const team of [box.away,box.home]){
    const heading=document.createElement('tr'),head=document.createElement('th');
