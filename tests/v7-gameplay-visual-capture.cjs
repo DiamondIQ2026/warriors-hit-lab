@@ -42,6 +42,24 @@ const fs=require('node:fs');
 
    if(data.overflow||data.buttonLabels.join(',')!=='1,2,3,4,5,6,7,8,9'||errors.length)throw Error(JSON.stringify({width,height,data,errors}));
    console.log(JSON.stringify({width,height,...data,errors}));
+   // Build 1 acceptance visual proof: score table, per-batter lineup, and
+   // finished game recap. Screenshots are CI artifacts, not a deployment.
+   await page.locator('#liveBoxScore > summary').click();
+   await page.locator('#lineupStats > summary').click();
+   await page.screenshot({path:`artifacts/v7-gameplay/gameplay-live-stats-${width}x${height}.png`,fullPage:true});
+   const api=require('../v7/pass-and-play.cjs');
+   const home=api.createProfile({id:'dad',name:'Dad',team:'Tampa Titans',hand:'R'});
+   const away=api.createProfile({id:'maddon',name:'Maddon',team:'Tampa Warriors',hand:'L'});
+   let finished=api.newMatch(home,away,3);
+   finished=api.recordSwing(finished,{zone:'MC',power:'hard',outcome:'homer'});
+   for(let n=0;n<40&&finished.status==='active';n++)
+    finished=api.recordSwing(finished,{zone:'MC',power:'medium',outcome:'out'});
+   if(finished.status!=='final')throw Error('Could not construct final game for visual capture');
+   await page.evaluate(saved=>localStorage.setItem('warriors-hit-lab-v7-multiplayer-prototype',saved),JSON.stringify(finished));
+   await page.reload();
+   if(!await page.locator('#postgameRecap').isVisible())throw Error('Final recap not visible');
+   await page.screenshot({path:`artifacts/v7-gameplay/gameplay-final-recap-${width}x${height}.png`,fullPage:true});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Final recap document overflow');
    await context.close();
   }
  } finally {await browser.close();}
