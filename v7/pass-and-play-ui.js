@@ -36,6 +36,10 @@
   $('homeScore').textContent=match.home.team+' '+match.score[match.home.id];
   $('inning').textContent=match.status==='final'?'FINAL':(match.half==='top'?'TOP ':'BOTTOM ')+match.inning+' • '+match.outs+' OUTS';
   $('bases').textContent='Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none');
+  const latest=match.atBats[match.atBats.length-1];
+  const field=$('game').querySelector('.simulated-field');
+  if(field)field.dataset.outcome=latest?.outcome||'';
+  if($('fieldOutcome'))$('fieldOutcome').textContent=latest?('Last simulated result: '+latest.outcome.toUpperCase()+' · '+latest.runs+' run'+(latest.runs===1?'':'s')):'Awaiting simulated result';
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
