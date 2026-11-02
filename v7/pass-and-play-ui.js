@@ -65,6 +65,7 @@
   $('turn').disabled=match.status==='final';
   $('record').disabled=!zone||!acknowledge||match.status==='final';
   $('recordAfterChoices').disabled=$('record').disabled;
+  $('seeLastSwing').classList.toggle('hidden',!latest);
   const impactReview=$('practiceImpactReview');
   impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
   impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · simulated result chosen separately'):'Select a net-impact zone to record your next real tee swing.';
@@ -87,6 +88,7 @@
  $('power').addEventListener('change',()=>{syncContactOptions();if(match)render();});
  syncContactOptions();
  $('recordAfterChoices').addEventListener('click',()=>{if(!$('record').disabled)$('record').click();});
+ $('seeLastSwing').addEventListener('click',()=>{$('event').scrollIntoView({behavior:'instant',block:'center'});});
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
