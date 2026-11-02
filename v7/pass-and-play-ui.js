@@ -55,6 +55,8 @@
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
+  $('practiceBatterHand').textContent=(p.hand==='L'?'LEFT-HANDED':p.hand==='R'?'RIGHT-HANDED':'HANDEDNESS UNSET')+' · '+p.name;
+  $('practiceRealSwingCount').textContent='Recorded swings: '+match.realSwings[p.id];
   const now=api.currentTurn(match);
   const token=now.playerId+'-'+now.inning+'-'+now.half;
   if(lastTurn!==token){acknowledge=false;lastTurn=token;$('viewFlight').classList.add('hidden');delete $('viewFlight').dataset.url;if($('flightDialog').open)$('flightDialog').close();$('flightFrame').removeAttribute('src');}
