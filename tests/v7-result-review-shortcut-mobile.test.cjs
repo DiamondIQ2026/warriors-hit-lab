@@ -22,7 +22,12 @@ test('mobile practice result shortcut appears only after recorded swing and surv
    assert.equal(inView,true);
    const saved=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
    await page.reload();
+   // Reload correctly restores the pass-phone handoff: controls stay hidden until acknowledged.
+   assert.equal(await shortcut.isVisible(),false);
+   await page.locator('#turn').tap();
    assert.equal(await shortcut.isVisible(),true);
+   await shortcut.tap();
+   assert.match(await page.locator('#event').textContent(),/Net zone 5 of 9/);
    assert.equal(await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')),saved);
    assert.equal(await page.evaluate(()=>localStorage.getItem('hitlab-v7-visual-prototype-only')),null);
    await page.close();
