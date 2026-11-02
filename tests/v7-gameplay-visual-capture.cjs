@@ -21,6 +21,16 @@ const fs=require('node:fs');
     viewport:innerHeight
    }));
    await page.screenshot({path:`artifacts/v7-gameplay/gameplay-${width}x${height}.png`,fullPage:true});
+   // Capture a repeatable post-swing state so the new field/result treatment can be reviewed.
+   await page.locator('#outcome').selectOption('double');
+   await page.locator('#record').click();
+   const outcome=await page.locator('.simulated-field').getAttribute('data-outcome');
+   const outcomeText=await page.locator('#fieldOutcome').textContent();
+   const fieldBox=await page.locator('.simulated-field').boundingBox();
+   if(outcome!=='double'||!outcomeText.includes('DOUBLE')||!fieldBox||fieldBox.width<=0||fieldBox.height<=0)throw Error(JSON.stringify({width,height,outcome,outcomeText,fieldBox}));
+   await page.screenshot({path:`artifacts/v7-gameplay/gameplay-double-${width}x${height}.png`,fullPage:true});
+   console.log(JSON.stringify({width,height,outcome,outcomeText,fieldBox}));
+
    if(data.overflow||data.buttonLabels.join(',')!=='1,2,3,4,5,6,7,8,9'||errors.length)throw Error(JSON.stringify({width,height,data,errors}));
    console.log(JSON.stringify({width,height,...data,errors}));
    await context.close();
