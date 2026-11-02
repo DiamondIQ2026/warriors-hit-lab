@@ -72,11 +72,11 @@
   const lineup=document.createDocumentFragment();
   for(const team of [box.away,box.home]){
    const heading=document.createElement('tr'),head=document.createElement('th');
-   head.scope='rowgroup';head.colSpan=8;head.textContent=team.name;
+   head.scope='rowgroup';head.colSpan=9;head.textContent=team.name;
    heading.appendChild(head);lineup.appendChild(heading);
    for(const batter of team.batters){
     const row=document.createElement('tr');
-    for(const value of [batter.name,batter.atBats,batter.hits,batter.singles,batter.doubles,batter.triples,batter.homeRuns,batter.runsProduced]){
+    for(const value of [batter.name,batter.atBats,batter.hits,batter.average,batter.singles,batter.doubles,batter.triples,batter.homeRuns,batter.runsProduced]){
      const cell=document.createElement('td');cell.textContent=String(value);row.appendChild(cell);
     }
     lineup.appendChild(row);
