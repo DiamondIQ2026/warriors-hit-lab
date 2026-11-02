@@ -117,7 +117,7 @@
  setDefaults();
  try{
   const raw=localStorage.getItem(KEY),v=raw?JSON.parse(raw):null;
-  if(v&&v.version===1&&v.home?.id==='dad'&&v.away?.id==='maddon'&&['active','final'].includes(v.status)&&Array.isArray(v.atBats)&&Array.isArray(v.bases))match=v;
+  if(v&&v.version===1&&v.home?.id==='dad'&&v.away?.id==='maddon'&&['active','final'].includes(v.status)&&Array.isArray(v.atBats)&&Array.isArray(v.bases)){match=v;lastAnimatedAtBatCount=v.atBats.length;}
  }catch{}
  render();
 })();
