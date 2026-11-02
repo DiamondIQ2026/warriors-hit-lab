@@ -137,9 +137,13 @@
    $('event').textContent='Real tee swing recorded · Net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact. Simulated game result: '+$('outcome').value+'.';
    $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
    $('viewFlight').classList.remove('hidden');
-   if(old.playerId!==api.currentTurn(match).playerId||old.half!==match.half)acknowledge=false;
+   const handoffRequired=old.playerId!==api.currentTurn(match).playerId||old.half!==match.half;
+   if(handoffRequired)acknowledge=false;
    zone=null;for(const el of zoneRoot.children){el.classList.remove('active');el.setAttribute('aria-pressed','false');}
    persist();render();
+   // After a third out or a final result, show the live scoreboard and handoff
+   // instead of leaving the next player stranded below the fold.
+   if(handoffRequired||match.status==='final')window.scrollTo(0,0);
   }catch(e){$('event').textContent=e.message;}
  };
  $('viewFlight').onclick=()=>{
@@ -178,5 +182,12 @@
    else offerRecovery(raw,validation.reason);
   }
  }catch{$('setupError').textContent='Could not access V7 local storage. Existing saves were not changed.';}
+ // Reloaded WebKit may restore the scroll position of the previous batter's
+ // net-zone controls. Resume should expose the pass-phone gate, not a stale tap.
+ if('scrollRestoration' in history)history.scrollRestoration='manual';
  render();
+ window.addEventListener('pageshow',()=>{
+  if(match&&match.status==='active'&&!acknowledge)
+   requestAnimationFrame(()=>window.scrollTo(0,0));
+ });
 })();
