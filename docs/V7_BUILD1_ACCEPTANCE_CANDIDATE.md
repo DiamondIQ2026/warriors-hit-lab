@@ -25,7 +25,7 @@ The test deliberately uses the QA-only simulated outcome override to force a det
 - [ ] GitHub Actions CI passes on the **exact acceptance branch head**.
 - [ ] Chromium and WebKit full mobile 3-inning browser playthrough passes at both viewport sizes.
 - [ ] Final score, batter stats, replay integrity and byte-exact save persistence pass.
-- [ ] 375/390 mobile screenshot review and visual parity review completed (not claimed by automated text assertions).
+- [ ] 375/390 mobile screenshot review and visual parity review completed (not claimed by automated text assertions). CI captures game setup, animated-result completion, live stats and final recap at both sizes under the `v7-gameplay-mobile-captures` artifact; inspect the PNGs before checking this gate.
 - [ ] Integration lead verifies no conflicting newer gameplay branch and that all intended V7 changes are present.
 - [ ] User explicitly approves any merge into main and any deployment.
 
