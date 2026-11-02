@@ -15,5 +15,16 @@
   throw Error('Invalid nine-zone location');
  }
  function label(value){return ZONES[number(value)-1];}
- return Object.freeze({ZONES,number,label});
+ // Keyboard navigation follows the physical 3x3 net grid. At an edge,
+ // focus stays in place rather than jumping to a different row/column.
+ function move(index,key){
+  if(!Number.isInteger(index)||index<0||index>=ZONES.length)throw Error('Invalid nine-zone index');
+  const directions={ArrowRight:[0,1],ArrowLeft:[0,-1],ArrowDown:[1,0],ArrowUp:[-1,0]};
+  const step=directions[key];
+  if(!step)return index;
+  const row=Math.max(0,Math.min(2,Math.floor(index/3)+step[0]));
+  const col=Math.max(0,Math.min(2,index%3+step[1]));
+  return row*3+col;
+ }
+ return Object.freeze({ZONES,number,label,move});
 });
