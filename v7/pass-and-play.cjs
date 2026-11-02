@@ -31,7 +31,15 @@ function recordSwing(match,{zone,power,outcome}){
  if(match.status!=='active')throw Error('Match is complete');
  if(!ZONES.includes(zone)||!POWERS.includes(power)||!OUTCOMES.includes(outcome))throw Error('Invalid swing');
  const m=structuredClone(match),player=offense(m),index=m.battingOrder[player.id],batter=player.lineup[index];
- const result=scoreRuns(m.bases,outcome),runs=outcome==='out'?0:result.runs;
+ const result=scoreRuns(m.bases,outcome);
+ // In a bottom-of-final-inning walk-off, a non-homer scores only the
+ // runs required to win. Home runs are credited in full (including grand slams).
+ // Keep the simulated base-advancement result separate from credited runs.
+ const earnedRuns=outcome==='out'?0:result.runs;
+ const runs=m.half==='bottom'&&m.inning>=m.innings&&outcome!=='homer'&&
+  m.score[m.home.id]+earnedRuns>m.score[m.away.id]
+  ?Math.min(earnedRuns,Math.max(0,m.score[m.away.id]-m.score[m.home.id]+1))
+  :earnedRuns;
  m.realSwings[player.id]++;m.battingOrder[player.id]=(index+1)%9;
  m.atBats.push({teamId:player.id,batter,index,inning:m.inning,half:m.half,zone,power,outcome,runs,kind:'real-swing'});
  if(outcome==='out')m.outs++;else{m.bases=result.bases;m.score[player.id]+=runs}
