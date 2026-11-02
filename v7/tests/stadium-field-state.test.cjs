@@ -275,7 +275,7 @@ test('training report explains goals and preserves its above-fold library CTA',(
  assert.ok(page.indexOf('DRILL FOCUS')<page.indexOf('Zone Performance'));
  assert.match(page,/aria-label="Drill focus progress"[^>]*aria-valuemax="25" aria-valuenow="25"/);
  assert.match(page,/Reaction time and swing speed are not measured/);
- assert.match(app.training(),/25 REPS →/);
+ assert.match(app.training(),/25 REPS · START DRILL →/);
  assert.equal(app.writes.length,0);
 });
 test('malformed saved rep log cannot inflate training drill focus goals',()=>{
