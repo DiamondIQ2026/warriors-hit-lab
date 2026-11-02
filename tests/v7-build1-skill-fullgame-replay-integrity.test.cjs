@@ -37,7 +37,7 @@ function play(innings) {
  }
  assert.equal(match.status,'final','game must reach final within safety bound');
  assert.ok(match.inning>=innings);
- assert.ok(transitions>=innings*2-1,'must play required half-innings unless home leads after top final');
+ assert.ok(transitions>=innings*2-2,'home-leading top-final may end without a bottom-half handoff');
  assert.ok(scoring>0,'simulation should produce scoring opportunities');
  assert.equal(api.validateMatch(match).ok,true);
  assert.notEqual(JSON.stringify(match),initial);
