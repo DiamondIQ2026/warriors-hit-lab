@@ -11,7 +11,7 @@ assert.ok(source,'V7 inline script must exist');
 const anchor="el('menuButton').onclick=";
 assert.ok(source.includes(anchor),'stable V7 test hook');
 const script=source.replace(anchor,
- "window.__state=()=>state;window.__score=score;window.__fielders=reactingFielders;window.__step=fielderStep;window.__swing=swing;"+anchor);
+ "window.__state=()=>state;window.__score=score;window.__field=field;window.__summary=trainingSummary;window.__report=report;window.__results=results;window.__fielders=reactingFielders;window.__step=fielderStep;window.__swing=swing;"+anchor);
 function boot(rolls=[.99]){
  const elements={},created=[],writes=[],timers=[];
  const fielders=Array.from({length:8},()=>({
@@ -37,7 +37,7 @@ function boot(rolls=[.99]){
  vm.runInNewContext(script,{document,window,Math:random,
   localStorage:{getItem:()=>null,setItem:(key,value)=>writes.push([key,value])},
   setTimeout:fn=>timers.push(fn)});
- return {state:window.__state(),score:window.__score,fielders:window.__fielders,
+ return {state:window.__state(),score:window.__score,field:window.__field,summary:window.__summary,report:window.__report,results:window.__results,fielders:window.__fielders,
   step:window.__step,swing:window.__swing,defenders:fielders,created,writes,
   tick(){const fn=timers.shift();assert.ok(fn);fn()}};
 }
@@ -137,4 +137,95 @@ test('stadium visuals never write a legacy save key',()=>{
  assert.equal(app.state.reps,0);
  assert.ok(app.writes.length>0);
  assert.ok(app.writes.every(([key])=>key==='hitlab-v7-visual-prototype-only'));
+});
+
+test('on-field runner diamonds reflect occupied bases in game mode',()=>{
+ const app=boot();
+ app.state.screen='Game';app.state.bases=[true,false,true];
+ const field=app.field();
+ assert.match(field,/field-base-first occupied/);
+ assert.match(field,/field-base-third occupied/);
+ assert.match(field,/field-base-second"/);
+ assert.doesNotMatch(field,/field-base-second occupied/);
+ assert.equal((field.match(/class="field-base field-base-/g)||[]).length,3);
+ assert.match(field,/class="field-bases" aria-hidden="true"/);
+ assert.match(field,/class="field-home"/);
+});
+test('training field hides game runners without changing live game bases',()=>{
+ const app=boot();
+ app.state.screen='Drill';app.state.bases=[true,true,true];
+ const field=app.field();
+ assert.doesNotMatch(field,/field-base-(first|second|third) occupied/);
+ assert.deepEqual(Array.from(app.state.bases),[true,true,true]);
+ assert.equal(app.writes.length,0);
+});
+test('base overlay tracks the CSS diamond at different aspect ratios without blocking zone taps',()=>{
+ assert.match(html,/\.field \.field-bases\{[^}]*top:62%;width:32%;aspect-ratio:1/);
+ assert.match(html,/\.field \.field-bases\{[^}]*pointer-events:none/);
+ assert.match(html,/\.field \.field-base-first\{left:100%;top:0\}/);
+ assert.match(html,/\.field \.field-base-second\{left:0;top:0\}/);
+ assert.match(html,/\.field \.field-base-third\{left:0;top:100%\}/);
+});
+test('empty training log shows no percentages and no invented coaching focus',()=>{
+ const app=boot();
+ const summary=app.summary();
+ assert.equal(summary.focus,null);
+ assert.equal(summary.zones.length,9);
+ assert.ok(summary.zones.every(z=>z.reps===0&&z.hits===0));
+ assert.match(app.report(),/Record at least 3 reps in two different zones/);
+});
+test('one-rep 100% is visibly marked as a small sample, not a recommendation',()=>{
+ const app=boot();
+ app.state.trainingLog=[{zone:3,contact:'HARD',hit:true}];
+ const summary=app.summary();
+ assert.equal(summary.focus,null);
+ assert.equal(summary.zones[2].reps,1);
+ assert.equal(summary.zones[2].hits,1);
+ assert.match(app.report(),/1\/1 simulated hits · SMALL SAMPLE/);
+ assert.match(app.report(),/100%/);
+});
+test('training recommendations require two comparable zones and use simulated hit rates',()=>{
+ const app=boot();
+ app.state.trainingLog=[
+  {zone:2,contact:'SOFT',hit:false},
+  {zone:2,contact:'MEDIUM',hit:false},
+  {zone:2,contact:'HARD',hit:true},
+  {zone:5,contact:'HARD',hit:true},
+  {zone:5,contact:'HARD',hit:true},
+  {zone:5,contact:'MEDIUM',hit:true}
+ ];
+ const summary=app.summary();
+ assert.equal(summary.focus,2);
+ assert.equal(summary.zones[1].hits,1);
+ assert.equal(summary.zones[1].reps,3);
+ assert.deepEqual({...summary.contacts},{SOFT:1,MEDIUM:2,HARD:3});
+ assert.match(app.report(),/Review Zone 2: lowest simulated hit rate/);
+ assert.match(app.report(),/Contact choices: Soft 1 · Medium 2 · Hard 3/);
+});
+test('invalid drill entries cannot corrupt zone counts or coaching comparisons',()=>{
+ const app=boot();
+ app.state.trainingLog=[null,{zone:0,hit:true},{zone:10,hit:true},{zone:'3',hit:true},{zone:3,contact:'INVALID',hit:true},{zone:3,contact:'SOFT',hit:false}];
+ const summary=app.summary();
+ assert.equal(summary.zones[2].reps,2);
+ assert.equal(summary.zones[2].hits,1);
+ assert.equal(summary.contacts.SOFT,1);
+ assert.equal(summary.focus,null);
+ app.state.trainingLog='malformed';
+ assert.ok(app.summary().zones.every(z=>z.reps===0));
+});
+test('training report offers the primary library action before the detailed statistics',()=>{
+ const app=boot();
+ const page=app.report();
+ assert.ok(page.indexOf('BACK TO DRILL LIBRARY')<page.indexOf('Zone Performance'));
+ assert.match(page,/not measurements of real-world swing accuracy/);
+ assert.equal(app.writes.length,0);
+});
+test('Family Rivalry results expose Play Again immediately after score, before comparison',()=>{
+ const app=boot();
+ app.state.mode='Family Rivalry';
+ const page=app.results();
+ assert.ok(page.indexOf('PLAY AGAIN ▶')>page.indexOf('Game scoreboard'));
+ assert.ok(page.indexOf('PLAY AGAIN ▶')<page.indexOf('Player Comparison'));
+ assert.equal((page.match(/PLAY AGAIN ▶/g)||[]).length,1);
+ assert.equal(app.writes.length,0);
 });
