@@ -2,6 +2,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
+const {matchFixture}=require('./helpers/v7-match-fixtures.cjs');
 const ROOT='http://127.0.0.1:8765/v7/';
 const CPU='hitlab-v7-visual-prototype-only',RIVALRY='warriors-hit-lab-v7-multiplayer-prototype';
 const phone={viewport:{width:375,height:812},isMobile:true,hasTouch:true};
@@ -11,12 +12,8 @@ test('Family Rivalry mobile final third out, navigation, and final-score reload'
   const page=await browser.newPage(phone);
   await page.goto(ROOT+'multiplayer.html');
   await page.locator('#start').tap();
-  await page.evaluate(key=>{
-   const m=JSON.parse(localStorage.getItem(key));
-   m.inning=3;m.half='top';m.outs=2;
-   m.score[m.home.id]=5;m.score[m.away.id]=1;
-   localStorage.setItem(key,JSON.stringify(m));
-  },RIVALRY);
+  await page.evaluate(({key,match})=>localStorage.setItem(key,JSON.stringify(match)),
+   {key:RIVALRY,match:matchFixture('home-leads-top3-two-outs')});
   await page.reload();
   if(await page.locator('#turn').isVisible())await page.locator('#turn').tap();
   const zones=page.locator('#zones button');
