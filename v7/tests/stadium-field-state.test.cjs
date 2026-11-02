@@ -226,6 +226,8 @@ test('training report offers the primary library action before the detailed stat
 test('Family Rivalry results expose Play Again immediately after score, before comparison',()=>{
  const app=boot();
  app.state.mode='Family Rivalry';
+ app.state.gameFinished=true;
+ app.state.finalReason='Completed 6 innings.';
  const page=app.results();
  assert.ok(page.indexOf('PLAY AGAIN ▶')>page.indexOf('Game scoreboard'));
  assert.ok(page.indexOf('PLAY AGAIN ▶')<page.indexOf('Player Comparison'));
