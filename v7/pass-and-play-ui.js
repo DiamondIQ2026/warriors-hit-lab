@@ -97,7 +97,7 @@
    if(executed.warning){window.__hitLabTransitionWarning=executed.warning;console.warn('V7 transition observation:',executed.warning);}
    const updatedMatch=executed.next;
    match=updatedMatch;
-   $('event').textContent='Recorded '+zone+' / '+$('power').value+' • simulated '+$('outcome').value+'.';
+   $('event').textContent='Real tee swing recorded · Net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact. Simulated game result: '+$('outcome').value+'.';
    $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:$('outcome').value,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
    $('viewFlight').classList.remove('hidden');
    if(old.playerId!==api.currentTurn(match).playerId||old.half!==match.half)acknowledge=false;
