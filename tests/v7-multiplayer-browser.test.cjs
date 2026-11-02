@@ -195,8 +195,10 @@ test('metallic scoreboard displays both team scores with compact mobile geometry
   await page.locator('#start').click();
   const score=page.locator('.score');
   assert.equal(await score.evaluate(e=>getComputedStyle(e).display),'grid');
-  assert.match(await page.locator('#awayScore').innerText(),/Tampa Warriors 0/);
-  assert.match(await page.locator('#homeScore').innerText(),/Tampa Titans 0/);
+  assert.equal(await page.locator('#awayScore .score-team').innerText(),'Tampa Warriors');
+  assert.equal(await page.locator('#awayScore .score-points').innerText(),'0');
+  assert.equal(await page.locator('#homeScore .score-team').innerText(),'Tampa Titans');
+  assert.equal(await page.locator('#homeScore .score-points').innerText(),'0');
   assert.equal(await page.locator('.scoreMid').innerText(),'VS');
   const bounds=await score.boundingBox();
   assert.ok(bounds&&bounds.height<115,'Scoreboard should remain compact');
