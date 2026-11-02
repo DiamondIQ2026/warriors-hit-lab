@@ -23,7 +23,7 @@ for(const [name,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
      localStorage.setItem('warriors-hit-lab-v6-snapshot',snapshot);
     },{key:KEY,raw,legacy:OLD,snapshot:OLD_SNAPSHOT});
     await page.goto(GAME_URL);
-    assert.match(await page.locator('h1').innerText(),/Saved game needs attention/);
+    assert.match(await page.locator('h1').innerText(),/Saved game needs attention/i);
     assert.equal(await page.locator('#swing').count(),0,'recording is blocked while save is locked');
     assert.equal(await page.locator('[data-go="Play"]').count(),0,'play controls are not available before recovery');
     const saved=()=>page.evaluate(key=>localStorage.getItem(key),KEY);
@@ -38,13 +38,15 @@ for(const [name,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await page.locator('#keepRecovery').click();
     assert.equal(await saved(),raw);
     await page.reload();
-    assert.match(await page.locator('h1').innerText(),/Saved game needs attention/);
+    assert.match(await page.locator('h1').innerText(),/Saved game needs attention/i);
     await page.locator('#discardRecovery').click();
     await page.locator('#cancelDiscardRecovery').click();
     assert.equal(await saved(),raw,'cancel keeps original');
     await page.locator('#discardRecovery').click();
     await page.locator('#confirmDiscardRecovery').click();
     assert.equal(await saved(),null,'confirmed discard removes only experimental key');
+    const backups=await page.evaluate(key=>Object.keys(localStorage).filter(k=>k.startsWith(key+':recovery:')).map(k=>localStorage.getItem(k)),KEY);
+    assert.deepEqual(backups,[raw],'every explicit discard must retain one byte-exact recovery backup');
     assert.equal(await page.evaluate(k=>localStorage.getItem(k),LEGACY),OLD);
     assert.equal(await page.evaluate(k=>localStorage.getItem(k),SNAPSHOT),OLD_SNAPSHOT);
     await page.locator('[data-go="Play"]').first().click();

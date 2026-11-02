@@ -53,7 +53,7 @@ for(const [name,engine] of [['Chromium',chromium],['WebKit',webkit]]){
    assert.equal(state.gameFinished,true);
    assert.equal(state.reps,1);
    await page.waitForTimeout(1100);
-   assert.match(await page.locator('main').innerText(),/Final Score/);
+   assert.match(await page.locator('main').innerText(),/Final Score/i);
 
    await setup(page,{...base,home:1,contact:'HARD'});
    state=await recorded(page,[0,0]);
