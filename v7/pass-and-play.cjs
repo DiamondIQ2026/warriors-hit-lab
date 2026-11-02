@@ -126,6 +126,23 @@ function boxScore(match){
   status:match.status,winner:match.winner,
   away:teams[match.away.id],home:teams[match.home.id]};
 }
+// Postgame recap is derived, never stored. A tie-break for standout hitters
+// uses credited runs, then home runs, hits, and original lineup order.
+function postgameRecap(match){
+ const box=boxScore(match);
+ if(box.status!=='final')return null;
+ const winner=box.winner===box.home.id?box.home:box.away;
+ const loser=winner.id===box.home.id?box.away:box.home;
+ const leaders=[...box.away.batters.map(b=>({...b,team:box.away.name})),
+  ...box.home.batters.map(b=>({...b,team:box.home.name}))];
+ leaders.sort((a,b)=>b.runsProduced-a.runsProduced||
+  b.homeRuns-a.homeRuns||b.hits-a.hits||a.index-b.index);
+ const leader=leaders[0];
+ return {winner:winner.name,loser:loser.name,winnerRuns:winner.runs,
+  loserRuns:loser.runs,innings:match.inning,
+  standout:{name:leader.name,team:leader.team,hits:leader.hits,
+   homeRuns:leader.homeRuns,runsProduced:leader.runsProduced}};
+}
 function currentTurn(m){return {team:offense(m).team,playerId:offense(m).id,inning:m.inning,half:m.half,outs:m.outs,status:m.status}}
 // Validate persisted V7-only matches before rendering or accepting more swings.
 // Never repair, migrate or rewrite an invalid save: recovery is an explicit user action.
@@ -196,6 +213,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;

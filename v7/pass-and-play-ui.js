@@ -92,6 +92,13 @@
   $('awayScore').querySelector('.score-points').textContent=match.score[match.away.id];
   $('homeScore').querySelector('.score-team').textContent=match.home.team;
   $('homeScore').querySelector('.score-points').textContent=match.score[match.home.id];
+  const recap=api.postgameRecap(match);
+  $('postgameRecap').classList.toggle('hidden',!recap);
+  if(recap){
+   $('recapWinner').textContent=recap.winner+' WIN!';
+   $('recapScore').textContent='FINAL · '+recap.winner+' '+recap.winnerRuns+' — '+recap.loser+' '+recap.loserRuns+' · '+recap.innings+' inning'+(recap.innings===1?'':'s');
+   $('recapStandout').textContent='Standout hitter: '+recap.standout.name+' ('+recap.standout.team+') · '+recap.standout.hits+' hits · '+recap.standout.homeRuns+' HR · '+recap.standout.runsProduced+' runs produced';
+  }
   $('inning').textContent=match.status==='final'?'FINAL':(match.half==='top'?'TOP ':'BOTTOM ')+match.inning+' • '+match.outs+' OUTS';
   $('bases').textContent='Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none');
   const diamond=$('game').querySelector('.score-diamond');
