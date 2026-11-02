@@ -114,7 +114,8 @@ function persist(){try{localStorage.setItem(storeKey,JSON.stringify(state))}catc
 function go(s){pendingEndGame=false;if(s!=='Training')pendingDrill=null;
  if(s==='Play'){
   pendingNewGame=false;
-  pendingGameSetup=canResumeGame()?{mode:state.mode,ballpark:state.ballpark,innings:state.innings,difficulty:state.difficulty,rivalName:state.rivalName,homeName:state.homeName}:null;
+  // Completed-game Results are immutable while drafting the next matchup, too.
+   pendingGameSetup=(canResumeGame()||state.gameFinished)?{mode:state.mode,ballpark:state.ballpark,innings:state.innings,difficulty:state.difficulty,rivalName:state.rivalName,homeName:state.homeName}:null;
  }else{pendingNewGame=false;pendingGameSetup=null}
  state.screen=s;persist();render();window.scrollTo(0,0)}
 function btn(label,to){return '<button data-go="'+to+'">'+label+'</button>'}
