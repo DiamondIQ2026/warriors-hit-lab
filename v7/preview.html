@@ -22,15 +22,16 @@ button:focus-visible,select:focus-visible{outline:3px solid #ffcf65;outline-offs
 <main>
 <svg id="field" viewBox="0 0 800 510" role="img" aria-label="Illustrated baseball diamond with simulated ball path">
  <defs><radialGradient id="grass"><stop stop-color="#327d4e"/><stop offset="1" stop-color="#17533e"/></radialGradient></defs>
- <path d="M40 490 L400 32 L760 490 Z" fill="url(#grass)" stroke="#9bc8a6" stroke-width="3"/>
- <path d="M400 442 L250 315 L400 186 L550 315 Z" fill="#ab7e58" stroke="#dfb991" stroke-width="3"/>
+ <path d="M70 160 Q400 -15 730 160" fill="none" stroke="#7897aa" stroke-width="14" opacity=".7"/><path d="M90 150 Q400 5 710 150" fill="none" stroke="#b5c9d4" stroke-width="3" stroke-dasharray="12 10" opacity=".8"/><text x="400" y="28" text-anchor="middle" fill="#e3f2ff" font-size="16" font-weight="700">TROPICANA FIELD · SIMULATED STADIUM</text><path d="M40 490 L400 32 L760 490 Z" fill="url(#grass)" stroke="#9bc8a6" stroke-width="3"/>
+ <path d="M84 450 Q400 -8 716 450" fill="none" stroke="#9ab3c8" stroke-width="7" opacity=".8"/><path d="M400 442 L250 315 L400 186 L550 315 Z" fill="#ab7e58" stroke="#dfb991" stroke-width="3"/>
  <path d="M400 441 L400 36 M400 441 L42 490 M400 441 L758 490" fill="none" stroke="#e8ece1" stroke-width="2" stroke-dasharray="7 6" opacity=".6"/>
  <g fill="#f4e8d2" stroke="#fff" stroke-width="2"><rect x="391" y="428" width="18" height="18" transform="rotate(45 400 437)"/><rect x="541" y="306" width="18" height="18" transform="rotate(45 550 315)"/><rect x="391" y="177" width="18" height="18" transform="rotate(45 400 186)"/><rect x="241" y="306" width="18" height="18" transform="rotate(45 250 315)"/></g>
- <g fill="#cbd5e1" stroke="#061e34" stroke-width="3"><circle cx="400" cy="186" r="8"/><circle cx="300" cy="193" r="8"/><circle cx="500" cy="193" r="8"/><circle cx="217" cy="118" r="8"/><circle cx="583" cy="118" r="8"/><circle cx="401" cy="85" r="8"/></g>
+ <g fill="#cbd5e1" stroke="#061e34" stroke-width="3"><circle data-fielder="P" cx="400" cy="186" r="8"/><circle data-fielder="SS" cx="300" cy="193" r="8"/><circle data-fielder="2B" cx="500" cy="193" r="8"/><circle data-fielder="LF" cx="217" cy="118" r="8"/><circle data-fielder="RF" cx="583" cy="118" r="8"/><circle data-fielder="CF" cx="401" cy="85" r="8"/></g>
  <polyline id="trail" points="" fill="none" stroke="#ffe9a5" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
  <circle id="ball" cx="400" cy="440" r="8" fill="#fff" stroke="#cf3650" stroke-width="2"/>
  <text x="18" y="27" fill="#ecf4ff" font-size="16">SIMULATED • NOT TRACKED</text>
 </svg>
+<p id="fielderStatus" role="status" aria-live="polite">Fielders ready for a simulated play.</p>
 <div class="controls">
 <label>Net impact<select id="zone"><option>MC</option><option>UL</option><option>UC</option><option>UR</option><option>ML</option><option>MR</option><option>LL</option><option>LC</option><option>LR</option></select></label>
 <label>Contact<select id="contact"><option>hard</option><option>medium</option><option>soft</option></select></label>
