@@ -19,15 +19,14 @@ test('Build 1 integrity: fresh, in-progress, extra-inning and final saves remain
  m=swing(m,'single');assert.equal(validateMatch(clone(m)).ok,true);
  for(let i=0;i<3;i++)m=swing(m);
  assert.equal(validateMatch(m).ok,true);
- m=swing(m,'homer');
- assert.equal(validateMatch(m).ok,true);
- for(let i=0;i<3;i++)m=swing(m);
- for(let i=0;i<3;i++)m=swing(m);
- for(let i=0;i<3;i++)m=swing(m);
- for(let i=0;i<3;i++)m=swing(m);
- for(let i=0;i<3;i++)m=swing(m);
- assert.equal(m.status,'final');
- assert.equal(validateMatch(clone(m)).ok,true);
+ let finished=swing(newMatch(dad,maddon,3),'homer'); // Visitor leads; home bats in all three innings.
+ for(let inning=1;inning<=3;inning++){
+  for(let i=0;i<3;i++)finished=swing(finished);
+  for(let i=0;i<3;i++)finished=swing(finished);
+ }
+ assert.equal(finished.status,'final');
+ assert.equal(finished.winner,'maddon');
+ assert.equal(validateMatch(clone(finished)).ok,true);
 });
 
 test('Build 1 integrity: reject corrupted score, swing counts, bases, lineup, outs, and winner',()=>{
