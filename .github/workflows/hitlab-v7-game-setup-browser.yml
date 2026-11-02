@@ -1,0 +1,32 @@
+name: Hit Lab - V7 Game Setup Mobile Browser QA
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  game-setup-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated Chromium test dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start local static server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hitlab-game-setup-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8765/v7/experimental/visual-prototype.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/hitlab-game-setup-http.log
+          exit 1
+      - name: Run Chromium 375px and 390px game setup regressions
+        run: node --test v7/browser-tests/game-setup-mobile-browser.test.cjs
