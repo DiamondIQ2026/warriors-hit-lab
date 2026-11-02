@@ -9,7 +9,7 @@ test('real tee training summary counts zones/contact without crediting simulated
  let match=api.newMatch(home,away,3);
  match=api.recordSwing(match,{zone:'MC',power:'hard',outcome:'homer'});
  match=api.recordSwing(match,{zone:'MC',power:'soft',outcome:'out'});
- match=api.recordSwing(match,{zone:'TL',power:'medium',outcome:'out'});
+ match=api.recordSwing(match,{zone:'UL',power:'medium',outcome:'out'});
  const raw=JSON.stringify(match),summary=api.trainingSummary(match);
  assert.equal(summary.totalSwings,3);
  assert.equal(summary.away.swings,3);
