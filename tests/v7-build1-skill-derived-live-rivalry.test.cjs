@@ -57,6 +57,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]])
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto(GAME_URL);
    await page.evaluate(()=>{localStorage.setItem('warriors-hit-lab-v4','{"sentinel":"do-not-change"}')});
+   await page.locator('#awayHand').selectOption('L'); // Default setup is right-handed; explicitly exercise left-handed flight.
    await page.locator('#start').tap();
    await page.locator('#turn').tap();
    assert.equal(await page.locator('#outcome').inputValue(),'auto','auto simulation must be default');
