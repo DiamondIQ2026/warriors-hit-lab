@@ -11,7 +11,7 @@ assert.ok(source,'V7 inline script must exist');
 const anchor="el('menuButton').onclick=";
 assert.ok(source.includes(anchor),'stable V7 test hook');
 const script=source.replace(anchor,
- "window.__state=()=>state;window.__score=score;window.__field=field;window.__summary=trainingSummary;window.__report=report;window.__results=results;window.__fielders=reactingFielders;window.__step=fielderStep;window.__swing=swing;"+anchor);
+ "window.__state=()=>state;window.__score=score;window.__field=field;window.__summary=trainingSummary;window.__report=report;window.__results=results;window.__fielders=reactingFielders;window.__step=fielderStep;window.__swing=swing;window.__goal=drillGoal;window.__drill=drill;window.__training=training;"+anchor);
 function boot(rolls=[.99]){
  const elements={},created=[],writes=[],timers=[];
  const fielders=Array.from({length:8},()=>({
@@ -38,7 +38,7 @@ function boot(rolls=[.99]){
   localStorage:{getItem:()=>null,setItem:(key,value)=>writes.push([key,value])},
   setTimeout:fn=>timers.push(fn)});
  return {state:window.__state(),score:window.__score,field:window.__field,summary:window.__summary,report:window.__report,results:window.__results,fielders:window.__fielders,
-  step:window.__step,swing:window.__swing,defenders:fielders,created,writes,
+  step:window.__step,swing:window.__swing,goal:window.__goal,drill:window.__drill,training:window.__training,defenders:fielders,created,writes,
   tick(){const fn=timers.shift();assert.ok(fn);fn()}};
 }
 test('scorebug renders bases in a diamond with occupied markers and readable order',()=>{
@@ -227,5 +227,71 @@ test('Family Rivalry results expose Play Again immediately after score, before c
  assert.ok(page.indexOf('PLAY AGAIN ▶')>page.indexOf('Game scoreboard'));
  assert.ok(page.indexOf('PLAY AGAIN ▶')<page.indexOf('Player Comparison'));
  assert.equal((page.match(/PLAY AGAIN ▶/g)||[]).length,1);
+ assert.equal(app.writes.length,0);
+});
+
+test('six training drills have distinct, measurable, honest goals without extra save fields',()=>{
+ const app=boot();
+ const entries=[
+  {zone:1,contact:'HARD',hit:true},{zone:3,contact:'HARD',hit:true},
+  {zone:4,contact:'SOFT',hit:false},{zone:6,contact:'MEDIUM',hit:true},
+  {zone:9,contact:'HARD',hit:false},{zone:5,contact:'MEDIUM',hit:true},
+  {zone:5,contact:'SOFT',hit:false},{zone:2,contact:'MEDIUM',hit:true},
+  {zone:7,contact:'HARD',hit:true},{zone:8,contact:'SOFT',hit:false}
+ ];
+ app.state.trainingLog=entries;
+ app.state.trainingReps=10;
+ const expected={
+  'Zone Precision':[5,5],
+  'Barrel Control':[6,15],
+  'Opposite Field':[6,12],
+  'Power Challenge':[4,15],
+  'Situational Hitting':[3,3],
+  'Quick Hands':[10,25]
+ };
+ for(const [name,[current,target]] of Object.entries(expected)){
+  const goal=app.goal(name);
+  assert.equal(goal.current,current,name);
+  assert.equal(goal.target,target,name);
+  assert.ok(goal.note.length>20,name+' explains the measurement limitation');
+ }
+ assert.equal(app.writes.length,0,'read-only drill calculations never persist');
+});
+test('drill focus panel is after the record-rep CTA and before the field',()=>{
+ const app=boot();app.state.drill='Power Challenge';
+ app.state.trainingReps=2;
+ app.state.trainingLog=[{zone:5,contact:'HARD',hit:true},{zone:2,contact:'SOFT',hit:false}];
+ const screen=app.drill();
+ assert.ok(screen.indexOf('RECORD REP ▶')<screen.indexOf('DRILL FOCUS'));
+ assert.ok(screen.indexOf('DRILL FOCUS')<screen.indexOf('id="ballfield"'));
+ assert.match(screen,/aria-label="Drill focus progress"[^>]*aria-valuemax="15" aria-valuenow="1"/);
+ assert.match(screen,/tracks selected effort, not actual bat speed/);
+ assert.equal(app.writes.length,0);
+});
+test('training report explains goals and preserves its above-fold library CTA',()=>{
+ const app=boot();app.state.drill='Quick Hands';app.state.trainingReps=25;
+ const page=app.report();
+ assert.ok(page.indexOf('BACK TO DRILL LIBRARY')<page.indexOf('DRILL FOCUS'));
+ assert.ok(page.indexOf('DRILL FOCUS')<page.indexOf('Zone Performance'));
+ assert.match(page,/aria-label="Drill focus progress"[^>]*aria-valuemax="25" aria-valuenow="25"/);
+ assert.match(page,/Reaction time and swing speed are not measured/);
+ assert.match(app.training(),/25 REPS →/);
+ assert.equal(app.writes.length,0);
+});
+test('malformed saved rep log cannot inflate training drill focus goals',()=>{
+ const app=boot();app.state.drill='Zone Precision';
+ app.state.trainingLog=[
+  null,{}, {zone:0,contact:'HARD',hit:true},
+  {zone:10,contact:'HARD',hit:true},{zone:'5',contact:'HARD',hit:true},
+  {zone:5,contact:'INVALID',hit:true},{zone:5,contact:'HARD',hit:'yes'},
+  {zone:5,contact:'HARD',hit:true},{zone:5,contact:'HARD',hit:false}
+ ];
+ assert.equal(app.goal().current,1);
+ app.state.trainingLog='invalid';
+ assert.equal(app.goal().current,0);
+ app.state.drill='Quick Hands';app.state.trainingReps=999;
+ assert.equal(app.goal().current,25,'displayed progress is capped at goal');
+ app.state.trainingReps=-20;
+ assert.equal(app.goal().current,0);
  assert.equal(app.writes.length,0);
 });
