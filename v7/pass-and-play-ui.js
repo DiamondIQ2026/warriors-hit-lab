@@ -182,5 +182,12 @@
    else offerRecovery(raw,validation.reason);
   }
  }catch{$('setupError').textContent='Could not access V7 local storage. Existing saves were not changed.';}
+ // Reloaded WebKit may restore the scroll position of the previous batter's
+ // net-zone controls. Resume should expose the pass-phone gate, not a stale tap.
+ if('scrollRestoration' in history)history.scrollRestoration='manual';
  render();
+ window.addEventListener('pageshow',()=>{
+  if(match&&match.status==='active'&&!acknowledge)
+   requestAnimationFrame(()=>window.scrollTo(0,0));
+ });
 })();
