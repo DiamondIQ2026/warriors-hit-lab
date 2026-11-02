@@ -95,6 +95,33 @@ function recordSwing(match,{zone,power,outcome}){
  }
  return m;
 }
+// Derive a live box score from authoritative swing history; never persist or
+// infer measured ball flight. Runs use the credited play value (walk-off cap).
+function boxScore(match){
+ const check=validateMatch(match);
+ if(!check.ok)throw Error('Invalid match: '+check.reason);
+ const ids=[match.away.id,match.home.id];
+ const teams=Object.fromEntries(ids.map(id=>[id,{
+  id,name:id===match.home.id?match.home.team:match.away.team,
+  runs:match.score[id],hits:0,atBats:0,outs:0,
+  singles:0,doubles:0,triples:0,homeRuns:0,
+  runsByInning:{}
+ }]));
+ for(const play of match.atBats){
+  const t=teams[play.teamId];
+  t.atBats++;
+  if(play.outcome==='out')t.outs++;
+  else{
+   t.hits++;
+   const field={single:'singles',double:'doubles',triple:'triples',homer:'homeRuns'}[play.outcome];
+   t[field]++;
+  }
+  t.runsByInning[play.inning]=(t.runsByInning[play.inning]||0)+play.runs;
+ }
+ return {inning:match.inning,half:match.half,outs:match.outs,
+  status:match.status,winner:match.winner,
+  away:teams[match.away.id],home:teams[match.home.id]};
+}
 function currentTurn(m){return {team:offense(m).team,playerId:offense(m).id,inning:m.inning,half:m.half,outs:m.outs,status:m.status}}
 // Validate persisted V7-only matches before rendering or accepting more swings.
 // Never repair, migrate or rewrite an invalid save: recovery is an explicit user action.
@@ -165,6 +192,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
