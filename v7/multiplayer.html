@@ -15,11 +15,16 @@
 /* V7 simulated-field motion: presentation-only; no scoring or recorded swing changes. */
 .simulated-field[data-outcome] .outcome-ball{will-change:transform,opacity}
 @keyframes hitlab-field-flight{
-  0%{transform:translate(-50%,-50%) scale(.45);opacity:.2}
+  0%{transform:translate(calc(-50% + var(--flight-x,0px)),calc(-50% + var(--flight-y,35px))) scale(.45);opacity:.2}
   28%{opacity:1}
   75%{opacity:1}
   100%{transform:translate(-50%,-50%) scale(1);opacity:1}
 }
+ .simulated-field[data-outcome="single"] .outcome-ball{--flight-x:-32px;--flight-y:26px}
+.simulated-field[data-outcome="double"] .outcome-ball{--flight-x:-54px;--flight-y:49px}
+.simulated-field[data-outcome="triple"] .outcome-ball{--flight-x:56px;--flight-y:51px}
+.simulated-field[data-outcome="homer"] .outcome-ball{--flight-x:0px;--flight-y:94px}
+.simulated-field[data-outcome="out"] .outcome-ball{--flight-x:0px;--flight-y:27px}
 .simulated-field[data-outcome="single"] .outcome-ball,
 .simulated-field[data-outcome="double"] .outcome-ball,
 .simulated-field[data-outcome="triple"] .outcome-ball,
