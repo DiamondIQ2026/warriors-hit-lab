@@ -32,3 +32,7 @@ The test deliberately uses the QA-only simulated outcome override to force a det
 ## Safety and deferred scope
 
 No merges, deployment, production changes, Pages configuration, Diamond IQ repository changes, V6.3 save schema changes or logo recreation. Seasons/tournaments, Training Academy and final Figma parity are outside Build 1.
+
+## Training analytics visual acceptance
+
+The GitHub Actions `v7-gameplay-mobile-captures` artifact now includes `gameplay-training-heatmaps-375x812.png` and `gameplay-training-heatmaps-390x844.png`. These full-page captures show both nine-zone real-tee heatmaps, the recent recorded-swing review, and live score/lineup panels after a deterministic simulated double. Review the small-screen readability, visual hierarchy, legibility of all 18 cells, and distinction between actual practice and simulated results before approving a merge. The capture job asserts both heatmaps exist, a real tee rep was counted, the recent simulated outcome is labeled, and no horizontal overflow occurred. Screenshots are CI artifacts only; they are not a production deployment.

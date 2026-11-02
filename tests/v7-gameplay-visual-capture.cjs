@@ -47,6 +47,19 @@ const fs=require('node:fs');
    await page.locator('#liveBoxScore > summary').click();
    await page.locator('#lineupStats > summary').click();
    await page.screenshot({path:`artifacts/v7-gameplay/gameplay-live-stats-${width}x${height}.png`,fullPage:true});
+   // Show the actual tee training heatmaps and swing history together with
+   // the live game stats in a reproducible CI screenshot.
+   await page.locator('#trainingInsights > summary').click();
+   await page.locator('#recentPlays > summary').click();
+   const heatmapCells=await page.locator('.training-heatmap-cell').count();
+   if(heatmapCells!==18)throw Error('Expected 18 player-zone heatmap cells, found '+heatmapCells);
+   if(!await page.locator('#trainingTotal').textContent().then(t=>t.includes('1 actual tee swings')))
+    throw Error('Training summary did not record the live swing');
+   if(!await page.locator('#recentPlaysList').textContent().then(t=>t.includes('Simulated DOUBLE')))
+    throw Error('Recent swing review did not render simulated outcome');
+   await page.screenshot({path:`artifacts/v7-gameplay/gameplay-training-heatmaps-${width}x${height}.png`,fullPage:true});
+   if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))
+    throw Error('Training heatmap document overflow');
    const api=require('../v7/pass-and-play.cjs');
    const home=api.createProfile({id:'dad',name:'Dad',team:'Tampa Titans',hand:'R'});
    const away=api.createProfile({id:'maddon',name:'Maddon',team:'Tampa Warriors',hand:'L'});
