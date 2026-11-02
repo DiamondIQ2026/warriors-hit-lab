@@ -7,7 +7,7 @@ const assert=require('node:assert/strict');
 const {chromium,webkit}=require('playwright');
 const api=require('../v7/pass-and-play.cjs');
 const KEY='warriors-hit-lab-v7-multiplayer-prototype';
-const URL='http://127.0.0.1:8765/v7/multiplayer.html';
+const GAME_URL='http://127.0.0.1:8765/v7/multiplayer.html';
 const away=api.createProfile({id:'maddon',name:'Maddon',team:'Tampa Warriors',hand:'L'});
 const home=api.createProfile({id:'dad',name:'Dad',team:'Tampa Titans',hand:'R'});
 
@@ -55,7 +55,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]])
    const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,serviceWorkers:'block',reducedMotion:'reduce'});
    const page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
-   await page.goto(URL);
+   await page.goto(GAME_URL);
    await page.evaluate(()=>{localStorage.setItem('warriors-hit-lab-v4','{"sentinel":"do-not-change"}')});
    await page.locator('#start').tap();
    await page.locator('#turn').tap();
@@ -83,8 +83,8 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]])
    assert.match(await page.locator('#event').innerText(),new RegExp('Simulated game result: '+expected,'i'));
    assert.match(await page.locator('#fieldOutcome').innerText(),new RegExp(expected,'i'));
    const flight=await page.locator('#viewFlight').getAttribute('data-url');
-   assert.equal(new URL(flight,URL).searchParams.get('outcome'),expected);
-   assert.equal(new URL(flight,URL).searchParams.get('hand'),'L');
+   assert.equal(new URL(flight,GAME_URL).searchParams.get('outcome'),expected);
+   assert.equal(new URL(flight,GAME_URL).searchParams.get('hand'),'L');
    const raw=await page.evaluate(k=>localStorage.getItem(k),KEY);
    await page.reload();
    assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),raw,'reload must preserve exact saved game');
