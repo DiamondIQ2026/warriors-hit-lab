@@ -113,7 +113,7 @@ test('game swing remains independent of prior drill counters',()=>{
 });
 test('explicit End Game clears resume eligibility without touching drill stats',()=>{
  const app=boot();app.begin();app.state.trainingReps=7;
- app.click({id:'endGame'});
+ app.click({},'endGame');
  assert.equal(app.state.screen,'Results');
  assert.equal(app.state.gameStarted,false);
  assert.equal(app.state.gameFinished,true);
