@@ -46,7 +46,8 @@ test('zero-rep drill resume survives refresh without modifying stored data',()=>
  reloaded.click({go:'Training'});
  assert.match(reloaded.read().training,/RESUME Quick Hands · 0\/25/);
  assert.equal(reloaded.read().state.trainingReps,0);
- assert.equal(reloaded.saved(),saved.replace('"screen":"Home"','"screen":"Training"')===reloaded.saved()?reloaded.saved():reloaded.saved());
+ assert.equal(JSON.parse(reloaded.saved()).trainingReps,0);
+ assert.equal(JSON.parse(reloaded.saved()).drill,'Quick Hands');
  assert.ok(reloaded.writes.every(([key])=>key==='hitlab-v7-visual-prototype-only'));
 });
 test('inconsistent counters pause recording and preserve game and saved session',()=>{
