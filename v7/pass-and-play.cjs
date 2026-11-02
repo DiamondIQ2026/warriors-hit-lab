@@ -113,6 +113,32 @@ function validateMatch(m){
   if(counts[id]!==m.realSwings[id]||counts[id]%9!==m.battingOrder[id]||runs[id]!==m.score[id])
    return fail('Swing history and scoreboard disagree');
  }
+ // Reconstruct the game from its actual swing inputs. Conservation of totals
+ // alone cannot detect a forged inning, extra out, swapped batter, runner or
+ // premature final state. Use the same deterministic rules as live gameplay.
+ // Keep the replay history at one entry per step: recordSwing clones its input,
+ // so replaying a full 10,000-entry history otherwise has quadratic cost.
+ let replay;
+ try{
+  replay=newMatch(m.home,m.away,m.innings);
+  for(const a of m.atBats){
+   if(replay.status==='final')return fail('Recorded swing after game ended');
+   replay=recordSwing(replay,{zone:a.zone,power:a.power,outcome:a.outcome});
+   const expected=replay.atBats[0];
+   for(const field of ['teamId','batter','index','inning','half','zone','power','outcome','runs','kind'])
+    if(a[field]!==expected[field])return fail('Swing history does not match game progression');
+   replay.atBats=[];
+  }
+ }catch{return fail('Swing history cannot be replayed');}
+ if(replay.inning!==m.inning||replay.half!==m.half||replay.outs!==m.outs||
+  replay.status!==m.status||replay.winner!==m.winner||
+  replay.bases.some((occupied,i)=>occupied!==m.bases[i]))
+  return fail('Saved game state does not match swing history');
+ for(const id of ids){
+  if(replay.score[id]!==m.score[id]||replay.realSwings[id]!==m.realSwings[id]||
+   replay.battingOrder[id]!==m.battingOrder[id])
+   return fail('Saved game totals do not match replay');
+ }
  return {ok:true,reason:null};
 }
 const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch};
