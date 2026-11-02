@@ -4,7 +4,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {chromium,webkit}=require('playwright');
-const URL='http://127.0.0.1:8765/v7/multiplayer.html';
+const GAME_URL='http://127.0.0.1:8765/v7/multiplayer.html';
 const KEY='warriors-hit-lab-v7-multiplayer-prototype';
 const LEGACY='warriors-hit-lab-v4';
 const SNAPSHOT='warriors-hit-lab-v6-snapshot';
@@ -19,7 +19,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true,reducedMotion:'reduce',serviceWorkers:'block'});
     const page=await context.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(URL);
+    await page.goto(GAME_URL);
     await page.evaluate(([legacy,snapshot])=>{
      localStorage.setItem('warriors-hit-lab-v4',legacy);
      localStorage.setItem('warriors-hit-lab-v6-snapshot',snapshot);
