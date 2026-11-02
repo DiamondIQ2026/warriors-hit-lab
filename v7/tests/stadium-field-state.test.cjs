@@ -295,3 +295,24 @@ test('malformed saved rep log cannot inflate training drill focus goals',()=>{
  assert.equal(app.goal().current,0);
  assert.equal(app.writes.length,0);
 });
+
+test('real simulated drill swings update focus goals without mutating an active game',()=>{
+ const app=boot([0,.5]);
+ Object.assign(app.state,{screen:'Drill',drill:'Barrel Control',zone:5,contact:'HARD',
+  home:4,away:3,bases:[true,false,true],inning:4,outs:2,reps:8,hits:6});
+ app.swing();
+ assert.equal(app.goal().current,1,'simulated hit counts toward Barrel Control');
+ assert.equal(app.state.trainingReps,1);
+ assert.equal(app.state.trainingHits,1);
+ assert.equal(app.state.reps,8);
+ assert.equal(app.state.hits,6);
+ assert.equal(app.state.home,4);
+ assert.equal(app.state.away,3);
+ assert.equal(app.state.inning,4);
+ assert.equal(app.state.outs,2);
+ assert.equal(Array.from(app.state.bases).join(','),'true,false,true');
+ assert.ok(app.writes.length>0);
+ assert.ok(app.writes.every(([key])=>key==='hitlab-v7-visual-prototype-only'));
+ app.tick();
+ assert.equal(app.goal().current,1);
+});
