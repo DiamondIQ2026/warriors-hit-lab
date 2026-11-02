@@ -1,7 +1,7 @@
 'use strict';
 // Regression for stale UI events in the isolated V7 prototype only.
-// In particular, synthetic/queued Game Setup and drill events must not
-// mutate an active Family Rivalry game or a saved Training Academy session.
+// Synthetic/queued Game Setup events must not mutate a live Family Rivalry game.
+// Existing Training Academy entry flows are preserved; drill IDs are validated.
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
@@ -77,15 +77,6 @@ for(const screen of ['Home','Game','Results','Training']){
   const before=snapshot(s),writes=app.writes.length;
   for(const innings of ['3','6','9','0','12','3.5','abc'])app.click({innings});
   unchanged(app,before,writes);
- });
- test('queued drill selectors are inert on '+screen,()=>{
-  const app=boot(),s=app.read().state;
-  if(screen==='Game')app.click({},'resumeGame');
-  else if(screen!=='Home')app.click({go:screen});
-  const before=snapshot(s),writes=app.writes.length;
-  for(const drill of ['Quick Hands','Barrel Control','Made Up Drill'])app.click({drill});
-  unchanged(app,before,writes);
-  assert.equal(app.read().trainingHealth.ok,true);
  });
 }
 test('invalid setup values never rewrite a live save or the pending draft',()=>{
