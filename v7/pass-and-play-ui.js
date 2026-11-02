@@ -69,6 +69,20 @@
    fragment.appendChild(row);
   }
   body.replaceChildren(fragment);
+  const lineup=document.createDocumentFragment();
+  for(const team of [box.away,box.home]){
+   const heading=document.createElement('tr'),head=document.createElement('th');
+   head.scope='rowgroup';head.colSpan=8;head.textContent=team.name;
+   heading.appendChild(head);lineup.appendChild(heading);
+   for(const batter of team.batters){
+    const row=document.createElement('tr');
+    for(const value of [batter.name,batter.atBats,batter.hits,batter.singles,batter.doubles,batter.triples,batter.homeRuns,batter.runsProduced]){
+     const cell=document.createElement('td');cell.textContent=String(value);row.appendChild(cell);
+    }
+    lineup.appendChild(row);
+   }
+  }
+  $('lineupStatsRows').replaceChildren(lineup);
  }
  function render(){
   $('setup').classList.toggle('hidden',!!match);
