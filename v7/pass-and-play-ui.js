@@ -57,6 +57,19 @@
  }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
+ function renderBoxScore(){
+  const box=api.boxScore(match),body=$('boxScoreRows');
+  const fragment=document.createDocumentFragment();
+  for(const team of [box.away,box.home]){
+   const row=document.createElement('tr');
+   const cell=(value,kind)=>{const td=document.createElement('td');td.textContent=String(value);if(kind)td.className=kind;row.appendChild(td);};
+   cell(team.name);
+   for(let inning=1;inning<=9;inning++)cell(inning<=match.innings||inning<=match.inning?(team.runsByInning[inning]??'–'):'–');
+   cell(team.runs,'total');cell(team.hits,'total');cell(team.outs);
+   fragment.appendChild(row);
+  }
+  body.replaceChildren(fragment);
+ }
  function render(){
   $('setup').classList.toggle('hidden',!!match);
   $('game').classList.toggle('hidden',!match);
@@ -87,6 +100,7 @@
    }
   }
   if($('fieldOutcome'))$('fieldOutcome').textContent=latest?('Last simulated result: '+latest.outcome.toUpperCase()+' · '+latest.runs+' run'+(latest.runs===1?'':'s')):'Awaiting simulated result';
+  renderBoxScore();
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
