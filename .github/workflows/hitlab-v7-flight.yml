@@ -1,0 +1,35 @@
+name: Hit Lab - V7 Flight Prototype
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  flight-tests:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate flight model and tests
+        run: |
+          node --check v7/flight-model.cjs
+          node --check v7/flight-browser.js
+          node --test tests/v7-flight.test.cjs tests/v7-preview.test.cjs
+      - name: Install browser test tooling
+        run: npm install --no-save --no-package-lock playwright@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Serve PR branch locally
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/hitlab-v7.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8765/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/hitlab-v7.log
+          exit 1
+      - name: Run embedded preview Chromium test
+        run: node --test tests/v7-embedded-browser.test.cjs
