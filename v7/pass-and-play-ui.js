@@ -57,6 +57,26 @@
  }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
+ function renderRecentPlays(){
+  const plays=api.recentPlays(match,8),list=$('recentPlaysList');
+  const fragment=document.createDocumentFragment();
+  if(!plays.length){
+   const empty=document.createElement('li');empty.textContent='No swings recorded yet.';
+   fragment.appendChild(empty);
+  }
+  for(const play of plays){
+   const item=document.createElement('li');
+   const headline=document.createElement('strong');
+   headline.textContent='#'+play.number+' · '+play.batter+' · '+play.team;
+   const detail=document.createElement('small');
+   detail.textContent=(play.half==='top'?'TOP ':'BOTTOM ')+play.inning+
+    ' · Real net zone '+(zones.indexOf(play.zone)+1)+' of 9 · '+play.power+
+    ' contact · Simulated '+play.outcome.toUpperCase()+
+    (play.runs?' · '+play.runs+' run'+(play.runs===1?'':'s'):'');
+   item.append(headline,detail);fragment.appendChild(item);
+  }
+  list.replaceChildren(fragment);
+ }
  function renderBoxScore(){
   const box=api.boxScore(match),body=$('boxScoreRows');
   const fragment=document.createDocumentFragment();
@@ -128,6 +148,7 @@
   }
   if($('fieldOutcome'))$('fieldOutcome').textContent=latest?('Last simulated result: '+latest.outcome.toUpperCase()+' · '+latest.runs+' run'+(latest.runs===1?'':'s')):'Awaiting simulated result';
   renderBoxScore();
+  renderRecentPlays();
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
