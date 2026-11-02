@@ -54,7 +54,7 @@ test('Chromium 375/390px Academy undo, zero-rep resume, corrupt review and expli
         await page.locator('[data-go="Training"]').first().click();
         await page.locator('[data-go="Drill"]').click();
         assert.match(await page.locator('h1').innerText(), /Zone Precision/i);
-        assert.match(await page.locator('.drill-progress').getAttribute('aria-valuenow') || '',
+        assert.match(await page.getByRole('progressbar', { name: 'Drill repetitions' }).getAttribute('aria-valuenow') || '',
           /^0$/);
 
         // Deliberately corrupt only the experimental V7 session, never a real save.
