@@ -57,6 +57,17 @@
  }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
+ $('exportPracticeCsv').addEventListener('click',()=>{
+  if(!match)return;
+  try{
+   const csv=api.practiceCsv(match);
+   const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+   const url=URL.createObjectURL(blob),link=document.createElement('a');
+   link.href=url;link.download='warriors-hit-lab-v7-tee-practice.csv';
+   document.body.appendChild(link);link.click();link.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch{$('event').textContent='Could not export the current practice summary. Saved game unchanged.';}
+ });
  function renderTrainingInsights(){
   const summary=api.trainingSummary(match);
   $('trainingTotal').textContent=summary.totalSwings+' actual tee swings recorded';
