@@ -195,8 +195,11 @@ test('metallic scoreboard displays both team scores with compact mobile geometry
   await page.locator('#start').click();
   const score=page.locator('.score');
   assert.equal(await score.evaluate(e=>getComputedStyle(e).display),'grid');
-  assert.match(await page.locator('#awayScore').innerText(),/Tampa Warriors 0/);
-  assert.match(await page.locator('#homeScore').innerText(),/Tampa Titans 0/);
+  // Scorebug uses separate stacked team and score elements; avoid whitespace-sensitive innerText assertions.
+  for (const [id, team] of [['awayScore', 'Tampa Warriors'], ['homeScore', 'Tampa Titans']]) {
+    assert.equal((await page.locator('#'+id+' .score-team').textContent()).trim(),team);
+    assert.equal((await page.locator('#'+id+' .score-points').textContent()).trim(),'0');
+  }
   assert.equal(await page.locator('.scoreMid').innerText(),'VS');
   const bounds=await score.boundingBox();
   assert.ok(bounds&&bounds.height<115,'Scoreboard should remain compact');
