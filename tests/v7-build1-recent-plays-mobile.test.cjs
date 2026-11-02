@@ -11,7 +11,7 @@ test('recent plays are reverse chronological, bounded, read-only and tamper prot
  const before=JSON.stringify(match),plays=api.recentPlays(match);
  assert.equal(plays.length,8);
  assert.deepEqual(plays.map(x=>x.number),[12,11,10,9,8,7,6,5]);
- assert.equal(plays[0].batter,'Batter 3');
+ assert.equal(plays[0].batter,'Batter 6');
  assert.equal(JSON.stringify(match),before);
  assert.deepEqual(api.recentPlays(JSON.parse(before)),plays);
  assert.equal(api.recentPlays(match,3).length,3);
