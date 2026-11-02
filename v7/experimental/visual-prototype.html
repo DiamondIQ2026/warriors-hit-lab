@@ -127,9 +127,45 @@ function drillGoal(name=state.drill,log=state.trainingLog){
  const plan=plans[name]||{title:'Complete all 25 repetitions',short:'25 REPS',target:25,current:Number.isInteger(state.trainingReps)?state.trainingReps:0,note:'Simulated drill; real-world swing performance is not measured.'};
  return {...plan,current:Math.max(0,Math.min(plan.target,plan.current))};
 }
+/* Session coaching is read-only and uses existing valid V7-only rep entries.
+   A completed 25-rep session is not automatically a completed focus goal. */
+function drillNextStep(name=state.drill,log=state.trainingLog){
+ const goal=drillGoal(name,log),entries=validTrainingEntries(log);
+ const met=goal.current>=goal.target;
+ if(met)return {status:'FOCUS GOAL REACHED',guidance:trainingComplete()?'Review your completed session report.':'Keep practicing toward 25 reps or review your report.'};
+ if(trainingComplete())return {status:'25 REPS COMPLETE · FOCUS GOAL NOT REACHED',guidance:'This session has ended. Start a new drill from the library to try the focus goal again.'};
+ const remaining=goal.target-goal.current;
+ let guidance;
+ switch(name){
+  case 'Zone Precision':{
+   const visited=new Set(entries.map(e=>e.zone));
+   const next=Array.from({length:9},(_,i)=>i+1).find(z=>!visited.has(z));
+   guidance='Next practice prompt: choose unvisited Zone '+next+'. '+remaining+' more distinct zone'+(remaining===1?'':'s')+' needed.';
+   break;
+  }
+  case 'Barrel Control':
+   guidance=remaining+' more simulated hit'+(remaining===1?'':'s')+' needed. Outcomes are random; keep recording tee repetitions.';
+   break;
+  case 'Opposite Field':
+   guidance=remaining+' more outer-column selection'+(remaining===1?'':'s')+' needed. Choose Zone 1, 3, 4, 6, 7 or 9; actual ball direction is not measured.';
+   break;
+  case 'Power Challenge':
+   guidance=remaining+' more HARD selection'+(remaining===1?'':'s')+' needed. This does not measure real bat speed.';
+   break;
+  case 'Situational Hitting':{
+   const next=['SOFT','MEDIUM','HARD'].find(c=>entries.filter(e=>e.contact===c).length<3);
+   const count=entries.filter(e=>e.contact===next).length;
+   guidance='Try '+next+' contact for '+(3-count)+' more rep'+(3-count===1?'':'s')+' to balance your selections.';
+   break;
+  }
+  default:
+   guidance=remaining+' more recorded rep'+(remaining===1?'':'s')+' needed. Reaction time is not measured.';
+ }
+ return {status:'FOCUS IN PROGRESS',guidance};
+}
 function drillGoalPanel(){
  const goal=drillGoal(),pct=Math.round(100*goal.current/goal.target);
- return '<div class="panel drill-goal"><h2>DRILL FOCUS</h2><p>'+esc(goal.title)+'</p><div class="row"><b>'+goal.current+' / '+goal.target+'</b><small>'+pct+'% of focus goal</small></div><div class="drill-progress" role="progressbar" aria-label="Drill focus progress" aria-valuemin="0" aria-valuemax="'+goal.target+'" aria-valuenow="'+goal.current+'"><span style="width:'+pct+'%"></span></div><p class="note">'+esc(goal.note)+'</p></div>'
+ return '<div class="panel drill-goal"><h2>DRILL FOCUS</h2><p>'+esc(goal.title)+'</p><div class="row"><b>'+goal.current+' / '+goal.target+'</b><small>'+pct+'% of focus goal</small></div><div class="drill-progress" role="progressbar" aria-label="Drill focus progress" aria-valuemin="0" aria-valuemax="'+goal.target+'" aria-valuenow="'+goal.current+'"><span style="width:'+pct+'%"></span></div><p class="note">'+esc(goal.note)+'</p><p class="note" role="status" aria-live="polite"><b>'+esc(drillNextStep().status)+'</b><br>'+esc(drillNextStep().guidance)+'</p></div>'
 }
 function drill(){const done=trainingComplete();const reps=Math.min(state.trainingReps,25);return '<h1>'+esc(state.drill||'Zone Precision')+'</h1><div class="panel"><div class="row"><b>REPS '+reps+'/25</b><b>HITS '+state.trainingHits+'</b></div><div class="drill-progress" role="progressbar" aria-label="Drill repetitions" aria-valuemin="0" aria-valuemax="25" aria-valuenow="'+reps+'"><span style="width:'+(reps*4)+'%"></span></div></div><div class="panel"><div class="row"><b>ZONE '+state.zone+'</b><b>CONTACT '+state.contact+'</b></div>'+quickZonePicker()+'<div class="actions">'+['SOFT','MEDIUM','HARD'].map(x=>'<button data-contact="'+x+'" class="'+(state.contact===x?'selected':'')+'">'+x+'</button>').join('')+'</div></div>'+(done?'<button class="primary wide" data-go="Training Results">25/25 COMPLETE · VIEW REPORT ▶</button>':'<button class="primary wide" id="swing">RECORD REP ▶</button>')+drillGoalPanel()+'<p class="feedback" id="feedback" role="status">'+esc(done?'Drill complete! Review your 25 recorded reps.':state.trainingFeedback||'Select zone and record real tee contact.')+'</p>'+field()+'<p>'+btn('View Development Report','Training Results')+'</p>'}
 function trainingSummary(){
