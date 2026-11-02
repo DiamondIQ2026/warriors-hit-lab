@@ -16,7 +16,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     page.on('pageerror',e=>errors.push(e.message));
     await page.goto(URL+'?zone=MC&contact=hard&outcome=single&hand=R');
     await page.evaluate(([key,value])=>localStorage.setItem(key,value),[LEGACY,'{"legacy":"unchanged"}']);
-    assert.match(await page.locator('#field').innerText(),/TROPICANA FIELD/);
+    assert.match(await page.locator('#field').textContent(),/TROPICANA FIELD/);
     assert.equal(await page.locator('[data-fielder]').count(),6);
     assert.equal(await page.locator('#zone').inputValue(),'MC');
     assert.equal(await page.locator('#outcome').inputValue(),'single');
