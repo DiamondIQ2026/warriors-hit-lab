@@ -54,7 +54,7 @@ test('cancel preserves current session and report',()=>{
  assert.equal(app.read().state.drill,'Barrel Control');
  assert.equal(app.read().state.trainingReps,1);
  assert.equal(app.saved(),before);assert.equal(app.writes.length,writes);
- assert.doesNotMatch(app.read().training(),/REPLACE CURRENT DRILL/);
+ assert.doesNotMatch(app.read().training,/REPLACE CURRENT DRILL/);
 });
 test('confirmed replacement resets training only, leaving live game intact',()=>{
  const app=boot();app.click({drill:'Zone Precision'});
