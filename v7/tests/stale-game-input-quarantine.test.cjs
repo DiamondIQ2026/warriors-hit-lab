@@ -169,3 +169,33 @@ test('healthy Family Rivalry handoff still unlocks a valid swing',()=>{
  assert.equal(s.outs,2);
  unchangedLegacy(app);
 });
+
+test('hidden zone and contact controls cannot change a pass-the-phone handoff',()=>{
+ const app=boot(),s=app.read().state;
+ app.click({},'resumeGame');
+ assert.match(app.read().game,/PASS THE PHONE/);
+ const before=gameplay(s),writes=app.writes.length;
+ app.click({zone:'9'});app.click({contact:'HARD'});
+ assert.equal(s.zone,5);assert.equal(s.contact,'MEDIUM');
+ assert.equal(gameplay(s),before);
+ assert.equal(app.writes.length,writes);
+ app.click({},'readyBatter');
+ app.click({zone:'9'});
+ assert.equal(s.zone,9,'zone selection becomes available after handoff');
+ unchangedLegacy(app);
+});
+test('hidden batting controls cannot mutate an open End Game confirmation',()=>{
+ const app=boot(savedGame({handoff:false})),s=app.read().state;
+ app.click({},'resumeGame');
+ app.click({},'endGame');
+ assert.match(app.read().game,/END THIS GAME EARLY/);
+ const before=gameplay(s),writes=app.writes.length;
+ app.click({zone:'1'});app.click({contact:'HARD'});
+ assert.equal(s.zone,5);assert.equal(s.contact,'MEDIUM');
+ assert.equal(gameplay(s),before);
+ assert.equal(app.writes.length,writes);
+ app.click({},'cancelEndGame');
+ app.click({contact:'HARD'});
+ assert.equal(s.contact,'HARD','controls work again after cancellation');
+ unchangedLegacy(app);
+});
