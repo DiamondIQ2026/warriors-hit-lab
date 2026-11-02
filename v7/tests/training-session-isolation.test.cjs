@@ -90,7 +90,7 @@ test('drill summary reads training counters instead of active-game counters',()=
  assert.match(app.report(),/2 repetitions · 1 hits/);
  assert.doesNotMatch(app.report(),/50 repetitions/);
  assert.match(app.report(),/ZONE 5<br><b>—/);
-  assert.match(app.report(),/1\\/2 simulated hits · SMALL SAMPLE/);
+ assert.match(app.report(),/1\/2 simulated hits · SMALL SAMPLE/);
 });
 test('starting another drill resets drill counters but not gameplay progress',()=>{
  const app=boot();app.begin();
