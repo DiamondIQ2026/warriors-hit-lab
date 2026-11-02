@@ -64,6 +64,9 @@
   $('turn').textContent=match.status==='final'?('GAME OVER • WINNER: '+(match.winner===match.home.id?match.home.team:match.away.team)):(acknowledge?('BATTING: '+p.team):('PASS PHONE TO '+p.name.toUpperCase()+' • '+p.team+' — TAP TO CONTINUE'));
   $('turn').disabled=match.status==='final';
   $('record').disabled=!zone||!acknowledge||match.status==='final';
+  const impactReview=$('practiceImpactReview');
+  impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
+  impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · simulated result chosen separately'):'Select a net-impact zone to record your next real tee swing.';
  }
  $('turn').addEventListener('click',()=>{if(match&&match.status==='active'){acknowledge=true;render();}});
  $('start').onclick=()=>{
@@ -78,6 +81,7 @@
  for(const [zoneIndex,z] of zones.entries()){
   const b=document.createElement('button');b.textContent=String(zoneIndex+1);b.type='button';b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Net impact zone '+(zoneIndex+1)+' of 9 ('+z+')');b.onclick=()=>{zone=z;for(const el of zoneRoot.children){el.classList.toggle('active',el===b);el.setAttribute('aria-pressed',String(el===b));}render();};b.addEventListener('keydown',e=>{const keys={ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3};if(!(e.key in keys))return;e.preventDefault();const next=(zones.indexOf(z)+keys[e.key]+9)%9;zoneRoot.children[next].focus();});zoneRoot.appendChild(b);
  }
+ $('power').addEventListener('change',()=>{if(match)render();});
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
