@@ -36,6 +36,11 @@
   $('homeScore').textContent=match.home.team+' '+match.score[match.home.id];
   $('inning').textContent=match.status==='final'?'FINAL':(match.half==='top'?'TOP ':'BOTTOM ')+match.inning+' • '+match.outs+' OUTS';
   $('bases').textContent='Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none');
+  const diamond=$('game').querySelector('.score-diamond');
+  if(diamond){
+   for(const marker of diamond.querySelectorAll('[data-base]'))marker.classList.toggle('occupied',!!match.bases[Number(marker.dataset.base)-1]);
+   diamond.setAttribute('aria-label', 'Bases occupied: '+(match.bases.map((v,i)=>v?i+1:null).filter(Boolean).join(', ')||'none'));
+  }
   const latest=match.atBats[match.atBats.length-1];
   const field=$('game').querySelector('.simulated-field');
   if(field)field.dataset.outcome=latest?.outcome||'';
