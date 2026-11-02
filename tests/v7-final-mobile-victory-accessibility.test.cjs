@@ -2,6 +2,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const {chromium}=require('playwright');
+const {matchFixture}=require('./helpers/v7-match-fixtures.cjs');
 const ROOT='http://127.0.0.1:8765/v7/',R='warriors-hit-lab-v7-multiplayer-prototype',C='hitlab-v7-visual-prototype-only';
 test('375px Family Rivalry bottom final third out settles visitor victory and retains scoreboard after reload',async()=>{
  const browser=await chromium.launch();
@@ -9,12 +10,8 @@ test('375px Family Rivalry bottom final third out settles visitor victory and re
   const page=await browser.newPage({viewport:{width:375,height:812},hasTouch:true,isMobile:true});
   await page.goto(ROOT+'multiplayer.html');
   await page.locator('#start').tap();
-  await page.evaluate(key=>{
-   const m=JSON.parse(localStorage.getItem(key));
-   m.inning=3;m.half='bottom';m.outs=2;
-   m.score[m.away.id]=6;m.score[m.home.id]=1;
-   localStorage.setItem(key,JSON.stringify(m));
-  },R);
+  await page.evaluate(({key,match})=>localStorage.setItem(key,JSON.stringify(match)),
+   {key:R,match:matchFixture('away-leads-bottom3-two-outs')});
   await page.reload();
   if(await page.locator('#turn').isVisible())await page.locator('#turn').tap();
   const zones=page.locator('#zones button');
