@@ -1,0 +1,32 @@
+name: Hit Lab - V7 Academy Mobile Browser QA
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  academy-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install isolated browser test dependencies
+        run: |
+          npm install --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Start local static server
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/hitlab-academy-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:8765/v7/experimental/visual-prototype.html > /dev/null; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/hitlab-academy-http.log
+          exit 1
+      - name: Run synthetic 375px and 390px browser regression
+        run: node --test v7/browser-tests/training-academy-mobile-browser.test.cjs
