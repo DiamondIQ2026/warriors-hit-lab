@@ -29,4 +29,4 @@ jobs:
           cat /tmp/hitlab-academy-http.log
           exit 1
       - name: Run synthetic 375px and 390px browser regression
-        run: node --test v7/tests/training-academy-mobile-browser.test.cjs
+        run: node --test v7/browser-tests/training-academy-mobile-browser.test.cjs
