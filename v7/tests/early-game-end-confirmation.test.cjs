@@ -25,11 +25,12 @@ function savedGame(overrides={}){
   ],...overrides};
 }
 function boot(saved=savedGame()){
- const elements={},listeners={},writes=[],storage={
+ const elements={},listeners={},writes=[],focusEvents=[],storage={
   [KEY]:JSON.stringify(saved),[LEGACY]:'untouched-v6.3-sentinel'
  };
  const el=id=>elements[id]??(elements[id]={
   innerHTML:'',textContent:'',clientWidth:300,clientHeight:250,disabled:false,
+  focus(){focusEvents.push(id)}, 
   classList:{add(){},remove(){},toggle(){}},style:{setProperty(){}},
   appendChild(){},querySelectorAll(){return []}
  });
@@ -40,7 +41,8 @@ function boot(saved=savedGame()){
  vm.runInNewContext(script,{document,window,Math:random,setTimeout(){},
   localStorage:{getItem:key=>storage[key]??null,
    setItem:(key,value)=>{writes.push([key,value]);storage[key]=value}}});
- return {read:window.__end,swing:window.__swing,writes,storage,
+ return {read:window.__end,swing:window.__swing,writes,storage,focusEvents,
+  keydown:(key)=>{let prevented=false;listeners.keydown({key,preventDefault(){prevented=true}});return prevented}, 
   click:(dataset={},id='')=>listeners.click({target:{closest:()=>({dataset,id})}})};
 }
 function gameSnapshot(s){
@@ -203,4 +205,24 @@ test('Exhibition games also require confirmation before ending early',()=>{
  app.click({},'confirmEndGame');
  assert.equal(s.gameFinished,true);
  assert.equal(s.screen,'Results');
+});
+test('confirmation focuses the safe action and returns focus after cancellation',()=>{
+ const app=boot();
+ app.click({},'resumeGame');
+ app.click({},'endGame');
+ assert.equal(app.focusEvents.at(-1),'cancelEndGame');
+ app.click({},'cancelEndGame');
+ assert.equal(app.focusEvents.at(-1),'endGame');
+});
+test('Escape cancels confirmation without ending or rewriting the active game',()=>{
+ const app=boot(),s=app.read().state;
+ app.click({},'resumeGame');
+ const before=gameSnapshot(s),writes=app.writes.length;
+ app.click({},'endGame');
+ assert.equal(app.keydown('Escape'),true);
+ assert.equal(app.read().pendingEndGame,false);
+ assert.equal(app.focusEvents.at(-1),'endGame');
+ assert.equal(gameSnapshot(s),before);
+ assert.equal(app.writes.length,writes);
+ assert.equal(app.keydown('Escape'),false);
 });
