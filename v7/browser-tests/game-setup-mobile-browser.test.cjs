@@ -2,7 +2,7 @@
 // Synthetic V7-only browser QA; never reads or migrates real V6.3 saves.
 const { test } = require('node:test');
 const assert = require('node:assert/strict');
-const { chromium } = require('playwright');
+const { chromium, webkit } = require('playwright');
 
 const URL = 'http://127.0.0.1:8765/v7/experimental/visual-prototype.html';
 const V7_KEY = 'hitlab-v7-visual-prototype-only';
@@ -22,8 +22,9 @@ const gameFields = s => ({
 const saved = page => page.evaluate(key => JSON.parse(localStorage.getItem(key)), V7_KEY);
 const legacy = page => page.evaluate(key => localStorage.getItem(key), LEGACY_KEY);
 
-test('375px and 390px: active game setup cancellation, resume, reload and confirmed restart', async () => {
-  const browser = await chromium.launch();
+for (const [engineName, engine] of [['Chromium', chromium], ['WebKit', webkit]]) {
+test(`${engineName}: 375px and 390px active game setup cancellation, resume, reload and confirmed restart`, async () => {
+  const browser = await engine.launch();
   try {
     for (const [width, height] of [[375, 812], [390, 844]]) {
       const context = await browser.newContext({
@@ -141,3 +142,4 @@ test('375px and 390px: active game setup cancellation, resume, reload and confir
     await browser.close();
   }
 });
+}
