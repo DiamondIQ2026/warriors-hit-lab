@@ -21,6 +21,7 @@ for(const [name,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
      localStorage.setItem('warriors-hit-lab-v6-snapshot',snapshot);
     },{key:KEY,raw,legacy:'{"career":"cpu-recovery-sentinel"}',snapshot:'{"snapshot":"cpu-recovery-sentinel"}'});
     await page.goto(GAME_URL);
+    // A recovery-locked save must remain unchanged through ordinary navigation.
     await page.locator('[data-go="Play"]').first().click();
     await page.locator('[data-go="Game"]').first().click();
     const values=await page.evaluate(([key,legacy,snapshot])=>[localStorage.getItem(key),localStorage.getItem(legacy),localStorage.getItem(snapshot)],[KEY,LEGACY,SNAPSHOT]);
