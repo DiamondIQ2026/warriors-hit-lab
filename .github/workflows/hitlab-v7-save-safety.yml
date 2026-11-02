@@ -1,7 +1,7 @@
 name: Hit Lab - V7 Save Safety
 on:
   pull_request:
-    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101', 'chatgpt/v7-reader-failclosed-20261101', 'chatgpt/v7-cross-tab-race-reproducer-20261101', 'chatgpt/v7-web-lock-gate-prototype-20261101']
+    branches: [main, 'chatgpt/v7-save-envelope-foundation-20261101', 'chatgpt/v7-save-envelope-fault-injection-20261101', 'chatgpt/v7-injectable-save-writer-20261101', 'chatgpt/v7-reader-failclosed-20261101', 'chatgpt/v7-cross-tab-race-reproducer-20261101', 'chatgpt/v7-web-lock-gate-prototype-20261101', 'chatgpt/v7-real-browser-save-lock-qa-20261101']
   workflow_dispatch:
 permissions:
   contents: read
@@ -30,3 +30,9 @@ jobs:
         run: |
           node --check tests/v7-save-lock-browser.test.cjs
           node --test tests/v7-save-lock-browser.test.cjs
+      - name: Install isolated WebKit browser dependencies
+        run: npx playwright install --with-deps webkit
+      - name: Exercise WebKit unsupported/denied lock fail-closed at mobile widths
+        run: |
+          node --check tests/v7-save-lock-webkit.test.cjs
+          node --test tests/v7-save-lock-webkit.test.cjs
