@@ -95,6 +95,7 @@ for(const [name,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
    assert.equal(state.realSwings.maddon,9);
    assert.equal(state.realSwings.dad,7);
    assert.match(await page.locator('#inning').innerText(),/FINAL/);
+   await assertFirstScreen(page,'#turn');
    assert.equal(await page.locator('#turn').isDisabled(),true);
    assert.equal(await page.locator('#swingPanel').isVisible(),false);
    const final=await raw(page);
