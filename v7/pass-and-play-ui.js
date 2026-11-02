@@ -3,7 +3,7 @@
  const api=window.HitLabMultiplayer;
  const KEY='warriors-hit-lab-v7-multiplayer-prototype';
  const $=id=>document.getElementById(id);
- let match=null,zone=null,acknowledge=false,lastTurn=null;
+ let match=null,zone=null,acknowledge=false,lastTurn=null,lastAnimatedAtBatCount=0;
  const zones=window.HitLabZoneRules.ZONES;
  function getNames(id){return $(id).value.trim().split(/\r?\n/).map(x=>x.trim());}
  function setDefaults(){
@@ -43,7 +43,14 @@
   }
   const latest=match.atBats[match.atBats.length-1];
   const field=$('game').querySelector('.simulated-field');
-  if(field)field.dataset.outcome=latest?.outcome||'';
+  if(field){
+   field.dataset.outcome=latest?.outcome||'';
+   if(latest&&match.atBats.length>lastAnimatedAtBatCount){
+    const marker=field.querySelector('.outcome-ball');
+    if(marker){marker.classList.remove('flight-playing');void marker.offsetWidth;marker.classList.add('flight-playing');}
+    lastAnimatedAtBatCount=match.atBats.length;
+   }
+  }
   if($('fieldOutcome'))$('fieldOutcome').textContent=latest?('Last simulated result: '+latest.outcome.toUpperCase()+' · '+latest.runs+' run'+(latest.runs===1?'':'s')):'Awaiting simulated result';
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
@@ -61,7 +68,7 @@
   try{
    const home=api.createProfile({id:'dad',name:$('homeName').value,team:$('homeTeam').value,hand:$('homeHand').value,lineup:getNames('homeLineup')});
    const away=api.createProfile({id:'maddon',name:$('awayName').value,team:$('awayTeam').value,hand:$('awayHand').value,lineup:getNames('awayLineup')});
-   match=api.newMatch(home,away,Number($('innings').value));zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
+   match=api.newMatch(home,away,Number($('innings').value));lastAnimatedAtBatCount=0;zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
    $('setupError').textContent='';persist();render();
   }catch(e){$('setupError').textContent=e.message;}
  };
