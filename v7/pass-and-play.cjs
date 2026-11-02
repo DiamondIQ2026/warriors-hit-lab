@@ -128,6 +128,19 @@ function boxScore(match){
 }
 // Postgame recap is derived, never stored. A tie-break for standout hitters
 // uses credited runs, then home runs, hits, and original lineup order.
+// A short, reverse-chronological play history. Read-only and derived from
+// integrity-checked recorded tee swings; never modifies persistent match data.
+function recentPlays(match,limit=8){
+ const checked=validateMatch(match);
+ if(!checked.ok)throw Error('Invalid match: '+checked.reason);
+ if(!Number.isInteger(limit)||limit<1||limit>50)throw Error('Invalid play history limit');
+ return match.atBats.slice(-limit).reverse().map((play,offset)=>({
+  number:match.atBats.length-offset,
+  team:play.teamId===match.home.id?match.home.team:match.away.team,
+  batter:play.batter,inning:play.inning,half:play.half,
+  zone:play.zone,power:play.power,outcome:play.outcome,runs:play.runs
+ }));
+}
 function postgameRecap(match){
  const box=boxScore(match);
  if(box.status!=='final')return null;
@@ -213,6 +226,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
