@@ -105,16 +105,18 @@ function boxScore(match){
   id,name:id===match.home.id?match.home.team:match.away.team,
   runs:match.score[id],hits:0,atBats:0,outs:0,
   singles:0,doubles:0,triples:0,homeRuns:0,
-  runsByInning:{}
+  runsByInning:{},batters:(id===match.home.id?match.home:match.away).lineup.map((name,index)=>({name,index,atBats:0,hits:0,outs:0,singles:0,doubles:0,triples:0,homeRuns:0,runsProduced:0}))
  }]));
  for(const play of match.atBats){
   const t=teams[play.teamId];
+  const batter=t.batters[play.index];
+  batter.atBats++;batter.runsProduced+=play.runs;
   t.atBats++;
-  if(play.outcome==='out')t.outs++;
+  if(play.outcome==='out'){t.outs++;batter.outs++;}
   else{
-   t.hits++;
+   t.hits++;batter.hits++;
    const field={single:'singles',double:'doubles',triple:'triples',homer:'homeRuns'}[play.outcome];
-   t[field]++;
+   t[field]++;batter[field]++;
   }
   t.runsByInning[play.inning]=(t.runsByInning[play.inning]||0)+play.runs;
  }
