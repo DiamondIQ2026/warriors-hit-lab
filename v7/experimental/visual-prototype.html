@@ -58,7 +58,16 @@
 .quick-zone{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;max-width:180px;margin:7px auto 9px}
 .quick-zone button{padding:5px 0;min-height:29px;font-size:12px;font-weight:900;border-radius:6px;background:#0a2744}
 .quick-zone button.chosen{background:#d42a43;border-color:#ffb2b8;color:white;box-shadow:0 0 0 1px #ffb2b8}
-@media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}</style>
+@media(max-height:740px){.page{padding:10px 14px}.hero{min-height:105px;margin:9px 0}.hero .mark{font-size:31px}.hero h1{margin:2px}.panel{padding:10px;margin-bottom:8px}.field{max-height:38dvh;aspect-ratio:1.55}h1{font-size:20px;margin:5px 0 9px}.score>div{padding:6px 2px}.score strong{font-size:25px}.nav button{padding:7px 1px}}.primary.wide{min-height:48px;margin-bottom:10px}
+/* Build A: compact metallic field and clear accessible batting response */
+.field{border-color:#9db7cc;box-shadow:inset 0 0 0 2px #09243c,0 6px 16px #0008}
+.field .diamond{border-color:#dbbd8e;box-shadow:0 0 0 2px #513c2999}
+.field .fielder{width:12px;height:12px;border-radius:2px;box-shadow:0 0 6px #a4d2ff88}
+.score{border:2px solid #b9cfdf}
+.feedback{border:1px solid #8a7141;background:linear-gradient(180deg,#25344b,#142336);padding:9px 7px;border-radius:8px;line-height:1.35}
+.quick-zone button{min-height:44px;touch-action:manipulation}
+@media(max-width:410px){.score .left,.score .right{font-size:12px}.score .middle{font-size:11px}.field{margin-top:6px}}
+</style>
 <a id="alphaHomeLink" href="../alpha/index.html" style="display:inline-block;margin:10px;padding:10px 14px;color:#fff;background:#153e67;border:1px solid #71a7dc;border-radius:9px;font:700 14px system-ui;text-decoration:none">← Alpha Home</a><div class="app"><header class="head"><button id="menuButton" aria-label="Open menu">☰</button><div class="brand">TW <b>HIT LAB</b><small>V7 PROTOTYPE</small></div><button id="backButton" aria-label="Go home">⌂</button></header><main class="page" id="page"></main><nav class="nav" id="nav"></nav></div>
 <div class="menu hidden" id="menu"><div class="drawer"><div class="row"><h2>Hit Lab Menu</h2><button id="closeMenu">✕</button></div><div id="menuItems" class="list"></div></div></div>
 <script src="../alpha/unified-game-state.cjs"></script><script src="../alpha/game-transition.cjs"></script><script src="../alpha/game-execution.cjs"></script><script src="../alpha/nine-zone-rules.cjs"></script><script src="../alpha/baseball-rules.cjs"></script><script src="../alpha/game-finish-rules.cjs"></script><script>
