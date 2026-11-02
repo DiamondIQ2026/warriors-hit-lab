@@ -183,7 +183,8 @@ test('one-rep 100% is visibly marked as a small sample, not a recommendation',()
  assert.equal(summary.zones[2].reps,1);
  assert.equal(summary.zones[2].hits,1);
  assert.match(app.report(),/1\/1 simulated hits · SMALL SAMPLE/);
- assert.match(app.report(),/100%/);
+ assert.match(app.report(),/ZONE 3<br><b>—/);
+  assert.doesNotMatch(app.report(),/ZONE 3<br><b>100%/);
 });
 test('training recommendations require two comparable zones and use simulated hit rates',()=>{
  const app=boot();
