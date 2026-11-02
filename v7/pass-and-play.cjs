@@ -130,6 +130,21 @@ function boxScore(match){
 // uses credited runs, then home runs, hits, and original lineup order.
 // A short, reverse-chronological play history. Read-only and derived from
 // integrity-checked recorded tee swings; never modifies persistent match data.
+// Training metrics count only the player's actual tee selections and contact
+// self-ratings. They never interpret simulated hits as measured batted-ball data.
+function trainingSummary(match){
+ const checked=validateMatch(match);
+ if(!checked.ok)throw Error('Invalid match: '+checked.reason);
+ const create=profile=>({name:profile.name,team:profile.team,hand:profile.hand,
+  swings:0,zones:ZONES.map((zone,index)=>({zone,number:index+1,swings:0,hard:0,medium:0,soft:0})),
+  contact:{hard:0,medium:0,soft:0}});
+ const players=Object.fromEntries([match.home,match.away].map(p=>[p.id,create(p)]));
+ for(const play of match.atBats){
+  const player=players[play.teamId],zone=player.zones[ZONES.indexOf(play.zone)];
+  player.swings++;player.contact[play.power]++;zone.swings++;zone[play.power]++;
+ }
+ return {totalSwings:match.atBats.length,home:players[match.home.id],away:players[match.away.id]};
+}
 function recentPlays(match,limit=8){
  const checked=validateMatch(match);
  if(!checked.ok)throw Error('Invalid match: '+checked.reason);
@@ -226,6 +241,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;

@@ -57,6 +57,21 @@
  }
  function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
  function active(){return match.half==='top'?match.away:match.home}
+ function renderTrainingInsights(){
+  const summary=api.trainingSummary(match);
+  $('trainingTotal').textContent=summary.totalSwings+' actual tee swings recorded';
+  const fragment=document.createDocumentFragment();
+  for(const player of [summary.away,summary.home]){
+   for(const zone of player.zones){
+    const row=document.createElement('tr');
+    for(const value of [player.name,zone.number,zone.swings,zone.hard,zone.medium,zone.soft]){
+     const cell=document.createElement('td');cell.textContent=String(value);row.appendChild(cell);
+    }
+    fragment.appendChild(row);
+   }
+  }
+  $('trainingZoneRows').replaceChildren(fragment);
+ }
  function renderRecentPlays(){
   const plays=api.recentPlays(match,8),list=$('recentPlaysList');
   const fragment=document.createDocumentFragment();
@@ -149,6 +164,7 @@
   if($('fieldOutcome'))$('fieldOutcome').textContent=latest?('Last simulated result: '+latest.outcome.toUpperCase()+' · '+latest.runs+' run'+(latest.runs===1?'':'s')):'Awaiting simulated result';
   renderBoxScore();
   renderRecentPlays();
+  renderTrainingInsights();
   $('counts').textContent='Real recorded swings: '+match.away.name+' '+match.realSwings[match.away.id]+' | '+match.home.name+' '+match.realSwings[match.home.id];
   const p=active(),i=match.battingOrder[p.id];
   $('batter').textContent='At bat: '+p.lineup[i]+' (#'+(i+1)+')';
