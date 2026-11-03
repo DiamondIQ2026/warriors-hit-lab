@@ -14,11 +14,11 @@ test('Build 1 milestone: setup, multiple real swings, turn handoff, saved replay
     await page.locator('#zones button').nth(4).tap();
     await page.locator('.contact-quality-options button[data-contact=medium]').tap();
     await page.locator('#outcome').selectOption('out');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     let state=await page.evaluate(()=>JSON.parse(localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')));
     assert.equal(state.atBats.length,n+1);
     assert.equal(state.realSwings[state.away.id],n+1);
-    if(n<2)assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true);
+    if(n<2)assert.equal(await page.locator('#record').isDisabled(),true);
    }
    const state=await page.evaluate(()=>JSON.parse(localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')));
    assert.equal(state.outs,0,'three outs reset on half-inning transition');
