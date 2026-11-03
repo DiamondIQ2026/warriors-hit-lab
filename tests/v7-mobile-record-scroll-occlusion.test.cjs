@@ -32,7 +32,10 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
       await el.scrollIntoViewIfNeeded();
       // A scrollable control must have at least one unoccluded point above
       // the fixed nav and outside the fixed CTA, even after scrolling.
-      const clear=await el.evaluate(node=>{
+      let clear=false;
+      let diagnostics=[];
+      for(let attempt=0;attempt<12;attempt++){
+       const probe=await el.evaluate(node=>{
        const rect=node.getBoundingClientRect(),cta=document.querySelector('#record').getBoundingClientRect();
        const nav=document.querySelector('.v7-nav').getBoundingClientRect();
        for(const fx of [.25,.5,.75])for(const fy of [.2,.5,.8]){
@@ -42,9 +45,15 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
         const hit=document.elementFromPoint(x,y);
         if(hit===node||node.contains(hit))return true;
        }
-       return false;
-      });
-      assert.ok(clear,'control obscured '+engine+' '+width+'x'+height+' '+selector);
+       return {clear:false,scrollY:scrollY,scrollHeight:document.documentElement.scrollHeight,zone:rect.toJSON(),cta:cta.toJSON(),nav:nav.toJSON()};
+       });
+       if(probe===true){clear=true;break;}
+       diagnostics.push(probe);
+       // Browser auto-scrolling can center a control behind a fixed CTA.
+       // Search available scroll positions before declaring it unreachable.
+       await page.evaluate(()=>window.scrollBy(0,40));
+      }
+      assert.ok(clear,'control unreachable after scroll probing '+engine+' '+width+'x'+height+' '+selector+': '+JSON.stringify(diagnostics.slice(-3)));
       await el.tap({timeout:3000});
      }
      assert.equal(await page.locator('#record').isEnabled(),true);
