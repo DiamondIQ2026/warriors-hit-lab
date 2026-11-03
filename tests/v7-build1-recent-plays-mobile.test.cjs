@@ -31,7 +31,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      await page.locator('#turn').tap();
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('double');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      await page.locator('#recentPlays > summary').tap();
      assert.equal(await page.locator('#recentPlaysList li').count(),1);
      assert.match(await page.locator('#recentPlaysList').innerText(),/Real net zone 5 of 9/);
