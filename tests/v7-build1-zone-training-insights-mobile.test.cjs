@@ -36,7 +36,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      await page.locator('#turn').tap();
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('homer');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      await page.locator('#trainingInsights > summary').tap();
      assert.match(await page.locator('#trainingTotal').innerText(),/1 actual tee swing/);
      assert.equal(await page.locator('#trainingZoneRows tr').count(),18);
