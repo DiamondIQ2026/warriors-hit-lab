@@ -147,6 +147,23 @@ function practiceCsv(match){
    rows.push([player.name,player.team,player.hand,zone.number,zone.swings,zone.hard,zone.medium,zone.soft]);
  return rows.map(row=>row.map(escapeCell).join(',')).join('\r\n')+'\r\n';
 }
+// Suggest the least-practiced net zone for each player. Deterministic,
+// encouraging practice guidance, not a claim about batting performance.
+function nextZoneDrills(match){
+ const summary=trainingSummary(match);
+ const choose=player=>{
+  const min=Math.min(...player.zones.map(z=>z.swings));
+  const candidates=player.zones.filter(z=>z.swings===min);
+  // Prefer the middle-middle zone on an entirely new practice session;
+  // otherwise rotate among equally under-practiced zones by rep count.
+  const zone=player.swings===0?player.zones[4]:candidates[player.swings%candidates.length];
+  return {name:player.name,team:player.team,zone:zone.zone,number:zone.number,
+   completed:zone.swings,target:zone.swings+3,
+   instruction:'Try 3 controlled tee swings into net zone '+zone.number+
+    '. Choose contact quality after each real swing.'};
+ };
+ return {away:choose(summary.away),home:choose(summary.home)};
+}
 function trainingSummary(match){
  const checked=validateMatch(match);
  if(!checked.ok)throw Error('Invalid match: '+checked.reason);
@@ -256,6 +273,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv,nextZoneDrills};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;

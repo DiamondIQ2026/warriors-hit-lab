@@ -92,6 +92,16 @@
    progress.appendChild(row);
   }
   $('teeGoalProgress').replaceChildren(progress);
+  const drills=api.nextZoneDrills(match),drillFragment=document.createDocumentFragment();
+  for(const player of [drills.away,drills.home]){
+   const card=document.createElement('div');card.className='guided-tee-drill';
+   const heading=document.createElement('strong');
+   heading.textContent=player.name+' · Zone '+player.number;
+   const instruction=document.createElement('span');
+   instruction.textContent=player.instruction;
+   card.append(heading,instruction);drillFragment.appendChild(card);
+  }
+  $('guidedTeeDrills').replaceChildren(drillFragment);
   const fragment=document.createDocumentFragment();
   for(const player of [summary.away,summary.home]){
    for(const zone of player.zones){
