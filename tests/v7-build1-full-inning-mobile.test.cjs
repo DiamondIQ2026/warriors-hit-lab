@@ -20,7 +20,7 @@ test('Build 1: full two-sided inning credits only real swings and restores game 
     await page.locator('#zones button').nth(out+3).tap();
     await page.locator('.contact-quality-options button[data-contact=medium]').tap();
     await page.locator('#outcome').selectOption('out');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const state=await storage();
     assert.equal(state.atBats.length,half*3+out+1);
     assert.equal(state.realSwings[player],out+1);

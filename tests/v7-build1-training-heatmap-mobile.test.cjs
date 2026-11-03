@@ -18,7 +18,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.equal(await page.locator('.training-heatmap-cell').nth(4).locator('strong').innerText(),'0');
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.equal(await page.locator('.training-heatmap-cell').nth(4).locator('strong').innerText(),'1');
      assert.match(await page.locator('.training-heatmap-cell').nth(4).getAttribute('aria-label'),/Zone 5: 1 actual tee swings/);
      assert.equal(await page.locator('.training-heatmap-cell').nth(13).locator('strong').innerText(),'0');

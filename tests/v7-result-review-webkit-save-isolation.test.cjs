@@ -29,7 +29,7 @@ test('375/390px result review survives handoff and reload in Chromium and WebKit
      await page.locator('#zones button').nth(4).tap();
      await page.locator('.contact-quality-options button[data-contact=soft]').tap();
      await page.locator('#outcome').selectOption('double');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.equal(await review.isVisible(),true,'result shortcut shown after rep');
      const touch=await review.boundingBox();
      assert.ok(touch&&touch.height>=44&&touch.width>=44,'review button has 44px touch target');

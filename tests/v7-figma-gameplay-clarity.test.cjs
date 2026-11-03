@@ -14,9 +14,11 @@ test('Real practice is visually and semantically distinguished from simulated re
  assert.match(html,/Simulated game result<select id="outcome"/);
  assert.match(html,/class="practice-note" aria-label="Real practice and simulated outcome explanation"/);
 });
-test('Primary action remains above nine-zone grid',()=>{
- const record=html.indexOf('id="record"'),zones=html.indexOf('id="zones"');
- assert.ok(record>0 && zones>record);
+test('Single canonical Record Swing action follows zone and contact controls',()=>{
+ const record=html.indexOf('id="record"'),zones=html.indexOf('id="zones"'),contact=html.indexOf('class="contact-quality-options"'),power=html.indexOf('id="power"');
+ assert.ok(zones>0 && contact>zones && power>contact && record>power);
+ assert.equal((html.match(/id="record"/g)||[]).length,1);
+ assert.doesNotMatch(html,/id="recordAfterChoices"/);
  assert.match(html,/#record:disabled/);
  assert.match(html,/\.zones button\{min-height:70px(?:;|\})/);
 });

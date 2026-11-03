@@ -21,8 +21,8 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
       if(!await page.locator('#swingPanel').isVisible()){await page.locator('#turn').tap();handOffs++;}
       await page.locator('#zones button').nth(4).tap();
       await page.locator('#outcome').selectOption(outcomes[i]);
-      assert.equal(await page.locator('#recordAfterChoices').isEnabled(),true);
-      await page.locator('#recordAfterChoices').tap();
+      assert.equal(await page.locator('#record').isEnabled(),true);
+      await page.locator('#record').tap();
       const saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
       assert.equal(saved.atBats.length,++previousSwings);
       assert.equal(saved.realSwings.dad+saved.realSwings.maddon,previousSwings);

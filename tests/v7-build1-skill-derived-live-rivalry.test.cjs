@@ -93,7 +93,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]])
    await page.locator('#turn').tap();
    await page.locator('#outcome').selectOption('homer');
    await page.locator('#zones button').nth(0).tap();
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    saved=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
    assert.equal(saved.atBats.length,2,'one extra swing');
    assert.equal(saved.atBats[1].outcome,'homer','explicit QA override remains available');

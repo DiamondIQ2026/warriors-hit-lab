@@ -16,11 +16,11 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      await page.locator('#turn').tap();
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.equal(await page.locator('#quickAwayLine').innerText(),'0 · 1 · 0');
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('homer');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.equal(await page.locator('#quickAwayLine').innerText(),'2 · 2 · 0');
      const raw=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
      await page.reload();

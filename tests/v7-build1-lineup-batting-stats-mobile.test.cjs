@@ -39,7 +39,7 @@ for(const [browserType,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.equal(await page.locator('#lineupStatsRows tr').count(),20);
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      const first=page.locator('#lineupStatsRows tr').nth(1);
      assert.equal(await first.locator('td').nth(1).innerText(),'1');
      assert.equal(await first.locator('td').nth(2).innerText(),'1');

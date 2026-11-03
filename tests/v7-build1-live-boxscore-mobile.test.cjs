@@ -20,10 +20,10 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']]){
      assert.equal(await rows.nth(0).locator('td').nth(10).innerText(),'0');
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('homer');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.equal(await rows.nth(0).locator('td').nth(1).innerText(),'2');
      assert.equal(await rows.nth(0).locator('td').nth(10).innerText(),'2');
      assert.equal(await rows.nth(0).locator('td').nth(11).innerText(),'2');

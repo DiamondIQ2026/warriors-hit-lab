@@ -29,7 +29,7 @@ async function swing(page,outcome='out'){
  await page.locator('#zones button').nth(4).tap(); // Real net zone 5.
  await page.locator('.contact-quality-options button[data-contact=hard]').tap();
  await page.locator('#outcome').selectOption(outcome); // Separate simulated result.
- await page.locator('#recordAfterChoices').tap();
+ await page.locator('#record').tap();
  const after=await read(page);
  assert.equal(after.atBats.length,before.atBats.length+1,'one real swing per action');
  assert.equal(after.atBats.at(-1).zone,'MC');
@@ -37,7 +37,7 @@ async function swing(page,outcome='out'){
  assert.equal(after.atBats.at(-1).outcome,outcome);
  assert.equal(after.realSwings[before.half==='top'?'maddon':'dad'],
   before.realSwings[before.half==='top'?'maddon':'dad']+1);
- assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true,'no stale repeat');
+ assert.equal(await page.locator('#record').isDisabled(),true,'no stale repeat');
  return after;
 }
 async function threeOuts(page){for(let i=0;i<3;i++)await swing(page);}

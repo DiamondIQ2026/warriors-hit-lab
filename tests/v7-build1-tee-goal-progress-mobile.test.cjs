@@ -17,7 +17,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.match(await page.locator('.tee-goal-row').first().innerText(),/0 \/ 20 real tee swings/);
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.match(await page.locator('.tee-goal-row').first().innerText(),/1 \/ 20 real tee swings/);
      assert.equal(await page.locator('.tee-goal-row').first().locator('[role=progressbar]').getAttribute('aria-valuenow'),'1');
      const raw=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));

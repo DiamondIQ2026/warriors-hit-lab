@@ -28,7 +28,7 @@ for(const [engine,label] of [[chromium,'Chromium'],[webkit,'WebKit']]){
       }
       await page.locator('#zones button').nth(4).tap();
       await page.locator('#outcome').selectOption(i===0?'homer':'out');
-      await page.locator('#recordAfterChoices').tap();
+      await page.locator('#record').tap();
       if(i===Math.floor(total/2)){
        const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
        await page.reload();

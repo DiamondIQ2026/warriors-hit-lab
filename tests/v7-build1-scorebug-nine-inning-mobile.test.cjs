@@ -16,15 +16,15 @@ async function record(page,outcome='out',zone=4,contact='hard'){
  await page.locator('#zones button').nth(zone).tap();
  await page.locator('.contact-quality-options button[data-contact="'+contact+'"]').tap();
  await page.locator('#outcome').selectOption(outcome);
- assert.equal(await page.locator('#recordAfterChoices').isEnabled(),true);
- await page.locator('#recordAfterChoices').tap();
+ assert.equal(await page.locator('#record').isEnabled(),true);
+ await page.locator('#record').tap();
  const after=await read(page);
  const side=before.half==='top'?before.away.id:before.home.id;
  assert.equal(after.atBats.length,before.atBats.length+1,'exactly one tee swing');
  assert.equal(after.realSwings[side],before.realSwings[side]+1);
  assert.equal(after.atBats.at(-1).outcome,outcome);
  assert.equal(after.atBats.at(-1).power,contact);
- assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true);
+ assert.equal(await page.locator('#record').isDisabled(),true);
  return after;
 }
 async function handoff(page,name){

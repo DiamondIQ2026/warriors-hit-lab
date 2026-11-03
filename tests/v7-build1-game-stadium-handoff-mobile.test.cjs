@@ -33,7 +33,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await page.locator('#zones button').nth(4).tap(); // MC
     await page.locator('.contact-quality-options button[data-contact=hard]').tap();
     await page.locator('#outcome').selectOption('single');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const saved=await read(page),match=JSON.parse(saved);
     assert.equal(match.atBats.length,1,'one recorded game swing');
     assert.equal(match.atBats[0].zone,'MC');
@@ -66,7 +66,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await page.locator('#zones button').nth(1).tap(); // UC
     await page.locator('.contact-quality-options button[data-contact=soft]').tap();
     await page.locator('#outcome').selectOption('out');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const after=await read(page),updated=JSON.parse(after);
     assert.equal(updated.atBats.length,2,'second real swing recorded exactly once');
     assert.equal(updated.atBats[1].zone,'UC');
@@ -78,7 +78,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
      await page.locator('#zones button').nth(zoneIndex).tap();
      await page.locator('.contact-quality-options button[data-contact='+contact+']').tap();
      await page.locator('#outcome').selectOption('out');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
     }
     const afterAway=JSON.parse(await read(page));
     assert.equal(afterAway.atBats.length,4,'four away real swings total');
@@ -96,7 +96,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await page.locator('#zones button').nth(2).tap(); // UR
     await page.locator('.contact-quality-options button[data-contact=medium]').tap();
     await page.locator('#outcome').selectOption('double');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const afterHome=await read(page),home=JSON.parse(afterHome);
     assert.equal(home.atBats.length,5,'home swing recorded once after handoff');
     assert.equal(home.atBats[4].teamId,home.home.id);

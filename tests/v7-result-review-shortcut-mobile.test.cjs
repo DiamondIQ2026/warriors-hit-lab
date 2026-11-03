@@ -13,7 +13,7 @@ test('mobile practice result shortcut appears only after recorded swing and surv
    assert.equal(await page.locator('#seeLastSwing').isVisible(),false);
    await page.locator('#zones button').nth(4).tap();
    await page.locator('#outcome').selectOption('double');
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    const shortcut=page.locator('#seeLastSwing');
    assert.equal(await shortcut.isVisible(),true);
    await shortcut.tap();
