@@ -13,7 +13,7 @@ test('real swing feedback uses numbered zones and explicitly labels simulation o
    await page.locator('#zones button').nth(4).tap();
    await page.locator('.contact-quality-options button[data-contact=soft]').tap();
    await page.locator('#outcome').selectOption('double');
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    const event=await page.locator('#event').textContent();
    assert.match(event,/Real tee swing recorded/);
    assert.match(event,/Net zone 5 of 9/);
