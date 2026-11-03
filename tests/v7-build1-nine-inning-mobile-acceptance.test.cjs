@@ -27,7 +27,7 @@ async function record(page,outcome='out'){
  await page.locator('#zones button').nth(zoneIndex).tap();
  await page.locator('.contact-quality-options button[data-contact='+contact+']').tap();
  await page.locator('#outcome').selectOption(outcome);
- await page.locator('#recordAfterChoices').tap();
+ await page.locator('#record').tap();
  const after=await read(page),last=after.atBats.at(-1);
  const id=before.half==='top'?before.away.id:before.home.id;
  assert.equal(after.atBats.length,n+1,'exactly one real swing');
@@ -38,7 +38,7 @@ async function record(page,outcome='out'){
  assert.equal(last.teamId,id,'correct batting side');
  assert.equal(last.inning,before.inning,'swing credited to correct inning');
  assert.equal(last.half,before.half,'swing credited to correct half');
- assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true,'no duplicate swing');
+ assert.equal(await page.locator('#record').isDisabled(),true,'no duplicate swing');
  assert.equal(await page.locator('.simulated-field').getAttribute('data-outcome'),outcome,'latest visual result');
  return after;
 }
