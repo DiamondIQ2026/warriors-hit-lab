@@ -276,7 +276,6 @@
   $('turn').textContent=match.status==='final'?('GAME OVER • WINNER: '+(match.winner===match.home.id?match.home.team:match.away.team)):(acknowledge?('BATTING: '+p.team):('PASS PHONE TO '+p.name.toUpperCase()+' • '+p.team+' — TAP TO CONTINUE'));
   $('turn').disabled=match.status==='final';
   $('record').disabled=!zone||!acknowledge||match.status==='final';
-  $('recordAfterChoices').disabled=$('record').disabled;
   $('seeLastSwing').classList.toggle('hidden',!latest);
   const impactReview=$('practiceImpactReview');
   impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
@@ -300,7 +299,6 @@
  $('power').addEventListener('change',()=>{syncContactOptions();if(match)render();});
  syncContactOptions();
  $('outcome').addEventListener('change',()=>{if(match)render();});
- $('recordAfterChoices').addEventListener('click',()=>{if(!$('record').disabled)$('record').click();});
  $('seeLastSwing').addEventListener('click',()=>{$('event').scrollIntoView({behavior:'instant',block:'center'});});
  $('record').onclick=()=>{
   if(!match||match.status==='final'||!acknowledge||!zone)return;
