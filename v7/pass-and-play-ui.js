@@ -117,6 +117,23 @@
    row.append(heading,track,next);coverageFragment.appendChild(row);
   }
   $('practiceCoverage').replaceChildren(coverageFragment);
+  const milestones=api.practiceMilestones(match),milestoneFragment=document.createDocumentFragment();
+  for(const player of [milestones.away,milestones.home]){
+   const section=document.createElement('div');section.className='tee-milestone-player';
+   const heading=document.createElement('strong');
+   heading.textContent=player.name+' · '+player.total+' milestone'+(player.total===1?'':'s');
+   const list=document.createElement('div');list.className='tee-milestone-list';
+   if(!player.awards.length){
+    const empty=document.createElement('span');empty.className='tee-milestone-empty';
+    empty.textContent='First milestone: log one real tee swing.';list.appendChild(empty);
+   }
+   for(const award of player.awards){
+    const chip=document.createElement('span');chip.className='tee-milestone-chip';
+    chip.textContent='★ '+award.title;chip.title=award.description;list.appendChild(chip);
+   }
+   section.append(heading,list);milestoneFragment.appendChild(section);
+  }
+  $('teeMilestones').replaceChildren(milestoneFragment);
   const fragment=document.createDocumentFragment();
   for(const player of [summary.away,summary.home]){
    for(const zone of player.zones){
