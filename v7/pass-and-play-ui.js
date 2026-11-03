@@ -102,6 +102,21 @@
    card.append(heading,instruction);drillFragment.appendChild(card);
   }
   $('guidedTeeDrills').replaceChildren(drillFragment);
+  const coverage=api.practiceCoverage(match),coverageFragment=document.createDocumentFragment();
+  for(const player of [coverage.away,coverage.home]){
+   const row=document.createElement('div');row.className='practice-coverage-row';
+   const heading=document.createElement('strong');
+   heading.textContent=player.name+' · '+player.practicedZones+' / 9 zones practiced';
+   const track=document.createElement('div');track.className='practice-coverage-track';
+   track.setAttribute('role','progressbar');track.setAttribute('aria-label',player.name+' practiced net zones');
+   track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','9');
+   track.setAttribute('aria-valuenow',String(player.practicedZones));
+   const fill=document.createElement('div');fill.className='practice-coverage-fill';
+   fill.style.width=(player.practicedZones/9*100).toFixed(1)+'%';track.appendChild(fill);
+   const next=document.createElement('p');next.textContent=player.nextStep;
+   row.append(heading,track,next);coverageFragment.appendChild(row);
+  }
+  $('practiceCoverage').replaceChildren(coverageFragment);
   const fragment=document.createDocumentFragment();
   for(const player of [summary.away,summary.home]){
    for(const zone of player.zones){
