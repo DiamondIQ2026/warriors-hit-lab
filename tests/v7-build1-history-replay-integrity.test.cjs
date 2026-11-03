@@ -87,7 +87,7 @@ for(const [engine,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
     await page.locator('#turn').tap();
     await page.locator('#zones button').nth(4).tap();
     await page.locator('#outcome').selectOption('single');
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const original=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
     assert.equal(original.atBats.length,1);
     assert.equal(original.bases[0],true);
