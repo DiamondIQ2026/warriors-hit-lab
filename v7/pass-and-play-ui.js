@@ -2,9 +2,12 @@
 (()=>{
  const api=window.HitLabMultiplayer;
  const KEY='warriors-hit-lab-v7-multiplayer-prototype';
+ // Deterministic outcome overrides are permitted only on loopback QA hosts.
+ const localQaHost=['localhost','127.0.0.1','[::1]'].includes(window.location.hostname);
  const $=id=>document.getElementById(id);
  let match=null,zone=null,acknowledge=false,lastTurn=null,lastAnimatedAtBatCount=0;
  const zones=window.HitLabZoneRules.ZONES;
+ if(!localQaHost){$('outcome').value='auto';$('outcome').closest('.simulated-outcome-control').hidden=true;}
  function getNames(id){return $(id).value.trim().split(/\r?\n/).map(x=>x.trim());}
  function setDefaults(){
   $('homeLineup').value=Array.from({length:9},(_,i)=>'Titan '+(i+1)).join('\n');
@@ -277,7 +280,7 @@
   $('seeLastSwing').classList.toggle('hidden',!latest);
   const impactReview=$('practiceImpactReview');
   impactReview.dataset.ready=String(!!zone&&acknowledge&&match.status==='active');
-  impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · '+($('outcome').value==='auto'?'game outcome simulated from zone, contact and handedness':'test-only result override')):'Select a net-impact zone to record your next real tee swing.';
+  impactReview.textContent=zone?('Selected net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact · '+(localQaHost&&$('outcome').value!=='auto'?'test-only result override':'game outcome simulated from zone, contact and handedness')):'Select a net-impact zone to record your next real tee swing.';
  }
  $('turn').addEventListener('click',()=>{if(match&&match.status==='active'){acknowledge=true;render();}});
  $('start').onclick=()=>{
@@ -303,9 +306,9 @@
   if(!match||match.status==='final'||!acknowledge||!zone)return;
   try{
    const old=api.currentTurn(match);
-   const simulated=$('outcome').value==='auto'
-    ?api.resolveSimulatedOutcome(match,{zone,power:$('power').value})
-    :$('outcome').value; // Explicit QA scenario override only.
+   const simulated=localQaHost&&$('outcome').value!=='auto'
+    ?$('outcome').value // Explicit local QA scenario override only.
+    :api.resolveSimulatedOutcome(match,{zone,power:$('power').value});
    const executed=window.HitLabExecution.execute('rivalry',match,current=>
      api.recordSwing(current,{zone,power:$('power').value,outcome:simulated}));
    if(executed.observation)window.__hitLabLastTransition=executed.observation;
