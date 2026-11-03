@@ -28,8 +28,8 @@ for(const [engine,label] of [[chromium,'Chromium'],[webkit,'WebKit']]){
     assert.equal(await page.locator('#game').isVisible(),true);
     await (await reach('#turn')).tap();
     await (await reach('#zones button:nth-child(5)')).tap();
-    assert.equal(await page.locator('#recordAfterChoices').isEnabled(),true);
-    await (await reach('#recordAfterChoices')).tap();
+    assert.equal(await page.locator('#record').isEnabled(),true);
+    await (await reach('#record')).tap();
     const first=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),SAVE);
     assert.equal(first.atBats.length,1);
     assert.equal(first.realSwings.dad+first.realSwings.maddon,1);
