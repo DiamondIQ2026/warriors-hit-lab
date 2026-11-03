@@ -16,7 +16,7 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
     await page.locator('#start').tap();
     await page.locator('#turn').tap();
     await page.locator('#zones button').nth(4).tap();
-    await page.locator('#recordAfterChoices').tap();
+    await page.locator('#record').tap();
     const saved=await page.evaluate(k=>localStorage.getItem(k),KEY);
     assert.ok(saved&&JSON.parse(saved).atBats.length===1);
     page.once('dialog',d=>d.dismiss());
