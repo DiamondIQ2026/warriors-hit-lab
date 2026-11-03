@@ -34,7 +34,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.match(await page.locator('.guided-tee-drill').first().innerText(),/Zone 5/);
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.doesNotMatch(await page.locator('.guided-tee-drill').first().innerText(),/Zone 5/);
      const raw=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
      await page.reload();
