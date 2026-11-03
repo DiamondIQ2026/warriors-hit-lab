@@ -17,12 +17,12 @@ test('Build 1 scoreboard mirrors recorded scoring and base occupancy at both mob
    assert.equal(await home.locator('.score-points').innerText(),'0');
    await page.locator('#zones button').nth(4).tap();
    await page.locator('#outcome').selectOption('single');
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    assert.match(await page.locator('.score-diamond').getAttribute('aria-label'),/1/);
    assert.equal(await page.locator('.score-diamond [data-base="1"]').evaluate(e=>e.classList.contains('occupied')),true);
    await page.locator('#zones button').nth(4).tap();
    await page.locator('#outcome').selectOption('homer');
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype')));
    assert.equal(saved.score[saved.away.id],2);
    assert.equal(await away.locator('.score-team').innerText(),'Tampa Warriors');
