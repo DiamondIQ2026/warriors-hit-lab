@@ -81,6 +81,17 @@
  body:has(#game:not(.hidden)) #game #swingPanel{padding-bottom:72px}
 }
 
+/* Standard-height phones also need the one post-choice CTA above the fold.
+   Do not hide the development heading at these sizes. */
+@media (max-width:430px) and (min-height:701px) and (max-height:850px){
+ body:has(#game:not(.hidden)) #game #swingPanel:not(.hidden) #record{
+  position:fixed;left:50%;bottom:calc(82px + env(safe-area-inset-bottom));
+  transform:translateX(-50%);width:min(calc(100vw - 36px),420px);
+  margin:0;z-index:4;min-height:52px;
+ }
+ body:has(#game:not(.hidden)) #game #swingPanel{padding-bottom:72px}
+}
+
 /* V7 field visual pass: nine fielders and gentle, accessible simulated-ball motion. */
 .simulated-field .field-fielder{position:absolute;z-index:2;width:clamp(9px,2.6vw,13px);height:clamp(9px,2.6vw,13px);border:2px solid #e9f3ff;border-radius:50%;background:linear-gradient(135deg,#f85a69 0 46%,#203b68 47%);box-shadow:0 1px 4px #071725d9,0 0 0 2px #16344a99;transform:translate(-50%,-50%);pointer-events:none}
 .simulated-field .fielder-p{left:50%;top:66%}.simulated-field .fielder-c{left:50%;top:92%}
