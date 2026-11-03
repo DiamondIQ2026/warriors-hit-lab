@@ -150,6 +150,22 @@ function practiceCsv(match){
 // Suggest the least-practiced net zone for each player. Deterministic,
 // encouraging practice guidance, not a claim about batting performance.
 // Descriptive coverage, not a skill score or measured contact assessment.
+// Lightweight achievements derived from real tee history. These are
+// encouraging practice milestones, not simulated batting statistics.
+function practiceMilestones(match){
+ const summary=trainingSummary(match),coverage=practiceCoverage(match);
+ const calculate=(player,zones)=>{
+  const awards=[];
+  if(player.swings>=1)awards.push({id:'first-rep',title:'First Rep',description:'Logged your first real tee swing.'});
+  if(player.swings>=10)awards.push({id:'ten-reps',title:'Ten Reps',description:'Completed 10 real tee swings.'});
+  if(player.swings>=25)awards.push({id:'twenty-five-reps',title:'25-Repetition Club',description:'Completed 25 real tee swings.'});
+  if(zones.practicedZones>=3)awards.push({id:'three-zones',title:'Zone Explorer',description:'Practiced at least three different net zones.'});
+  if(zones.practicedZones===9)awards.push({id:'nine-zones',title:'Full Grid',description:'Logged a tee swing in all nine net zones.'});
+  if(player.contact.hard>=5)awards.push({id:'five-hard',title:'Contact Practice',description:'Logged five self-selected hard-contact reps.'});
+  return {name:player.name,team:player.team,awards,total:awards.length};
+ };
+ return {away:calculate(summary.away,coverage.away),home:calculate(summary.home,coverage.home)};
+}
 function practiceCoverage(match){
  const summary=trainingSummary(match);
  const calculate=player=>{
@@ -288,6 +304,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv,nextZoneDrills,practiceCoverage};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv,nextZoneDrills,practiceCoverage,practiceMilestones};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
