@@ -18,7 +18,7 @@ async function record(page,outcome='out'){
  await page.locator('#zones button').nth(4).tap();
  await page.locator('.contact-quality-options button[data-contact=hard]').tap();
  await page.locator('#outcome').selectOption(outcome);
- await page.locator('#recordAfterChoices').tap();
+ await page.locator('#record').tap();
  const after=await read(page);
  const id=before.half==='top'?before.away.id:before.home.id;
  assert.equal(after.atBats.length,before.atBats.length+1,'one real tee swing per simulated at-bat');
@@ -26,7 +26,7 @@ async function record(page,outcome='out'){
  assert.equal(after.atBats.at(-1).zone,'MC');
  assert.equal(after.atBats.at(-1).power,'hard');
  assert.equal(after.atBats.at(-1).outcome,outcome);
- assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true,'cannot record twice');
+ assert.equal(await page.locator('#record').isDisabled(),true,'cannot record twice');
  return after;
 }
 async function handoff(page,name){
