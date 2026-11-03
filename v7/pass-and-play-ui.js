@@ -68,9 +68,30 @@
    setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch{$('event').textContent='Could not export the current practice summary. Saved game unchanged.';}
  });
+ $('teeGoal').addEventListener('change',()=>{
+  if(match)renderTrainingInsights();
+ });
  function renderTrainingInsights(){
   const summary=api.trainingSummary(match);
   $('trainingTotal').textContent=summary.totalSwings+' actual tee swings recorded';
+  const goal=Number($('teeGoal').value),progress=document.createDocumentFragment();
+  for(const player of [summary.away,summary.home]){
+   const percent=Math.min(100,Math.round(player.swings/goal*100));
+   const row=document.createElement('div');row.className='tee-goal-row';
+   const label=document.createElement('strong');
+   label.textContent=player.name+' · '+player.swings+' / '+goal+' real tee swings'+
+    (player.swings>=goal?' · GOAL MET':'');
+   const track=document.createElement('div');track.className='tee-goal-track';
+   track.setAttribute('role','progressbar');
+   track.setAttribute('aria-label',player.name+' real tee swing goal');
+   track.setAttribute('aria-valuemin','0');
+   track.setAttribute('aria-valuemax',String(goal));
+   track.setAttribute('aria-valuenow',String(Math.min(player.swings,goal)));
+   const fill=document.createElement('div');fill.className='tee-goal-fill';
+   fill.style.width=percent+'%';track.appendChild(fill);row.append(label,track);
+   progress.appendChild(row);
+  }
+  $('teeGoalProgress').replaceChildren(progress);
   const fragment=document.createDocumentFragment();
   for(const player of [summary.away,summary.home]){
    for(const zone of player.zones){
