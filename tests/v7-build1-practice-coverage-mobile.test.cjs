@@ -32,7 +32,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.match(await page.locator('.practice-coverage-row').first().innerText(),/0 \/ 9 zones practiced/);
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.match(await page.locator('.practice-coverage-row').first().innerText(),/1 \/ 9 zones practiced/);
      assert.equal(await page.locator('.practice-coverage-row').first().locator('[role=progressbar]').getAttribute('aria-valuenow'),'1');
      const raw=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
