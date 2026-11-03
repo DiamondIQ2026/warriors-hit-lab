@@ -31,7 +31,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']])
      assert.match(await page.locator('.tee-milestone-player').first().innerText(),/0 milestones/);
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      assert.match(await page.locator('.tee-milestone-player').first().innerText(),/First Rep/);
      const raw=await page.evaluate(()=>localStorage.getItem('warriors-hit-lab-v7-multiplayer-prototype'));
      await page.reload();
