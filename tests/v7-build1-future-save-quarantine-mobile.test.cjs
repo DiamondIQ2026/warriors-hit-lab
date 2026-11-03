@@ -15,8 +15,8 @@ for(const [engine,label] of [[chromium,'Chromium'],[webkit,'WebKit']]){
     const future=await page.evaluate(()=>{
      const api=window.HitLabMultiplayer;
      const lineup=prefix=>Array.from({length:9},(_,i)=>prefix+' '+(i+1));
-     const home=api.createProfile('dad','Dad','Tampa Titans','R',lineup('Titan'));
-     const away=api.createProfile('maddon','Maddon','Tampa Warriors','L',lineup('Warrior'));
+     const home=api.createProfile({id:'dad',name:'Dad',team:'Tampa Titans',hand:'R',lineup:lineup('Titan')});
+     const away=api.createProfile({id:'maddon',name:'Maddon',team:'Tampa Warriors',hand:'L',lineup:lineup('Warrior')});
      const match=api.newMatch(home,away,3);
      match.version=999;
      match.futureOnly={payload:'PRESERVE_UNSUPPORTED_VERSION'};
