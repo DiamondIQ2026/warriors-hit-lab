@@ -149,6 +149,21 @@ function practiceCsv(match){
 }
 // Suggest the least-practiced net zone for each player. Deterministic,
 // encouraging practice guidance, not a claim about batting performance.
+// Descriptive coverage, not a skill score or measured contact assessment.
+function practiceCoverage(match){
+ const summary=trainingSummary(match);
+ const calculate=player=>{
+  const practiced=player.zones.filter(z=>z.swings>0).length;
+  const least=Math.min(...player.zones.map(z=>z.swings));
+  const most=Math.max(...player.zones.map(z=>z.swings));
+  return {name:player.name,team:player.team,swings:player.swings,
+   practicedZones:practiced,totalZones:9,unpracticedZones:9-practiced,
+   minimumZoneReps:least,maximumZoneReps:most,
+   nextStep:practiced===9?'All nine zones have at least one recorded tee swing. Keep practicing with controlled contact.':
+    'Practice '+(9-practiced)+' unvisited net zone'+(9-practiced===1?'':'s')+' to cover the full 3×3 grid.'};
+ };
+ return {home:calculate(summary.home),away:calculate(summary.away)};
+}
 function nextZoneDrills(match){
  const summary=trainingSummary(match);
  const choose=player=>{
@@ -273,6 +288,6 @@ function validateMatch(m){
  }
  return {ok:true,reason:null};
 }
-const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv,nextZoneDrills};
+const api={createProfile,newMatch,recordSwing,currentTurn,scoreRuns,validateMatch,resolveSimulatedOutcome,boxScore,postgameRecap,recentPlays,trainingSummary,practiceCsv,nextZoneDrills,practiceCoverage};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;
 if(typeof window!=='undefined')window.HitLabMultiplayer=api;
