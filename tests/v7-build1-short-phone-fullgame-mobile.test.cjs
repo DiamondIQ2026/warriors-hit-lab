@@ -40,7 +40,7 @@ async function swing(page,outcome='out',zone=4,contact='medium',first=false){
  await page.locator('#zones button').nth(zone).tap();
  await page.locator('.contact-quality-options button[data-contact="'+contact+'"]').tap();
  await page.locator('#outcome').selectOption(outcome);
- const button=page.locator(first?'#record':'#recordAfterChoices');
+ const button=page.locator('#record');
  assert.equal(await button.isEnabled(),true);
  await button.tap();
  const after=await read(page);
@@ -48,7 +48,8 @@ async function swing(page,outcome='out',zone=4,contact='medium',first=false){
  assert.equal(after.realSwings[side],before.realSwings[side]+1,'correct side real swing count');
  assert.equal(after.atBats.at(-1).outcome,outcome);
  assert.equal(after.atBats.at(-1).power,contact);
- assert.equal(await page.locator('#recordAfterChoices').isDisabled(),true,'no duplicate swing without a new net zone');
+ assert.equal(await page.locator('#record').isDisabled(),true,'no duplicate swing without a new net zone');
+ assert.equal(await page.locator('#recordAfterChoices').count(),0,'legacy duplicate remains absent');
  return after;
 }
 async function threeOuts(page,first=false){
