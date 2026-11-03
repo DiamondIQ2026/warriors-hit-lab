@@ -23,7 +23,7 @@ for(const [engine,name] of [[chromium,'Chromium'],[webkit,'WebKit']]){
     window.HitLabMultiplayer.resolveSimulatedOutcome=()=> 'out';
     document.getElementById('outcome').value='homer';
    });
-   await page.locator('#recordAfterChoices').tap();
+   await page.locator('#record').tap();
    const saved=await page.evaluate(key=>JSON.parse(localStorage.getItem(key)),KEY);
    assert.equal(saved.atBats.length,1);
    assert.equal(saved.atBats[0].outcome,'out');
