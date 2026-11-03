@@ -57,6 +57,16 @@ const fs=require('node:fs');
     throw Error('Training summary did not record the live swing');
    if(!await page.locator('#recentPlaysList').textContent().then(t=>t.includes('Simulated DOUBLE')))
     throw Error('Recent swing review did not render simulated outcome');
+   // Integrated practice experience: actual reps, goal progress, zone
+   // coverage, guided drill, achievements and heatmaps in one visual.
+   if(await page.locator('.tee-goal-row').count()!==2)throw Error('Missing per-player goal progress');
+   if(await page.locator('.guided-tee-drill').count()!==2)throw Error('Missing guided zone drills');
+   if(await page.locator('.practice-coverage-row').count()!==2)throw Error('Missing zone coverage overview');
+   if(await page.locator('.tee-milestone-player').count()!==2)throw Error('Missing tee milestones');
+   if(!await page.locator('.tee-milestone-player').first().textContent().then(t=>t.includes('First Rep')))
+    throw Error('First Rep milestone not awarded after actual tee swing');
+   if(!await page.locator('.practice-coverage-row').first().textContent().then(t=>t.includes('1 / 9')))
+    throw Error('Practice coverage not updated');
    await page.screenshot({path:`artifacts/v7-gameplay/gameplay-training-heatmaps-${width}x${height}.png`,fullPage:true});
    if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))
     throw Error('Training heatmap document overflow');
