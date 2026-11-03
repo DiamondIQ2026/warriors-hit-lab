@@ -36,3 +36,9 @@ No merges, deployment, production changes, Pages configuration, Diamond IQ repos
 ## Training analytics visual acceptance
 
 The GitHub Actions `v7-gameplay-mobile-captures` artifact now includes `gameplay-training-heatmaps-375x812.png` and `gameplay-training-heatmaps-390x844.png`. These full-page captures show both nine-zone real-tee heatmaps, the recent recorded-swing review, and live score/lineup panels after a deterministic simulated double. Review the small-screen readability, visual hierarchy, legibility of all 18 cells, and distinction between actual practice and simulated results before approving a merge. The capture job asserts both heatmaps exist, a real tee rep was counted, the recent simulated outcome is labeled, and no horizontal overflow occurred. Screenshots are CI artifacts only; they are not a production deployment.
+
+## Integrated tee-training acceptance candidate
+
+The combined draft chain #169–#176 now contains per-player validated tee repetition counts, nine-zone heatmaps, CSV download, configurable per-player practice goals, guided under-practiced zone drills, distinct-zone coverage, and practice milestones. This branch adds a Chromium/WebKit acceptance test at 375×812 and 390×844 that exercises all seven features in a single real gameplay session, exports CSV, changes a practice goal, reloads the game, checks saved match bytes are unchanged, and verifies no horizontal overflow. The mobile CI screenshot capture now asserts the integrated dashboard components are present and reflect one logged tee repetition.
+
+**Release gate:** Review screenshot artifacts, ensure the training panel remains usable on a small phone, verify user-facing copy distinguishes logged practice from simulated outcomes, and obtain explicit approval before merging or deploying. All training metrics are derived from validated game history; no skill, launch angle, or exit velocity is inferred.
