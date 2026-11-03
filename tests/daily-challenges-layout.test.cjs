@@ -1,0 +1,24 @@
+'use strict';
+const {test}=require('node:test');
+const assert=require('node:assert/strict');
+const fs=require('node:fs');
+const path=require('node:path');
+test('daily challenges is a unique panel immediately above play-by-play on the Play screen',()=>{
+ const html=fs.readFileSync(path.join(__dirname,'..','index.html'),'utf8');
+ const marker='<div class="v6-play-challenges">';
+ const challenge=html.indexOf(marker);
+ const playByPlay=html.indexOf('📋 Play-by-play');
+ const pregame=html.indexOf('id="pregame"');
+ const active=html.indexOf('id="activeGame"');
+ assert.ok(challenge>active,'daily challenges must follow gameplay');
+ assert.ok(playByPlay>challenge,'daily challenges must precede play-by-play');
+ assert.equal(html.indexOf(marker,challenge+1),-1,'daily challenges must not duplicate');
+ assert.equal(html.indexOf('id="playDailyChallenges"',challenge),challenge+html.slice(challenge).indexOf('id="playDailyChallenges"'));
+ assert.equal((html.match(/id="playDailyChallenges"/g)||[]).length,1);
+ assert.equal((html.match(/id="log"/g)||[]).length,1);
+ assert.ok(pregame<active,'setup must remain before active gameplay');
+ const between=html.slice(challenge,playByPlay);
+ assert.ok(between.includes('id="playDailyChallenges"'));
+ assert.ok(!between.includes('id="pregame"'));
+ assert.ok(!between.includes('id="activeGame"'));
+});
