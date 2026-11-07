@@ -52,7 +52,7 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
      await page.locator('#turn').tap();
      await page.locator('#zones button').nth(4).tap();
      await page.locator('#outcome').selectOption('single');
-     await page.locator('#recordAfterChoices').tap();
+     await page.locator('#record').tap();
      // Away scores once; all remaining swings are outs. Home loses 0-1.
      const expected=innings*6+1;
      for(let index=1;index<expected;index++){
@@ -70,7 +70,7 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
        document.querySelector('#zones button:nth-child(5)').click();
        document.getElementById('outcome').value='out';
        document.getElementById('outcome').dispatchEvent(new Event('change',{bubbles:true}));
-       document.getElementById('recordAfterChoices').click();
+       document.getElementById('record').click();
       });
      }
      const result=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
