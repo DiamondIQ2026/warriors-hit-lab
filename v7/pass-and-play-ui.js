@@ -2,6 +2,7 @@
 (()=>{
  const api=window.HitLabMultiplayer;
  const KEY='warriors-hit-lab-v7-multiplayer-prototype';
+ // Difficulty is fixed per match, saved with V7 state, and defaults to Standard for older V7 saves.
  // Deterministic outcome overrides are permitted only on loopback QA hosts.
  const localQaHost=['localhost','127.0.0.1','[::1]'].includes(window.location.hostname);
  const $=id=>document.getElementById(id);
@@ -286,7 +287,7 @@
   try{
    const home=api.createProfile({id:'dad',name:$('homeName').value,team:$('homeTeam').value,hand:$('homeHand').value,lineup:getNames('homeLineup')});
    const away=api.createProfile({id:'maddon',name:$('awayName').value,team:$('awayTeam').value,hand:$('awayHand').value,lineup:getNames('awayLineup')});
-   match=api.newMatch(home,away,Number($('innings').value));lastAnimatedAtBatCount=0;zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
+   match=api.newMatch(home,away,Number($('innings').value),$('difficulty').value);lastAnimatedAtBatCount=0;zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
    $('setupError').textContent='';persist();render();
   }catch(e){$('setupError').textContent=e.message;}
  };
