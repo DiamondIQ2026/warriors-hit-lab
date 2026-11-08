@@ -51,9 +51,9 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
      // Real user touch for the first rep, then DOM clicks for faster full-game regression.
      await page.locator('#turn').tap();
      await page.locator('#zones button').nth(4).tap();
-     await page.locator('#outcome').selectOption('single');
+     await page.locator('#outcome').selectOption('homer');
      await page.locator('#record').tap();
-     // Away scores once; all remaining swings are outs. Home loses 0-1.
+     // A solo home run establishes a 1-0 away lead; all remaining swings are outs. A single would leave a 0-0 tie and correctly trigger extra innings.
      const expected=innings*6+1;
      for(let index=1;index<expected;index++){
       if(index===Math.floor(expected/2)){
