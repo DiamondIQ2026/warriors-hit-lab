@@ -59,7 +59,17 @@
   panel.append(heading,detail,exportButton,discard);
   $('setup').appendChild(panel);$('start').disabled=true;
  }
- function persist(){try{localStorage.setItem(KEY,JSON.stringify(match));}catch{$('event').textContent='Prototype save failed; export a backup.';}}
+ function persist(candidate){
+  const bytes=JSON.stringify(candidate);
+  try{
+   localStorage.setItem(KEY,bytes);
+   if(localStorage.getItem(KEY)!==bytes)throw Error('V7 save verification failed');
+   return true;
+  }catch{
+   $('event').textContent='V7 game could not be saved. Swing not counted; free storage and try again.';
+   return false;
+  }
+ }
  function active(){return match.half==='top'?match.away:match.home}
  $('exportPracticeCsv').addEventListener('click',()=>{
   if(!match)return;
@@ -287,8 +297,10 @@
   try{
    const home=api.createProfile({id:'dad',name:$('homeName').value,team:$('homeTeam').value,hand:$('homeHand').value,lineup:getNames('homeLineup')});
    const away=api.createProfile({id:'maddon',name:$('awayName').value,team:$('awayTeam').value,hand:$('awayHand').value,lineup:getNames('awayLineup')});
-   match=api.newMatch(home,away,Number($('innings').value),$('difficulty').value);lastAnimatedAtBatCount=0;zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
-   $('setupError').textContent='';persist();render();
+   const candidate=api.newMatch(home,away,Number($('innings').value),$('difficulty').value);
+   if(!persist(candidate)){$('setupError').textContent='Game not started: V7 save unavailable.';return;}
+   match=candidate;lastAnimatedAtBatCount=0;zone=null;lastTurn=null;acknowledge=false;$('event').textContent='';
+   $('setupError').textContent='';render();
   }catch(e){$('setupError').textContent=e.message;}
  };
  const zoneRoot=$('zones');
@@ -313,6 +325,7 @@
    if(executed.observation)window.__hitLabLastTransition=executed.observation;
    if(executed.warning){window.__hitLabTransitionWarning=executed.warning;console.warn('V7 transition observation:',executed.warning);}
    const updatedMatch=executed.next;
+   if(!persist(updatedMatch))return;
    match=updatedMatch;
    $('event').textContent='Real tee swing recorded · Net zone '+(zones.indexOf(zone)+1)+' of 9 · '+$('power').value+' contact. Simulated game result: '+simulated+'.';
    $('viewFlight').dataset.url='./preview.html?'+new URLSearchParams({zone,contact:$('power').value,outcome:simulated,hand:(old.playerId===match.home.id?match.home:match.away).hand}).toString();
@@ -320,7 +333,7 @@
    const handoffRequired=old.playerId!==api.currentTurn(match).playerId||old.half!==match.half;
    if(handoffRequired)acknowledge=false;
    zone=null;for(const el of zoneRoot.children){el.classList.remove('active');el.setAttribute('aria-pressed','false');}
-   persist();render();
+   render();
    // After a third out or a final result, show the live scoreboard and handoff
    // instead of leaving the next player stranded below the fold.
    if(handoffRequired||match.status==='final')window.scrollTo(0,0);
