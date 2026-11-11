@@ -89,3 +89,46 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
   }
  }
 }
+
+for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
+ for(const [width,height] of [[375,667],[390,844]]){
+  test(`${browserName} ${width}x${height} V7 failed-save retry keeps swing, score, turn and legacy bytes intact`,async()=>{
+   const browser=await browserType.launch();
+   const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});
+   const page=await context.newPage();
+   const errors=[];page.on('pageerror',e=>errors.push(e.message));
+   try{
+    await page.goto(URL);
+    await page.evaluate(()=>localStorage.setItem('v6.3-preserve-test','legacy-untouched'));
+    await page.locator('#innings').selectOption('3');
+    await page.locator('#difficulty').selectOption('rookie');
+    await page.locator('#start').click();
+    await page.locator('#turn').click();
+    await page.locator('#zones button').nth(4).click();
+    const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
+    await page.evaluate(k=>{
+     const original=Storage.prototype.setItem;
+     window.__restoreV7SetItem=()=>{Storage.prototype.setItem=original;};
+     Storage.prototype.setItem=function(key,value){
+      if(key===k)throw new DOMException('Storage full','QuotaExceededError');
+      return original.call(this,key,value);
+     };
+    },KEY);
+    await page.locator('#record').click();
+    assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before);
+    assert.match(await page.locator('#event').innerText(),/Swing not counted/);
+    assert.equal(await page.locator('#record').isEnabled(),true,'retry remains available');
+    await page.evaluate(()=>window.__restoreV7SetItem());
+    await page.locator('#record').click();
+    const after=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
+    assert.equal(after.atBats.length,1,'exactly one committed tee rep');
+    assert.equal(after.realSwings[after.away.id],1);
+    assert.equal(engine.validateMatch(after).ok,true);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('v6.3-preserve-test')),'legacy-untouched');
+    await page.reload();
+    assert.equal(await page.evaluate(k=>JSON.parse(localStorage.getItem(k)).atBats.length,KEY),1);
+    assert.deepEqual(errors,[]);
+   }finally{await context.close();await browser.close();}
+  });
+ }
+}
