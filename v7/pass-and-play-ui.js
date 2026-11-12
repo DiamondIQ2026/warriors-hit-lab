@@ -51,8 +51,15 @@
   discard.id='saveRecoveryDiscard';discard.textContent='DISCARD INVALID V7 MATCH';
   discard.onclick=()=>{
    if(!confirm('Discard only the invalid V7 multiplayer match? Export it first if you want a backup. Other saves will not be touched.'))return;
-   try{localStorage.removeItem(KEY);}
-   catch{detail.textContent='Could not clear the invalid V7 save. No data was changed.';return;}
+   // Keep recovery locked until the invalid V7 bytes are verifiably absent.
+   // Some storage implementations can silently ignore removal without throwing.
+   try{
+    localStorage.removeItem(KEY);
+    if(localStorage.getItem(KEY)!==null)throw Error('V7 recovery removal verification failed');
+   }catch{
+    detail.textContent='Could not verify removal of the invalid V7 save. The recovery panel remains locked; export the original and retry.';
+    return;
+   }
    panel.remove();$('start').disabled=false;
    $('setupError').textContent='Invalid V7 match discarded. You can start a new match.';
   };
