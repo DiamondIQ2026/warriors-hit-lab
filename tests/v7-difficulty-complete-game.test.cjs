@@ -132,3 +132,52 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
   });
  }
 }
+
+for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]){
+ for(const [width,height] of [[375,667],[390,844]]){
+  test(`${browserName} ${width}x${height} V7 reset failure preserves scored Family Rivalry and successful retry isolates legacy saves`,async()=>{
+   const browser=await browserType.launch();
+   const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});
+   const page=await context.newPage();
+   const errors=[];page.on('pageerror',e=>errors.push(e.message));
+   page.on('dialog',dialog=>dialog.accept());
+   try{
+    await page.goto(URL);
+    await page.evaluate(()=>localStorage.setItem('v6.3-preserve-test','legacy-untouched'));
+    await page.locator('#innings').selectOption('3');
+    await page.locator('#start').click();
+    // Record a genuine skill-derived swing and validate the replayed game state.
+    await page.locator('#turn').click();
+    await page.locator('#zones button').nth(4).click();
+    await page.locator('#record').click();
+    const before=await page.evaluate(k=>localStorage.getItem(k),KEY);
+    const saved=JSON.parse(before);
+    assert.equal(saved.atBats.length,1);
+    assert.equal(engine.validateMatch(saved).ok,true);
+    await page.evaluate(k=>{
+     const original=Storage.prototype.removeItem;
+     window.__restoreV7RemoveItem=()=>{Storage.prototype.removeItem=original;};
+     Storage.prototype.removeItem=function(key){
+      if(key===k)throw new DOMException('Storage unavailable','SecurityError');
+      return original.call(this,key);
+     };
+    },KEY);
+    await page.locator('#reset').click();
+    assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before,'failed reset keeps saved bytes');
+    assert.match(await page.locator('#event').innerText(),/could not be reset/);
+    assert.equal(await page.locator('#game').isVisible(),true,'failed reset keeps current game playable');
+    await page.reload();
+    assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),before,'failed reset survives reload');
+    assert.equal(await page.locator('#game').isVisible(),true);
+    // A second reset with working storage must remove only the V7 match.
+    await page.locator('#reset').click();
+    assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),null);
+    assert.equal(await page.locator('#setup').isVisible(),true);
+    assert.equal(await page.evaluate(()=>localStorage.getItem('v6.3-preserve-test')),'legacy-untouched');
+    await page.reload();
+    assert.equal(await page.locator('#setup').isVisible(),true);
+    assert.deepEqual(errors,[]);
+   }finally{await context.close();await browser.close();}
+  });
+ }
+}
