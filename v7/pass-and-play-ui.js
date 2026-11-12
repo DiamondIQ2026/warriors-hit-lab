@@ -357,7 +357,17 @@
  };
  $('reset').onclick=()=>{
   if(!confirm('Reset this V7 multiplayer prototype? Existing solo careers are untouched.'))return;
-  match=null;zone=null;lastTurn=null;acknowledge=false;localStorage.removeItem(KEY);render();
+  // Never discard the in-memory game until its V7-only save has actually cleared.
+  // A failed removal must leave the full game playable and recoverable.
+  try{
+   localStorage.removeItem(KEY);
+   if(localStorage.getItem(KEY)!==null)throw Error('V7 reset verification failed');
+  }catch{
+   $('event').textContent='V7 match could not be reset. Saved game preserved; free storage or retry.';
+   return;
+  }
+  match=null;zone=null;lastTurn=null;acknowledge=false;lastAnimatedAtBatCount=0;
+  $('event').textContent='';render();
  };
  setDefaults();
  try{
