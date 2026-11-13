@@ -4,15 +4,17 @@
 const ZONES=['UL','UC','UR','ML','MC','MR','LL','LC','LR'];
 const POWERS=['soft','medium','hard'];
 const OUTCOMES=['out','single','double','triple','homer'];
+const DIFFICULTIES=['rookie','standard','legend'];
+function difficultyOf(match){return match.difficulty===undefined?'standard':match.difficulty;}
 function createProfile({id,name,team,hand='R',lineup}){
  if(!id||!name?.trim()||!team?.trim()||!['L','R'].includes(hand))throw Error('Invalid player profile');
  const names=lineup||Array.from({length:9},(_,i)=>'Batter '+(i+1));
  if(!Array.isArray(names)||names.length!==9||names.some(x=>!String(x).trim()))throw Error('Nine lineup slots required');
  return {id:String(id),name:name.trim(),team:team.trim(),hand,lineup:names.map(String)};
 }
-function newMatch(home,away,innings=3){
- if(!home||!away||home.id===away.id||home.team.toLowerCase()===away.team.toLowerCase()||![3,6,9].includes(innings))throw Error('Invalid matchup');
- return {version:1,home,away,innings,inning:1,half:'top',outs:0,bases:[false,false,false],score:{[home.id]:0,[away.id]:0},battingOrder:{[home.id]:0,[away.id]:0},atBats:[],realSwings:{[home.id]:0,[away.id]:0},status:'active',winner:null};
+function newMatch(home,away,innings=3,difficulty='standard'){
+ if(!home||!away||home.id===away.id||home.team.toLowerCase()===away.team.toLowerCase()||![3,6,9].includes(innings)||!DIFFICULTIES.includes(difficulty))throw Error('Invalid matchup');
+ return {version:1,home,away,innings,difficulty,inning:1,half:'top',outs:0,bases:[false,false,false],score:{[home.id]:0,[away.id]:0},battingOrder:{[home.id]:0,[away.id]:0},atBats:[],realSwings:{[home.id]:0,[away.id]:0},status:'active',winner:null};
 }
 function offense(m){return m.half==='top'?m.away:m.home}
 function scoreRuns(bases,outcome){
@@ -36,7 +38,9 @@ function resolveSimulatedOutcome(match,{zone,power}){
  const row=Math.floor(index/3),col=index%3;
  const centrality=1-(Math.abs(row-1)+Math.abs(col-1))/2;
  const handedSide=(player.hand==='L'&&col===2)||(player.hand==='R'&&col===0);
- const chance=Math.min(.85,({soft:.37,medium:.51,hard:.61}[power])+.16*centrality+(handedSide?.025:0));
+ const skillShift={rookie:.16,standard:0,legend:-.16}[difficultyOf(match)];
+ if(skillShift===undefined)throw Error('Invalid game difficulty');
+ const chance=Math.max(.08,Math.min(.9,({soft:.37,medium:.51,hard:.61}[power])+.16*centrality+(handedSide?.025:0)+skillShift));
  const seed=[player.id,player.hand,zone,power,match.inning,match.half,match.outs,
   match.atBats.length,match.battingOrder[player.id],match.score[player.id],
   match.score[player.id===match.home.id?match.away.id:match.home.id],...match.bases.map(Number)].join('|');
@@ -245,6 +249,7 @@ function validateMatch(m){
   Array.isArray(p.lineup)&&p.lineup.length===9&&p.lineup.every(n=>typeof n==='string'&&n.trim());
  if(!profile(m.home)||!profile(m.away)||m.home.id===m.away.id||m.home.team.toLowerCase()===m.away.team.toLowerCase())
   return fail('Invalid player or lineup');
+ if(!DIFFICULTIES.includes(difficultyOf(m)))return fail('Invalid game difficulty');
  if(![3,6,9].includes(m.innings)||!Number.isSafeInteger(m.inning)||m.inning<1||
   !['top','bottom'].includes(m.half)||!Number.isInteger(m.outs)||m.outs<0||m.outs>2)
   return fail('Invalid inning or outs');
@@ -283,7 +288,7 @@ function validateMatch(m){
  // so replaying a full 10,000-entry history otherwise has quadratic cost.
  let replay;
  try{
-  replay=newMatch(m.home,m.away,m.innings);
+  replay=newMatch(m.home,m.away,m.innings,difficultyOf(m));
   for(const a of m.atBats){
    if(replay.status==='final')return fail('Recorded swing after game ended');
    replay=recordSwing(replay,{zone:a.zone,power:a.power,outcome:a.outcome});
