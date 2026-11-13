@@ -252,6 +252,28 @@
   $('homeScore').querySelector('.score-points').textContent=match.score[match.home.id];
   const recap=api.postgameRecap(match);
   $('postgameRecap').classList.toggle('hidden',!recap);
+  // A completed Family Rivalry game can be replayed without touching other saves.
+  let rematch=$('rematch');
+  if(!rematch){
+   rematch=document.createElement('button');
+   rematch.id='rematch';rematch.type='button';rematch.className='primary';
+   rematch.textContent='PLAY REMATCH · SAME TEAMS';
+   rematch.addEventListener('click',()=>{
+    if(!match||match.status!=='final')return;
+    if(!confirm('Start a new Family Rivalry game with the same teams, lineups, innings and difficulty? Export the final game first if you want to keep it.'))return;
+    try{
+     const next=api.newMatch(match.home,match.away,match.innings,match.difficulty||'standard');
+     if(!persist(next))return; // Never discard final game in memory on a failed write.
+     match=next;zone=null;acknowledge=false;lastTurn=null;lastAnimatedAtBatCount=0;
+     $('event').textContent='New rematch saved. Pass the phone to the away player.';
+     for(const button of zoneRoot.children){button.classList.remove('active');button.setAttribute('aria-pressed','false');}
+     render();window.scrollTo(0,0);
+    }catch(e){$('event').textContent='Rematch unavailable: '+e.message;}
+   });
+   $('postgameRecap').appendChild(rematch);
+  }
+  rematch.hidden=!recap;
+
   if(recap){
    $('recapWinner').textContent=recap.winner+' WIN!';
    $('recapScore').textContent='FINAL · '+recap.winner+' '+recap.winnerRuns+' — '+recap.loser+' '+recap.loserRuns+' · '+recap.innings+' inning'+(recap.innings===1?'':'s');
