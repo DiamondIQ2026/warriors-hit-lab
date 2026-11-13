@@ -9,7 +9,7 @@ const URL='http://127.0.0.1:8765/v7/multiplayer.html';
 const KEY='warriors-hit-lab-v7-multiplayer-prototype';
 for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]])
  for(const [width,height] of [[375,667],[390,844]])
-  test(`${browserName} ${width}x${height}: genuine skill game, final, safe rematch and reload`,{timeout:180000},async()=>{
+  test(`${browserName} ${width}x${height}: genuine skill game, final, safe rematch and reload`,{timeout:360000},async()=>{
    const browser=await browserType.launch();
    const context=await browser.newContext({viewport:{width,height},isMobile:true,hasTouch:true});
    const page=await context.newPage(),errors=[];
@@ -28,12 +28,12 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
      if(priorHalf!==null&&priorHalf!==state.half)handoffs++;
      priorHalf=state.half;
      const z=i%9;seen.add(z);
-     await page.evaluate(index=>{
-      const turn=document.getElementById('turn');
-      if(!turn.disabled)turn.click();
-      document.querySelectorAll('#zones button')[index].click();
-      document.getElementById('record').click();
-     },z);
+     const turn=page.locator('#turn');
+     if(await turn.isEnabled())await turn.tap();
+     await page.locator('#zones button').nth(z).tap();
+     const record=page.locator('#record');
+     await record.scrollIntoViewIfNeeded();
+     await record.tap();
     }
     assert.ok(final,'skill-derived game reaches final');
     assert.equal(seen.size,9);
@@ -59,11 +59,11 @@ for(const [browserName,browserType] of [['Chromium',chromium],['WebKit',webkit]]
     await page.reload();
     assert.equal(await page.evaluate(k=>localStorage.getItem(k),KEY),saved);
     assert.equal(await page.evaluate(()=>localStorage.getItem('v6.3-preserve-test')),'original');
-    await page.evaluate(()=>{
-     document.getElementById('turn').click();
-     document.querySelector('#zones button').click();
-     document.getElementById('record').click();
-    });
+    const rematchTurn=page.locator('#turn');
+    if(await rematchTurn.isEnabled())await rematchTurn.tap();
+    await page.locator('#zones button').first().tap();
+    await page.locator('#record').scrollIntoViewIfNeeded();
+    await page.locator('#record').tap();
     const after=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)),KEY);
     assert.equal(after.atBats.length,1);
     assert.equal(engine.validateMatch(after).ok,true);
